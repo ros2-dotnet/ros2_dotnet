@@ -1,0 +1,106 @@
+using System;
+using System.Runtime.InteropServices;
+
+using ROS2dotnetUtils;
+
+namespace @(package_name)
+{
+namespace @(subfolder)
+{
+
+[StructLayout(LayoutKind.Sequential, CharSet=CharSet.Ansi)]
+public struct @(type_name)__MessageStruct : IMessageStruct {
+@[for field in spec.fields]@
+
+@[    if field.type.is_array]@
+// TODO(esteve): Arrays are not supported
+@[    else]@
+@[        if field.type.is_primitive_type()]@
+    public @(get_dotnet_type(field.type)) @(upperfirst(field.name)) { get; set; }
+@[        else]@
+// TODO(esteve): Nested types are not supported
+@[        end if]@
+@[    end if]@
+@[end for]@
+}
+
+public class @(type_name) : IMessage {
+   private static readonly DllLoadUtils dllLoadUtils;
+
+   static @(type_name)()
+   {
+        dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
+        try {
+            IntPtr nativelibrary = dllLoadUtils.LoadLibrary("@(spec.base_type.pkg_name)_@(type_name)__" + RCLdotnetProxy.GetTypesupportIdentifier());
+
+            IntPtr native_get_from_dotnet_converter_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_get_from_dotnet_converter");
+            Console.WriteLine("MSG @(spec.base_type.pkg_name)_@(type_name) PTR 1 " + native_get_from_dotnet_converter_ptr);
+            IntPtr native_get_to_dotnet_converter_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_get_to_dotnet_converter");
+            Console.WriteLine("MSG @(spec.base_type.pkg_name)_@(type_name) PTR 2 " + native_get_to_dotnet_converter_ptr);
+            IntPtr native_get_typesupport_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_get_typesupport");
+            Console.WriteLine("MSG @(spec.base_type.pkg_name)_@(type_name) PTR 3 " + native_get_typesupport_ptr);
+
+            @(type_name).native_get_from_dotnet_converter = Marshal.GetDelegateForFunctionPointer<NativeGetFromDotnetConverterType>(native_get_from_dotnet_converter_ptr);
+            @(type_name).native_get_to_dotnet_converter = Marshal.GetDelegateForFunctionPointer<NativeGetToDotnetConverterType>(native_get_to_dotnet_converter_ptr);
+            @(type_name).native_get_typesupport = Marshal.GetDelegateForFunctionPointer<NativeGetTypeSupportType>(native_get_typesupport_ptr);
+        } catch (UnsatisfiedLinkError e) {
+            System.Console.WriteLine("Native code library failed to load.\n" + e);
+            Environment.Exit(1);
+        }
+    }
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate IntPtr NativeGetFromDotnetConverterType();
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate IntPtr NativeGetToDotnetConverterType();
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate IntPtr NativeGetTypeSupportType();
+
+    private static NativeGetFromDotnetConverterType native_get_from_dotnet_converter = null;
+
+    private static NativeGetToDotnetConverterType native_get_to_dotnet_converter = null;
+
+    private static NativeGetTypeSupportType native_get_typesupport = null;
+
+    public static IntPtr getFromDotnetConverter() {
+        return native_get_from_dotnet_converter();
+    }
+
+    public static IntPtr getToDotnetConverter() {
+        return native_get_to_dotnet_converter();
+    }
+
+    public static IntPtr getTypeSupport() {
+        return native_get_typesupport();
+    }
+
+    private @(type_name)__MessageStruct MessageStruct_;
+
+    public IMessageStruct MessageStruct { get { return MessageStruct_;}  }
+
+@[for constant in spec.constants]@
+    public static readonly @(get_builtin_dotnet_type(constant.type)) @(constant.name) = @(constant_value_to_dotnet(constant.type, constant.value));
+@[end for]@
+
+@[for field in spec.fields]@
+
+@[    if field.type.is_array]@
+// TODO(esteve): Arrays are not supported
+@[    else]@
+@[        if field.type.is_primitive_type()]@
+    public @(get_dotnet_type(field.type)) @(upperfirst(field.name)) {
+        get { return MessageStruct_.@(upperfirst(field.name)); }
+        set { MessageStruct_.@(upperfirst(field.name)) = value; }
+    }
+@[        else]@
+// TODO(esteve): Nested types are not supported
+@[        end if]@
+@[    end if]@
+@[end for]@
+}
+
+} // @(subfolder)
+
+} // @(package_name)

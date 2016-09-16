@@ -1,0 +1,31 @@
+# generated from ament_cmake_export_assemblies/cmake/template/ament_cmake_export_assemblies.cmake.in
+
+set(_exported_assemblies_dll "@_AMENT_CMAKE_EXPORT_ASSEMBLIES_DLL@")
+
+# append absolute assemblies to @PROJECT_NAME@_ASSEMBLIES_DLL
+# warn about not existing paths
+if(NOT "${_exported_assemblies_dll} " STREQUAL " ")
+  find_package(ament_cmake_core QUIET REQUIRED)
+  foreach(_exported_assembly_dll ${_exported_assemblies_dll})
+    if(NOT EXISTS "${_exported_assembly_dll}")
+      message(WARNING "Package '@PROJECT_NAME@' exports the DLL assembly '${_exported_assembly_dll}' which doesn't exist")
+    endif()
+    normalize_path(_exported_assembly_dll "${_exported_assembly_dll}")
+    list(APPEND @PROJECT_NAME@_ASSEMBLIES_DLL "${_exported_assembly_dll}")
+  endforeach()
+endif()
+
+set(_exported_assemblies_nuget "@_AMENT_CMAKE_EXPORT_ASSEMBLIES_NUGET@")
+
+# append absolute assemblies to @PROJECT_NAME@_ASSEMBLIES_NUGET
+# warn about not existing paths
+if(NOT "${_exported_assemblies_nuget} " STREQUAL " ")
+  find_package(ament_cmake_core QUIET REQUIRED)
+  foreach(_exported_assembly_nuget ${_exported_assemblies_nuget})
+    if(NOT EXISTS "${_exported_assembly_nuget}")
+      message(WARNING "Package '@PROJECT_NAME@' exports the NuGet assembly '${_exported_assembly_nuget}' which doesn't exist")
+    endif()
+    normalize_path(_exported_assembly_nuget "${_exported_assembly_nuget}")
+    list(APPEND @PROJECT_NAME@_ASSEMBLIES_NUGET "${_exported_assembly_nuget}")
+  endforeach()
+endif()
