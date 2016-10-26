@@ -61,11 +61,7 @@ public class Node
     Type typeParametertype = typeof(T);
     MethodInfo m = typeParametertype.GetMethod("getTypeSupport");
 
-    Console.WriteLine("TYPE: " + typeParametertype);
-    Console.WriteLine("METH INFO: " + (m == null));
-
     IntPtr typesupport = (IntPtr)m.Invoke(null, new object[] {});
-    Console.WriteLine("TYPESUPPORT PTR: " + typesupport);
     IntPtr publisher_handle = native_rcl_create_publisher_handle(node_handle_, topic, typesupport);
     Publisher<T> publisher = new Publisher<T>(node_handle_, publisher_handle);
     return publisher;

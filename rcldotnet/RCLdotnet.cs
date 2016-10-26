@@ -65,7 +65,6 @@ public class RCLdotnet
 
   public static void Init()
   {
-    Console.WriteLine("No RMW implementation found INIT");
     lock(syncLock)
     {
       if (!initialized) {
@@ -97,17 +96,11 @@ public class RCLdotnet
     lock(syncLock) {
       DllLoadUtils dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
       string library_name = "rcldotnet__" + rmwImplementation;
-      System.Console.WriteLine("ABOUT TO LOAD: " + library_name);
       IntPtr pDll = dllLoadUtils.LoadLibrary(library_name);
-      System.Console.WriteLine("PTR 2: " + pDll);
       IntPtr native_rcl_init_ptr = dllLoadUtils.GetProcAddress(pDll, "native_rcl_init");
-      System.Console.WriteLine("PTR 3: " + native_rcl_init_ptr);
       IntPtr native_rcl_get_rmw_identifier_ptr = dllLoadUtils.GetProcAddress(pDll, "native_rcl_get_rmw_identifier");
-      System.Console.WriteLine("PTR 4: " + native_rcl_get_rmw_identifier_ptr);
       IntPtr native_rcl_ok_ptr = dllLoadUtils.GetProcAddress(pDll, "native_rcl_ok");
-      System.Console.WriteLine("PTR 5: " + native_rcl_ok_ptr);
       IntPtr native_rcl_create_node_handle_ptr = dllLoadUtils.GetProcAddress(pDll, "native_rcl_create_node_handle");
-      System.Console.WriteLine("PTR 6: " + native_rcl_create_node_handle_ptr);
 
       RCLdotnet.native_rcl_init = Marshal.GetDelegateForFunctionPointer<NativeRCLInitType>(native_rcl_init_ptr);
       RCLdotnet.native_rcl_get_rmw_identifier = Marshal.GetDelegateForFunctionPointer<NativeRCLGetRMWIdentifierType>(native_rcl_get_rmw_identifier_ptr);

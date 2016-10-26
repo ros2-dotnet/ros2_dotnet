@@ -34,11 +34,8 @@ public class @(type_name) : IMessage {
             IntPtr nativelibrary = dllLoadUtils.LoadLibrary("@(spec.base_type.pkg_name)_@(type_name)__" + RCLdotnetProxy.GetTypesupportIdentifier());
 
             IntPtr native_get_from_dotnet_converter_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_get_from_dotnet_converter");
-            Console.WriteLine("MSG @(spec.base_type.pkg_name)_@(type_name) PTR 1 " + native_get_from_dotnet_converter_ptr);
             IntPtr native_get_to_dotnet_converter_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_get_to_dotnet_converter");
-            Console.WriteLine("MSG @(spec.base_type.pkg_name)_@(type_name) PTR 2 " + native_get_to_dotnet_converter_ptr);
             IntPtr native_get_typesupport_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_get_typesupport");
-            Console.WriteLine("MSG @(spec.base_type.pkg_name)_@(type_name) PTR 3 " + native_get_typesupport_ptr);
 
             @(type_name).native_get_from_dotnet_converter = Marshal.GetDelegateForFunctionPointer<NativeGetFromDotnetConverterType>(native_get_from_dotnet_converter_ptr);
             @(type_name).native_get_to_dotnet_converter = Marshal.GetDelegateForFunctionPointer<NativeGetToDotnetConverterType>(native_get_to_dotnet_converter_ptr);

@@ -42,10 +42,8 @@ public class PublisherDelegates
     dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
     try {
       IntPtr nativelibrary = dllLoadUtils.LoadLibrary("rcldotnet_publisher__" + RCLdotnet.GetRMWIdentifier());
-      Console.WriteLine("PTR PUB nativelibrary: " + nativelibrary);
 
       IntPtr native_rcl_publish_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_rcl_publish");
-      Console.WriteLine("PTR PUB native_rcl_publish_ptr: " + native_rcl_publish_ptr);
 
       PublisherDelegates.native_rcl_publish = Marshal.GetDelegateForFunctionPointer<NativeRCLPublishType>(native_rcl_publish_ptr);
     } catch (UnsatisfiedLinkError e) {
@@ -75,16 +73,11 @@ public class Publisher<T> where T : IMessage
     Type typeParametertype = typeof(T);
     MethodInfo m = typeParametertype.GetMethod("getFromDotnetConverter");
     IntPtr converter_ptr = (IntPtr)m.Invoke(null, new object[] {});
-    Console.WriteLine("CONVERTER PTR: " + converter_ptr.ToInt64());
-    Console.WriteLine("PUB PTR: " + publisher_handle_.ToInt64());
 
     int msg_struct_size = Marshal.SizeOf(msg.MessageStruct);
     IntPtr pnt = Marshal.AllocHGlobal(msg_struct_size);
     Marshal.StructureToPtr(msg.MessageStruct, pnt, false);
 
-    Console.WriteLine("SIZE OF: " + msg_struct_size);
-
-    //PublisherDelegates.native_rcl_publish(publisher_handle_, msg.MessageStruct, converter_ptr);
     PublisherDelegates.native_rcl_publish(publisher_handle_, pnt, converter_ptr);
 
     Marshal.FreeHGlobal(pnt);
