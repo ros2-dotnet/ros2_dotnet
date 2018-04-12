@@ -1,0 +1,37 @@
+repositories:
+  ament/ament_cmake:
+    type: git
+    url: https://github.com/ament/ament_cmake.git
+    version: master
+  ament/ament_index:
+    type: git
+    url: https://github.com/ament/ament_index.git
+    version: master
+  ament/ament_lint:
+    type: git
+    url: https://github.com/ament/ament_lint.git
+    version: master
+  ament/ament_package:
+    type: git
+    url: https://github.com/ament/ament_package.git
+    version: master
+  ament/ament_tools:
+    type: git
+    url: https://github.com/esteve/ament_tools.git
+    version: win32-platform
+  ament/googletest:
+    type: git
+    url: https://github.com/ament/googletest.git
+    version: ros2
+  ament/osrf_pycommon:
+    type: git
+    url: https://github.com/osrf/osrf_pycommon.git
+    version: master
+  ament/uncrustify:
+    type: git
+    url: https://github.com/ament/uncrustify.git
+    version: master
+  ament_dotnet/ament_cmake_export_assemblies:
+    type: git
+    url: https://github.com/esteve/ament_cmake_export_assemblies.git
+    version: master
