@@ -47,8 +47,7 @@ add_dotnet_library(${PROJECT_NAME}_assemblies
   ${_assembly_deps_dll}
 )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/netcoreapp2.0/publish/${PROJECT_NAME}_assemblies.dll
-  DESTINATION lib/${PROJECT_NAME}/dotnet/)
+install_dotnet(${PROJECT_NAME}_assemblies DESTINATION lib/${PROJECT_NAME}/dotnet)
 ament_export_assemblies_dll("lib/${PROJECT_NAME}/dotnet/${PROJECT_NAME}_assemblies.dll")
 
 set(_native_sources "rcldotnet;rcldotnet_node;rcldotnet_publisher")

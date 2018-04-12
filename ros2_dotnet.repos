@@ -31,6 +31,10 @@ repositories:
     type: git
     url: https://github.com/ament/uncrustify.git
     version: master
+  ament_dotnet/ament_cmake_export_assemblies:
+    type: git
+    url: https://github.com/esteve/ament_cmake_export_assemblies.git
+    version: master
   eProsima/Fast-CDR:
     type: git
     url: https://github.com/eProsima/Fast-CDR.git

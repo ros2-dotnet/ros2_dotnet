@@ -1,4 +1,4 @@
-// Copyright 2016 Esteve Fernandez <esteve@apache.org>
+// Copyright 2016-2018 Esteve Fernandez <esteve@apache.org>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -236,7 +236,7 @@ namespace ROS2 {
       RCLdotnetDelegates.native_rcl_wait_set_clear_clients (waitSetHandle);
     }
 
-    private static void WaitSetAqosddSubscription (IntPtr waitSetHandle, IntPtr subscriptionHandle) {
+    private static void WaitSetAddSubscription (IntPtr waitSetHandle, IntPtr subscriptionHandle) {
       RCLdotnetDelegates.native_rcl_wait_set_add_subscription (waitSetHandle, subscriptionHandle);
     }
 

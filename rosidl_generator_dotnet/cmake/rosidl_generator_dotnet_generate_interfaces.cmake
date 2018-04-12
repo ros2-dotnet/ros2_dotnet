@@ -1,4 +1,4 @@
-# Copyright 2016 Esteve Fernandez <esteve@apache.org>
+# Copyright 2016-2018 Esteve Fernandez <esteve@apache.org>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ find_package(DotNETExtra REQUIRED)
 # Get a list of typesupport implementations from valid rmw implementations.
 rosidl_generator_dotnet_get_typesupports(_typesupport_impls)
 
-if("${_typesupport_impls} " STREQUAL " ")
+if(_typesupport_impls STREQUAL "")
   message(WARNING "No valid typesupport for .NET generator. .NET messages will not be generated.")
   return()
 endif()
@@ -101,7 +101,7 @@ foreach(dep ${target_dependencies})
   endif()
 endforeach()
 
-set(generator_arguments_file "${CMAKE_BINARY_DIR}/rosidl_generator_dotnet__arguments.json")
+set(generator_arguments_file "${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_dotnet__arguments.json")
 rosidl_write_generator_arguments(
   "${generator_arguments_file}"
   PACKAGE_NAME "${PROJECT_NAME}"
@@ -313,9 +313,6 @@ add_dotnet_library(${PROJECT_NAME}_assemblies
 
 add_dependencies("${PROJECT_NAME}_assemblies" "${rosidl_generate_interfaces_TARGET}${_target_suffix}")
 
-get_property(_assemblies_nuget_file TARGET "${PROJECT_NAME}_assemblies" PROPERTY "ASSEMBLIES_NUGET_FILE")
-get_property(_assemblies_dll_file TARGET "${PROJECT_NAME}_assemblies" PROPERTY "ASSEMBLIES_DLL_FILE")
-
 if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
   if(NOT _generated_msg_h_files STREQUAL "")
     install(
@@ -325,13 +322,12 @@ if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
   endif()
 
   set(_install_assembly_dir "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}")
-  if(NOT "${_generated_msg_cs_files} " STREQUAL " ")
+  if(NOT _generated_msg_cs_files STREQUAL "")
     list(GET _generated_msg_cs_files 0 _msg_file)
     get_filename_component(_msg_package_dir "${_msg_file}" DIRECTORY)
     get_filename_component(_msg_package_dir "${_msg_package_dir}" DIRECTORY)
 
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/netcoreapp2.0/publish/${PROJECT_NAME}_assemblies.dll
-      DESTINATION "lib/${PROJECT_NAME}/dotnet")
+    install_dotnet(${PROJECT_NAME}_assemblies DESTINATION "lib/${PROJECT_NAME}/dotnet")
     ament_export_assemblies_dll("lib/${PROJECT_NAME}/dotnet/${PROJECT_NAME}_assemblies.dll")
   endif()
 endif()

@@ -1,8 +1,8 @@
 diff --git a/rosidl_default_generators/CMakeLists.txt b/rosidl_default_generators/CMakeLists.txt
-index d6fda02..e616910 100644
+index 67b918a..cb15e4e 100644
 --- a/rosidl_default_generators/CMakeLists.txt
 +++ b/rosidl_default_generators/CMakeLists.txt
-@@ -7,8 +7,7 @@ find_package(ament_cmake REQUIRED)
+@@ -8,8 +8,7 @@ ament_export_dependencies(ament_cmake_core)
  ament_export_dependencies(rosidl_cmake)
  
  ament_export_dependencies(rosidl_generator_c)
@@ -13,10 +13,10 @@ index d6fda02..e616910 100644
  if(BUILD_TESTING)
    find_package(ament_lint_auto REQUIRED)
 diff --git a/rosidl_default_generators/package.xml b/rosidl_default_generators/package.xml
-index b6769dc..0e88ce3 100644
+index d9c957a..2d49e3d 100644
 --- a/rosidl_default_generators/package.xml
 +++ b/rosidl_default_generators/package.xml
-@@ -12,19 +12,15 @@
+@@ -13,8 +13,7 @@
    <buildtool_export_depend>rosidl_cmake</buildtool_export_depend>
  
    <buildtool_export_depend>rosidl_generator_c</buildtool_export_depend>
@@ -26,7 +26,9 @@ index b6769dc..0e88ce3 100644
  
    <buildtool_export_depend>rosidl_typesupport_c</buildtool_export_depend>
    <buildtool_export_depend>rosidl_typesupport_cpp</buildtool_export_depend>
- 
+@@ -22,12 +21,9 @@
+   <group_depend>rosidl_typesupport_c_packages</group_depend>
+   <group_depend>rosidl_typesupport_cpp_packages</group_depend>
    <buildtool_export_depend>rosidl_typesupport_introspection_c</buildtool_export_depend>
 -  <buildtool_export_depend>rosidl_typesupport_introspection_cpp</buildtool_export_depend>
  
