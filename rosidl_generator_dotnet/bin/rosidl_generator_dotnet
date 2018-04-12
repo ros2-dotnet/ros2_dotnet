@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import sys
+
+try:
+    from rosidl_generator_dotnet import generate_dotnet
+except ImportError:
+    # modifying sys.path and importing the .NET package with the same
+    # name as this script does not work on Windows
+    rosidl_generator_dotnet_root = os.path.dirname(os.path.dirname(__file__))
+    rosidl_generator_dotnet_module = os.path.join(
+        rosidl_generator_dotnet_root, 'rosidl_generator_dotnet', '__init__.py')
+    if not os.path.exists(rosidl_generator_dotnet_module):
+        raise
+    from importlib.machinery import SourceFileLoader
+
+    loader = SourceFileLoader('rosidl_generator_dotnet', rosidl_generator_dotnet_module)
+    rosidl_generator_dotnet = loader.load_module()
+    generate_dotnet = rosidl_generator_dotnet.generate_dotnet
+
+
+def main(argv=sys.argv[1:]):
+    parser = argparse.ArgumentParser(description='Generate the .NET ROS interfaces.')
+    parser.add_argument(
+        '--generator-arguments-file',
+        required=True,
+        help='The location of the file containing the generator arguments')
+    parser.add_argument(
+        '--typesupport-impl',
+        required=True,
+        help='The typesupport implementation targeted by the C interface')
+    parser.add_argument(
+        '--typesupport-impls',
+        required=True,
+        help='All the available typesupport implementations')
+    args = parser.parse_args(argv)
+
+    return generate_dotnet(args.generator_arguments_file, args.typesupport_impl, args.typesupport_impls)
+
+
+if __name__ == '__main__':
+    sys.exit(main())

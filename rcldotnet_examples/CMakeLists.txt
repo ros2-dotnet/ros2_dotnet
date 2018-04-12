@@ -1,35 +1,37 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(rcldotnet_examples NONE)
+project(rcldotnet_examples C)
 
 find_package(ament_cmake REQUIRED)
 find_package(rcldotnet REQUIRED)
 
-find_package(dotnet_cmake_module REQUIRED)
-find_package(DotNETExtra MODULE)
-
-find_package(ros2_dotnet_utils REQUIRED)
+find_package(rcldotnet_common REQUIRED)
 
 find_package(std_msgs REQUIRED)
 find_package(rcldotnet REQUIRED)
 
-set(CS_SOURCES
-  Program.cs
+find_package(dotnet_cmake_module REQUIRED)
+find_package(DotNETExtra REQUIRED)
+
+set(_assemblies_dep_dlls
+    ${rcldotnet_common_ASSEMBLIES_DLL}
+    ${rcldotnet_ASSEMBLIES_DLL}
+    ${std_msgs_ASSEMBLIES_DLL}
+    ${rcldotnet_ASSEMBLIES_DLL}
 )
 
-add_assemblies("rcldotnet_talker"
-  "${CS_SOURCES}"
-  OUTPUT_TYPE "Exe"
-  INCLUDE_ASSEMBLIES_DLL
-  ${ros2_dotnet_utils_ASSEMBLIES_DLL}
-  ${rcldotnet_ASSEMBLIES_DLL}
-  ${std_msgs_ASSEMBLIES_DLL}
-  INCLUDE_ASSEMBLIES_NUGET
-  ${ros2_dotnet_utils_ASSEMBLIES_NUGET}
-  ${rcldotnet_ASSEMBLIES_NUGET}
-  ${std_msgs_ASSEMBLIES_NUGET}
+add_dotnet_executable(rcldotnet_talker
+  RCLDotnetTalker.cs
+  INCLUDE_DLLS
+  ${_assemblies_dep_dlls}
+)
+add_dotnet_executable(rcldotnet_listener
+  RCLDotnetListener.cs
+  INCLUDE_DLLS
+  ${_assemblies_dep_dlls}
 )
 
-install_assemblies("rcldotnet_talker" COPY_DEPENDENCIES DESTINATION "share/${PROJECT_NAME}/dotnet")
+install_dotnet(rcldotnet_talker DESTINATION lib/${PROJECT_NAME}/dotnet)
+install_dotnet(rcldotnet_listener DESTINATION lib/${PROJECT_NAME}/dotnet)
 
 ament_package()

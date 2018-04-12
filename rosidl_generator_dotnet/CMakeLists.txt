@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.5)
 
 project(rosidl_generator_dotnet)
 
@@ -7,10 +7,7 @@ find_package(ament_cmake_export_assemblies REQUIRED)
 find_package(ament_cmake_python REQUIRED)
 find_package(rosidl_generator_c REQUIRED)
 
-find_package(dotnet_cmake_module REQUIRED)
-find_package(DotNETExtra MODULE)
-
-find_package(ros2_dotnet_utils REQUIRED)
+find_package(rcldotnet_common REQUIRED)
 
 ament_export_dependencies(rosidl_cmake)
 

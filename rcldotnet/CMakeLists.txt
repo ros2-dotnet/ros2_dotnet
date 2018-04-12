@@ -6,78 +6,84 @@ find_package(ament_cmake_export_assemblies REQUIRED)
 
 find_package(ament_cmake REQUIRED)
 find_package(rcl REQUIRED)
+find_package(rcl_interfaces REQUIRED)
 find_package(rmw REQUIRED)
+find_package(rmw_implementation REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
+find_package(rosidl_generator_c REQUIRED)
 
 find_package(dotnet_cmake_module REQUIRED)
-find_package(DotNETExtra MODULE)
+find_package(DotNETExtra REQUIRED)
 
-find_package(ros2_dotnet_utils REQUIRED)
+find_package(rcldotnet_common REQUIRED)
+
+if(NOT WIN32)
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined,error")
+  endif()
+endif()
 
 set(CS_SOURCES
+  INode.cs
+  IPublisher.cs
+  ISubscription.cs
   Node.cs
   Publisher.cs
   RCLdotnet.cs
   Subscription.cs
 )
 
-add_assemblies("${PROJECT_NAME}_assemblies"
+find_package(rcldotnet_common REQUIRED)
+foreach(_assembly_dep ${rcldotnet_common_ASSEMBLIES_DLL})
+  list(APPEND _assembly_deps_dll "${_assembly_dep}")
+endforeach()
+
+add_dotnet_library(${PROJECT_NAME}_assemblies
+  SOURCES
   ${CS_SOURCES}
-  OUTPUT_NAME
-  "${PROJECT_NAME}"
-  INCLUDE_ASSEMBLIES_DLL
-  ${ros2_dotnet_utils_ASSEMBLIES_DLL}
-  INCLUDE_ASSEMBLIES_NUGET
-  ${ros2_dotnet_utils_ASSEMBLIES_NUGET}
+  INCLUDE_DLLS
+  ${_assembly_deps_dll}
 )
 
-install_assemblies("${PROJECT_NAME}_assemblies" "share/${PROJECT_NAME}/dotnet")
-ament_export_assemblies_dll("share/${PROJECT_NAME}/dotnet/${PROJECT_NAME}.dll")
-ament_export_assemblies_nuget("share/${PROJECT_NAME}/dotnet/${PROJECT_NAME}.1.0.0.nupkg")
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/netcoreapp2.0/publish/${PROJECT_NAME}_assemblies.dll
+  DESTINATION lib/${PROJECT_NAME}/dotnet/)
+ament_export_assemblies_dll("lib/${PROJECT_NAME}/dotnet/${PROJECT_NAME}_assemblies.dll")
 
-macro(target)
-  if(NOT target_suffix STREQUAL "")
-    get_rcl_information("${rmw_implementation}" "rcl${target_suffix}")
-  endif()
-  # Only build the library if a C typesupport exists for the rmw_implementation
-  get_rmw_typesupport(typesupport_impls "${rmw_implementation}" LANGUAGE "c")
-  if(typesupport_impls STREQUAL "")
-    message(STATUS "Skipping rcldotnet for '${rmw_implementation}' because no C "
-      "typesupport library was found.")
-    return()
-  endif()
+set(_native_sources "rcldotnet;rcldotnet_node;rcldotnet_publisher")
 
-  message("Building native library for ${target_suffix}")
+foreach(_target_name ${_native_sources})
+  add_library(${_target_name} SHARED
+    ${_target_name}.c
+  )
+  set_target_properties(${_target_name}
+    PROPERTIES
+    OUTPUT_NAME ${_target_name}_native)
+  ament_target_dependencies(${_target_name}
+    "builtin_interfaces"
+    "rcl"
+    "rosidl_generator_c"
+    "rosidl_typesupport_c"
+  )
+  ament_export_libraries(${_target_name}_native)
 
-  set(_native_sources "rcldotnet;rcldotnet_node;rcldotnet_publisher")
+  install(TARGETS ${_target_name}
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+  )
+endforeach()
 
-  foreach(_native_source ${_native_sources})
+ament_export_dependencies(ament_cmake)
+ament_export_dependencies(builtin_interfaces)
+ament_export_dependencies(rcl)
+ament_export_dependencies(rosidl_generator_c)
+ament_export_dependencies(rosidl_typesupport_c)
 
-    set(_target_name "${_native_source}${target_suffix}")
-
-    add_library(
-      ${_target_name}
-      SHARED ${_native_source}.c
-    )
-    target_compile_definitions(${_target_name}
-      PRIVATE "RMW_IMPLEMENTATION_SUFFIX=${target_suffix}")
-
-    ament_target_dependencies(${_target_name}
-      "rcl${target_suffix}"
-    )
-
-    install(TARGETS ${_target_name}
-      ARCHIVE DESTINATION lib
-      LIBRARY DESTINATION lib
-      RUNTIME DESTINATION bin
-    )
-
-#  ament_export_libraries(${_target_name})
-
-  endforeach()
-
-endmacro()
-
-call_for_each_rmw_implementation(target)
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif()
 
 ament_package()

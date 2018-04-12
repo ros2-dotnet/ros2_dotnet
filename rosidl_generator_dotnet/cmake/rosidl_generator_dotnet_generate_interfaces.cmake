@@ -18,7 +18,7 @@ find_package(rmw_implementation_cmake REQUIRED)
 find_package(rmw REQUIRED)
 
 find_package(dotnet_cmake_module REQUIRED)
-find_package(DotNETExtra MODULE)
+find_package(DotNETExtra REQUIRED)
 
 # Get a list of typesupport implementations from valid rmw implementations.
 rosidl_generator_dotnet_get_typesupports(_typesupport_impls)
@@ -36,6 +36,14 @@ set(_generated_msg_c_files "")
 set(_generated_msg_c_ts_files "")
 set(_generated_msg_h_files "")
 set(_generated_srv_files "")
+
+if(NOT WIN32)
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined,error")
+  endif()
+endif()
 
 foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
   get_filename_component(_parent_folder "${_idl_file}" DIRECTORY)
@@ -81,10 +89,10 @@ endforeach()
 set(target_dependencies
   "${rosidl_generator_dotnet_BIN}"
   ${rosidl_generator_dotnet_GENERATOR_FILES}
-  "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg_support.entry_point.h.template"
-  "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg_support.entry_point.c.template"
-  "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.cs.template"
-  "${rosidl_generator_dotnet_TEMPLATE_DIR}/srv.cs.template"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.h.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.c.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.cs.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/srv.cs.em"
   ${rosidl_generate_interfaces_IDL_FILES}
   ${_dependency_files})
 foreach(dep ${target_dependencies})
@@ -156,52 +164,51 @@ foreach(_generated_msg_c_ts_file ${_generated_msg_c_ts_files})
   set(_generated_msg_c_common_file "${_full_folder}/${_base_msg_name}.c")
 
   set(_dotnetext_suffix "__dotnetext")
-  set(_library_target "${_package_name}_${_base_msg_name}__${_typesupport_impl}")
+  set(_target_name "${_package_name}_${_base_msg_name}__${_typesupport_impl}")
 
   string_camel_case_to_lower_case_underscore("${_module_name}" _header_name)
   set(_generated_msg_h_file "${_full_folder}/rcldotnet_${_header_name}.h")
 
-  add_library(${_library_target} SHARED
+  add_library(${_target_name} SHARED
     "${_generated_msg_c_ts_file}"
     "${_generated_msg_h_files}"
   )
 
   set(_destination_dir "${_output_path}/${_parent_folder}")
 
-  set_target_properties(${_library_target} PROPERTIES
+  set_target_properties(${_target_name} PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY "${_destination_dir}"
     RUNTIME_OUTPUT_DIRECTORY "${_destination_dir}"
+    OUTPUT_NAME ${_target_name}_native
   )
 
-  set_target_properties(${_library_target} PROPERTIES
+  set_target_properties(${_target_name} PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY_DEBUG "${_destination_dir}"
     RUNTIME_OUTPUT_DIRECTORY_DEBUG "${_destination_dir}"
+    OUTPUT_NAME ${_target_name}_native
   )
 
-  set_target_properties(${_library_target} PROPERTIES
+  set_target_properties(${_target_name} PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY_RELEASE "${_destination_dir}"
     RUNTIME_OUTPUT_DIRECTORY_RELEASE "${_destination_dir}"
+    OUTPUT_NAME ${_target_name}_native
   )
 
-  set_target_properties(${_library_target} PROPERTIES
+  set_target_properties(${_target_name} PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${_destination_dir}"
     RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${_destination_dir}"
+    OUTPUT_NAME ${_target_name}_native
   )
 
-  set_target_properties(${_library_target} PROPERTIES
+  set_target_properties(${_target_name} PROPERTIES
     COMPILE_FLAGS "${_extension_compile_flags}"
     LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${_destination_dir}"
     RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${_destination_dir}"
-  )
-
-  add_dependencies(
-    ${_library_target}
-    ${rosidl_generate_interfaces_TARGET}__rosidl_generator_c
-    ${rosidl_generate_interfaces_TARGET}${_target_suffix}
+    OUTPUT_NAME ${_target_name}_native
   )
 
   set(_extension_compile_flags "")
@@ -209,45 +216,58 @@ foreach(_generated_msg_c_ts_file ${_generated_msg_c_ts_files})
     set(_extension_compile_flags "-Wall -Wextra")
   endif()
 
-  target_link_libraries(
-    ${_library_target}
-    ${PROJECT_NAME}__${_typesupport_impl}
-  )
+  list(APPEND _extension_dependencies ${_target_name})
 
-  target_include_directories(${_library_target}
+  set(_extension_link_flags "")
+  if(NOT WIN32)
+    if(CMAKE_COMPILER_IS_GNUCXX)
+      set(_extension_link_flags "-Wl,--no-undefined")
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+      set(_extension_link_flags "-Wl,-undefined,error")
+    endif()
+  endif()
+  target_link_libraries(
+    ${_target_name}
+    ${PROJECT_NAME}__${_typesupport_impl}
+    ${_extension_link_flags}
+  )
+  rosidl_target_interfaces(${_target_name}
+    ${PROJECT_NAME} rosidl_typesupport_c)
+
+  target_include_directories(${_target_name}
     PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_c
     ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_dotnet
   )
 
+  ament_target_dependencies(${_target_name}
+    "rosidl_generator_c"
+    "rosidl_typesupport_c"
+    "rosidl_typesupport_interface"
+  )
   foreach(_pkg_name ${rosidl_generate_interfaces_DEPENDENCY_PACKAGE_NAMES})
-    ament_target_dependencies(
-      ${_library_target}
+    ament_target_dependencies(${_target_name}
       ${_pkg_name}
     )
   endforeach()
 
-  ament_target_dependencies(${_library_target}
+  add_dependencies(${_target_name}
+    ${rosidl_generate_interfaces_TARGET}__${_typesupport_impl}
+  )
+  ament_target_dependencies(${_target_name}
     "rosidl_generator_c"
     "rosidl_generator_dotnet"
-    "${_typesupport_impl}"
     "${PROJECT_NAME}__rosidl_generator_c"
   )
 
-  list(APPEND _extension_dependencies ${_library_target})
-
-  add_dependencies(${_library_target}
-    ${rosidl_generate_interfaces_TARGET}__${_typesupport_impl}
-  )
-
   if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
-    install(TARGETS ${_library_target}
+    install(TARGETS ${_target_name}
       ARCHIVE DESTINATION lib
       LIBRARY DESTINATION lib
       RUNTIME DESTINATION bin
     )
 
-#    ament_export_libraries(${_library_target})
+#    ament_export_libraries(${_target_name})
   endif()
 
 endforeach()
@@ -256,8 +276,8 @@ set(_assembly_deps_dll "")
 set(_assembly_deps_nuget "")
 set(ASSEMBLY_DEPENDENCIES "")
 
-find_package(ros2_dotnet_utils REQUIRED)
-foreach(_assembly_dep ${ros2_dotnet_utils_ASSEMBLIES_NUGET})
+find_package(rcldotnet_common REQUIRED)
+foreach(_assembly_dep ${rcldotnet_common_ASSEMBLIES_NUGET})
   list(APPEND _assembly_deps_nuget "${_assembly_dep}")
   get_filename_component(_assembly_filename ${_assembly_dep} NAME_WE)
   set(ASSEMBLY_DEPENDENCIES "${ASSEMBLY_DEPENDENCIES},\"${_assembly_filename}\": \"1.0.0\"")
@@ -272,8 +292,8 @@ foreach(_pkg_name ${rosidl_generate_interfaces_DEPENDENCY_PACKAGE_NAMES})
   endforeach()
 endforeach()
 
-find_package(ros2_dotnet_utils REQUIRED)
-foreach(_assembly_dep ${ros2_dotnet_utils_ASSEMBLIES_DLL})
+find_package(rcldotnet_common REQUIRED)
+foreach(_assembly_dep ${rcldotnet_common_ASSEMBLIES_DLL})
   list(APPEND _assembly_deps_dll "${_assembly_dep}")
 endforeach()
 
@@ -284,33 +304,14 @@ foreach(_pkg_name ${rosidl_generate_interfaces_DEPENDENCY_PACKAGE_NAMES})
   endforeach()
 endforeach()
 
-if(WIN32)
-else()
-configure_file(
-"${rosidl_generator_dotnet_TEMPLATE_DIR}/project.json.dotnet.in"
-"${CMAKE_CURRENT_BINARY_DIR}/project.json"
-@ONLY
-)
-endif()
-
-add_assemblies("${PROJECT_NAME}_assemblies"
-  "${_generated_msg_cs_files}"
-  OUTPUT_NAME
-  "${PROJECT_NAME}"
-  INCLUDE_ASSEMBLIES_DLL
+add_dotnet_library(${PROJECT_NAME}_assemblies
+  SOURCES
+  ${_generated_msg_cs_files}
+  INCLUDE_DLLS
   ${_assembly_deps_dll}
-  INCLUDE_ASSEMBLIES_NUGET
-  ${_assembly_deps_nuget}
 )
 
 add_dependencies("${PROJECT_NAME}_assemblies" "${rosidl_generate_interfaces_TARGET}${_target_suffix}")
-
-
-#  OUTPUT_NAME
-#  "${PROJECT_NAME}"
-#  INCLUDE_ASSEMBLIES
-#  "${_assembly_deps}"
-#)
 
 get_property(_assemblies_nuget_file TARGET "${PROJECT_NAME}_assemblies" PROPERTY "ASSEMBLIES_NUGET_FILE")
 get_property(_assemblies_dll_file TARGET "${PROJECT_NAME}_assemblies" PROPERTY "ASSEMBLIES_DLL_FILE")
@@ -329,8 +330,8 @@ if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
     get_filename_component(_msg_package_dir "${_msg_file}" DIRECTORY)
     get_filename_component(_msg_package_dir "${_msg_package_dir}" DIRECTORY)
 
-    install_assemblies("${PROJECT_NAME}_assemblies" "share/${PROJECT_NAME}/dotnet")
-    ament_export_assemblies_dll("share/${PROJECT_NAME}/dotnet/${PROJECT_NAME}.dll")
-    ament_export_assemblies_nuget("share/${PROJECT_NAME}/dotnet/${PROJECT_NAME}.1.0.0.nupkg")
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/netcoreapp2.0/publish/${PROJECT_NAME}_assemblies.dll
+      DESTINATION "lib/${PROJECT_NAME}/dotnet")
+    ament_export_assemblies_dll("lib/${PROJECT_NAME}/dotnet/${PROJECT_NAME}_assemblies.dll")
   endif()
 endif()

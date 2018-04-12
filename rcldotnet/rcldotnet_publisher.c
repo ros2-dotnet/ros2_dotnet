@@ -20,17 +20,13 @@
 #include <rcl/error_handling.h>
 #include <rcl/rcl.h>
 #include <rcl/node.h>
-#include <rosidl_generator_c/message_type_support.h>
+
+#include "rosidl_generator_c/message_type_support_struct.h"
 
 #include "rcldotnet_publisher.h"
 
-void native_rcl_publish(void * publisher_handle, void * msg_struct, void * converter)
+void native_rcl_publish(void * publisher_handle, void * raw_ros_message)
 {
-  typedef void * (* convert_from_dotnet_signature)(void *);
-  convert_from_dotnet_signature convert_from_dotnet = (convert_from_dotnet_signature)converter;
-
-  void * raw_ros_message = convert_from_dotnet(msg_struct);
-
   rcl_publisher_t * publisher = (rcl_publisher_t *)publisher_handle;
 
   rcl_ret_t ret = rcl_publish(publisher, raw_ros_message);

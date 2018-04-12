@@ -31,24 +31,25 @@ class Underscorer(string.Formatter):
             spec = spec[:-(len('underscore'))] + 's'
         return super(Underscorer, self).format_field(value, spec)
 
-def generate_dotnet(generator_arguments_file, typesupport_impl, typesupport_impls):
+
+def generate_dotnet(generator_arguments_file, typesupport_impl,
+                    typesupport_impls):
     args = read_generator_arguments(generator_arguments_file)
     typesupport_impls = typesupport_impls.split(';')
 
     template_dir = args['template_dir']
     type_support_impl_by_filename = {
-        '{{}}.ep.{impl}.c'.format(impl=impl): impl for impl in typesupport_impls
+        '{{}}.ep.{impl}.c'.format(impl=impl): impl
+        for impl in typesupport_impls
     }
     mapping_msgs = {
-        os.path.join(template_dir, 'msg.cs.template'): ['{0}.cs'],
-        os.path.join(template_dir, 'msg_support.entry_point.c.template'):
+        os.path.join(template_dir, 'msg.cs.em'): ['{0}.cs'],
+        os.path.join(template_dir, 'msg.c.em'):
         type_support_impl_by_filename.keys(),
-        os.path.join(template_dir, 'msg_support.entry_point.h.template'): ['rcldotnet_{0:underscore}.h'],
+        os.path.join(template_dir, 'msg.h.em'): ['rcldotnet_{0:underscore}.h'],
     }
 
-    mapping_srvs = {
-        os.path.join(template_dir, 'srv.cs.template'): ['%s.cs'],
-    }
+    mapping_srvs = {os.path.join(template_dir, 'srv.cs.em'): ['%s.cs'], }
 
     for template_file in mapping_msgs.keys():
         assert os.path.exists(template_file), \
@@ -57,10 +58,9 @@ def generate_dotnet(generator_arguments_file, typesupport_impl, typesupport_impl
         assert os.path.exists(template_file), \
             'Services template file %s not found' % template_file
 
-    functions = {
-        'get_dotnet_type': get_dotnet_type,
-    }
-    latest_target_timestamp = get_newest_modification_time(args['target_dependencies'])
+    functions = {'get_dotnet_type': get_dotnet_type, }
+    latest_target_timestamp = get_newest_modification_time(
+        args['target_dependencies'])
 
     modules = defaultdict(list)
     for ros_interface_file in args['ros_interface_files']:
@@ -85,23 +85,32 @@ def generate_dotnet(generator_arguments_file, typesupport_impl, typesupport_impl
             for generated_filename in generated_filenames:
                 data = {
                     'constant_value_to_dotnet': constant_value_to_dotnet,
-                    'convert_camel_case_to_lower_case_underscore': convert_camel_case_to_lower_case_underscore,
+                    'convert_camel_case_to_lower_case_underscore':
+                    convert_camel_case_to_lower_case_underscore,
                     'get_builtin_dotnet_type': get_builtin_dotnet_type,
-                    'module_name': module_name, 'package_name': package_name,
+                    'module_name': module_name,
+                    'package_name': package_name,
                     'jni_package_name': jni_package_name,
-                    'spec': spec, 'subfolder': subfolder,
-                    'typesupport_impl': type_support_impl_by_filename.get(generated_filename, ''),
+                    'spec': spec,
+                    'subfolder': subfolder,
+                    'typesupport_impl':
+                    type_support_impl_by_filename.get(generated_filename, ''),
                     'typesupport_impls': typesupport_impls,
                     'type_name': type_name,
                     'primitive_msg_type_to_c': primitive_msg_type_to_c,
-                    'upperfirst': upperfirst,
-                    'header_name': 'rcldotnet_{}'.format(convert_camel_case_to_lower_case_underscore(module_name)),
+                    'get_field_name': get_field_name,
+                    'header_name': 'rcldotnet_{}'.format(
+                        convert_camel_case_to_lower_case_underscore(
+                            module_name)),
                 }
                 data.update(functions)
                 generated_file = os.path.join(
-                    args['output_dir'], subfolder, Underscorer().format(generated_filename, type_name))
+                    args['output_dir'], subfolder,
+                    Underscorer().format(generated_filename, type_name))
                 expand_template(
-                    template_file, data, generated_file,
+                    template_file,
+                    data,
+                    generated_file,
                     minimum_timestamp=latest_target_timestamp)
 
     return 0
@@ -120,13 +129,17 @@ def constant_value_to_dotnet(type_, value):
         return 'true' if value else 'false'
 
     if type_ in [
-        'byte',
-        'char',
-        'int8', 'uint8',
-        'int16', 'uint16',
-        'int32', 'uint32',
-        'int64', 'uint64',
-        'float64',
+            'byte',
+            'char',
+            'int8',
+            'uint8',
+            'int16',
+            'uint16',
+            'int32',
+            'uint32',
+            'int64',
+            'uint64',
+            'float64',
     ]:
         return str(value)
 
@@ -209,8 +222,10 @@ MSG_TYPE_TO_C = {
     'string': "const char *",
 }
 
+
 def primitive_msg_type_to_c(type_):
     return MSG_TYPE_TO_C[type_]
+
 
 def msg_type_to_c(type_, name_):
     """
@@ -243,5 +258,13 @@ def msg_type_to_c(type_, name_):
     else:
         return '%s %s' % (c_type, name_)
 
+
 def upperfirst(s):
     return s[0].capitalize() + s[1:]
+
+
+def get_field_name(type_name, field_name):
+    if upperfirst(field_name) == type_name:
+        return "{0}_".format(type_name)
+    else:
+        return upperfirst(field_name)

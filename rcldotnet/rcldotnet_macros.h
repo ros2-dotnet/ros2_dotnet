@@ -12,14 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace ROS2dotnetUtils
-{
-public interface IMessageStruct {
-}
+#ifndef RCLDOTNET_MACROS_H
+#define RCLDOTNET_MACROS_H
 
-public interface IMessage {
-  IMessageStruct MessageStruct {
-    get;
-  }
-}
-}
+#if defined(_MSC_VER)
+    #define RCLDOTNET_EXPORT __declspec(dllexport)
+    #define RCLDOTNET_IMPORT __declspec(dllimport)
+    #define RCLDOTNET_CDECL __cdecl
+#elif defined(__GNUC__)
+    #define RCLDOTNET_EXPORT __attribute__((visibility("default")))
+    #define RCLDOTNET_IMPORT
+    #define RCLDOTNET_CDECL __attribute__((__cdecl__))
+#else
+    #define RCLDOTNET_EXPORT
+    #define RCLDOTNET_IMPORT
+    #define RCLDOTNET_CDECL
+    #pragma warning Unknown dynamic link import/export semantics.
+#endif
+
+#endif // RCLDOTNET_MACROS_H

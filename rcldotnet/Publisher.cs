@@ -15,72 +15,57 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
-using System.Reflection;
+using ROS2.Interfaces;
+using ROS2.Utils;
 
-using ROS2dotnetUtils;
+namespace ROS2 {
+  internal class PublisherDelegates {
+    internal static readonly DllLoadUtils dllLoadUtils;
 
-namespace rcldotnet
-{
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate void NativeRCLPublishType (
+      IntPtr publisher_handle, IntPtr message_struct);
 
-public class PublisherDelegates
-{
+    internal static NativeRCLPublishType native_rcl_publish = null;
 
-  [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-  public delegate void NativeRCLPublishType(IntPtr publisher_handle, IntPtr message_struct, IntPtr from_dotnet_converter);
-  //public delegate void NativeRCLPublishType(IntPtr publisher_handle, IMessageStruct message_struct, IntPtr from_dotnet_converter);
-
-  public static NativeRCLPublishType native_rcl_publish = null;
-
-  private static readonly DllLoadUtils dllLoadUtils;
-
-  static PublisherDelegates()
-  {
-    dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
-    try {
-      IntPtr nativelibrary = dllLoadUtils.LoadLibrary("rcldotnet_publisher__" + RCLdotnet.GetRMWIdentifier());
-
-      IntPtr native_rcl_publish_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_rcl_publish");
-
-      PublisherDelegates.native_rcl_publish = Marshal.GetDelegateForFunctionPointer<NativeRCLPublishType>(native_rcl_publish_ptr);
-    } catch (UnsatisfiedLinkError e) {
-      System.Console.WriteLine("Native code library failed to load.\n" + e);
-      Environment.Exit(1);
+    static PublisherDelegates () {
+      dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils ();
+      try {
+        IntPtr nativelibrary = dllLoadUtils.LoadLibrary ("rcldotnet_publisher");
+        IntPtr native_rcl_publish_ptr = dllLoadUtils.GetProcAddress (nativelibrary, "native_rcl_publish");
+        PublisherDelegates.native_rcl_publish = (NativeRCLPublishType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_publish_ptr, typeof (NativeRCLPublishType));
+      } catch (UnsatisfiedLinkError e) {
+        System.Console.WriteLine ("Native code library failed to load.\n" + e);
+        Environment.Exit (1);
+      }
     }
   }
 
-}
+  public class Publisher<T> : IPublisher
+  where T : IMessage {
 
+    private IntPtr publisher_handle_;
 
-public class Publisher<T> where T : IMessage
-{
+    public Publisher (IntPtr publisher_handle) {
+      publisher_handle_ = publisher_handle;
+    }
 
-  private IntPtr node_handle_;
+    public IntPtr Handle { get { return publisher_handle_; } }
 
-  private IntPtr publisher_handle_;
+    public void Publish (T msg) {
+      IntPtr message_handle = msg._CREATE_NATIVE_MESSAGE ();
 
-  public Publisher(IntPtr node_handle, IntPtr publisher_handle)
-  {
-    node_handle_ = node_handle;
-    publisher_handle_ = publisher_handle;
+      msg._WRITE_HANDLE (message_handle);
+
+      PublisherDelegates.native_rcl_publish (publisher_handle_, message_handle);
+
+      msg._DESTROY_NATIVE_MESSAGE (message_handle);
+    }
   }
-
-  public void Publish(T msg)
-  {
-    Type typeParametertype = typeof(T);
-    MethodInfo m = typeParametertype.GetMethod("getFromDotnetConverter");
-    IntPtr converter_ptr = (IntPtr)m.Invoke(null, new object[] {});
-
-    int msg_struct_size = Marshal.SizeOf(msg.MessageStruct);
-    IntPtr pnt = Marshal.AllocHGlobal(msg_struct_size);
-    Marshal.StructureToPtr(msg.MessageStruct, pnt, false);
-
-    PublisherDelegates.native_rcl_publish(publisher_handle_, pnt, converter_ptr);
-
-    Marshal.FreeHGlobal(pnt);
-  }
-}
 }

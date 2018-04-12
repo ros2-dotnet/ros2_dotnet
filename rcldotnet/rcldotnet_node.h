@@ -15,7 +15,16 @@
 #ifndef RCLDOTNET_NODE_H
 #define RCLDOTNET_NODE_H
 
-__declspec(dllexport)
-void * __cdecl native_rcl_create_publisher_handle(void *, const char *, void *);
+#include "rcldotnet_macros.h"
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_create_publisher_handle(void **, void *,
+                                                           const char *,
+                                                           void *);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_create_subscription_handle(void **, void *,
+                                                              const char *,
+                                                              void *);
 
 #endif // RCLDOTNET_NODE_H

@@ -12,12 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RCLDOTNET_PUBLISHER_H
-#define RCLDOTNET_PUBLISHER_H
+using System;
 
-#include "rcldotnet_macros.h"
+namespace ROS2 {
+  namespace Interfaces {
+    public interface IMessageStruct { }
 
-RCLDOTNET_EXPORT
-void RCLDOTNET_CDECL native_rcl_publish(void *, void *);
+    public interface IMessage {
+      IntPtr _CREATE_NATIVE_MESSAGE ();
+      void _READ_HANDLE (IntPtr messageHandle);
+      void _DESTROY_NATIVE_MESSAGE (IntPtr messageHandle);
+      void _WRITE_HANDLE (IntPtr messageHandle);
+    }
 
-#endif // RCLDOTNET_PUBLISHER_H
+    public interface IDisposable {
+      IntPtr Handle {
+        get;
+      }
+    }
+  }
+}
