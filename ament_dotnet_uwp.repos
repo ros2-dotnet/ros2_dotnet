@@ -13,8 +13,8 @@ repositories:
     version: master
   ament/ament_package:
     type: git
-    url: https://github.com/ament/ament_package.git
-    version: master
+    url: https://github.com/esteve/ament_package.git
+    version: windows-escape-values
   ament/ament_tools:
     type: git
     url: https://github.com/esteve/ament_tools.git

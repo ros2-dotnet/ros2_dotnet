@@ -10,8 +10,6 @@ environment:
   PYTHON: C:\Python36-x64
 
 before_build:
-  - echo BEFORE_BUILD
-  - echo %APPVEYOR_REPO_BRANCH%
   - SET PATH=%PYTHON%;%PYTHON%\Scripts;%path%
   - pip install vcstool
   - pip install EmPy pyparsing pyyaml
@@ -31,8 +29,12 @@ build_script:
   - cd \dev\ros2\src\ros2\rosidl_typesupport
   - patch -p1 < ..\..\ros2_dotnet/ros2_dotnet/rosidl_typesupport_ros2_uwp.patch
   - cd \dev\ros2
-  - ament build --cmake-args -G "Visual Studio 15 2017" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0 -DTHIRDPARTY=ON -DCOMPILE_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" -- --skip-packages std_srvs
-  - echo BUILD_SCRIPT
+  - type nul > src\ros2\common_interfaces\shape_msgs
+  - type nul > src\ros2\common_interfaces\actionlib_msgs
+  - type nul > src\ros2\common_interfaces\geometry_msgs
+  - type nul > src\ros2\common_interfaces\diagnostic_msgs
+
+  - ament build --cmake-args -G "Visual Studio 15 2017" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0 -DTHIRDPARTY=ON -DCOMPILE_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" --
 
 after_build:
   - 7z a ros2_uwp.zip \dev\ros2\install

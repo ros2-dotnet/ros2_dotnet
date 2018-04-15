@@ -1,6 +1,10 @@
 ROS2 for .NET
 =============
 
+Build status
+------------
+[![Build status](https://ros2-dotnet.visualstudio.com/_apis/public/build/definitions/3da961d8-6dea-4d3f-88c1-f4802b69960c/4/badge)](https://ros2-dotnet.visualstudio.com/ros2-dotnet/_build/index?definitionId=4)
+
 Introduction
 ------------
 
