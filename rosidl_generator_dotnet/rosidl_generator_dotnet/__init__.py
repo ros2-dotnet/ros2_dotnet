@@ -49,7 +49,7 @@ def generate_dotnet(generator_arguments_file, typesupport_impl,
         os.path.join(template_dir, 'msg.h.em'): ['rcldotnet_{0:underscore}.h'],
     }
 
-    mapping_srvs = {os.path.join(template_dir, 'srv.cs.em'): ['%s.cs'], }
+    mapping_srvs = {os.path.join(template_dir, 'srv.cs.em'): ['{0}.cs'], }
 
     for template_file in mapping_msgs.keys():
         assert os.path.exists(template_file), \
