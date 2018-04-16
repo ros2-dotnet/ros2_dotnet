@@ -33,6 +33,10 @@ Lots of things!
 Sounds great, how can I try this out?
 -------------------------------------
 
+First of all install the standard ROS2 dependencies for your operating system of choice https://github.com/ros2/ros2/wiki/Installation#building-from-source
+
+Next make sure you've either installed .Net Core (preferred) https://www.microsoft.com/net/learn/get-started or Mono https://www.mono-project.com/
+
 The following steps show how to build the examples:
 
 ```
