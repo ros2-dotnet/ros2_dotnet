@@ -65,7 +65,7 @@ foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
       )
       list(APPEND _type_support_by_generated_msg_c_files "${_typesupport_impl}")
     endforeach()
-  elseif(_parent_folder" STREQUAL "srv")
+  elseif(_parent_folder STREQUAL "srv")
     list(APPEND _generated_srv_cs_files
       "${_output_path}/${_parent_folder}/${_module_name}.cs"
     )
