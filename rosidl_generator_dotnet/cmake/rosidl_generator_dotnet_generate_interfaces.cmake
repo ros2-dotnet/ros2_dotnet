@@ -301,7 +301,7 @@ endforeach()
 add_dotnet_library(${PROJECT_NAME}_assemblies
   SOURCES
   ${_generated_msg_cs_files}
-#  ${_generated_srv_cs_files}
+  ${_generated_srv_cs_files}
   INCLUDE_DLLS
   ${_assembly_deps_dll}
 )
