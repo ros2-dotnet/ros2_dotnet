@@ -22,9 +22,8 @@ namespace ROS2 {
     public IntPtr Handle { get { return subscription_handle_; } }
 
     public IMessage CreateMessage () {
-      // IMessage msg = (IMessage) new T ();
-      // return msg;
-      return null;
+      IMessage msg = (IMessage) new T ();
+      return msg;
     }
 
     public void TriggerCallback (IMessage message) {
