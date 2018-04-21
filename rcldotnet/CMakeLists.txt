@@ -29,6 +29,7 @@ set(CS_SOURCES
   INode.cs
   IPublisher.cs
   ISubscription.cs
+  ISubscriptionBase.cs
   Node.cs
   Publisher.cs
   RCLdotnet.cs

@@ -47,7 +47,7 @@ namespace ROS2 {
     }
   }
 
-  public class Publisher<T> : IPublisher
+  public class Publisher<T> : IPublisher<T>
   where T : IMessage {
 
     private IntPtr publisher_handle_;

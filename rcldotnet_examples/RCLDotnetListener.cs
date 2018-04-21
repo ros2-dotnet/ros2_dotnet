@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Threading;
+
 using ROS2;
 
 namespace ConsoleApplication {
@@ -10,9 +11,9 @@ namespace ConsoleApplication {
     public static void Main (string[] args) {
       RCLdotnet.Init ();
 
-      Node node = RCLdotnet.CreateNode ("listener");
+      INode node = RCLdotnet.CreateNode ("listener");
 
-      Subscription<std_msgs.msg.String> chatter_sub = node.CreateSubscription<std_msgs.msg.String> (
+      ISubscription<std_msgs.msg.String> chatter_sub = node.CreateSubscription<std_msgs.msg.String> (
         "chatter", msg => Console.WriteLine ("I heard: [" + msg.Data + "]"));
 
       RCLdotnet.Spin (node);

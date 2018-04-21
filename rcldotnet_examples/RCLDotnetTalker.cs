@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Threading;
+
 using ROS2;
 using ROS2.Utils;
 
@@ -11,9 +12,9 @@ namespace ConsoleApplication {
     public static void Main (string[] args) {
       RCLdotnet.Init ();
 
-      Node node = RCLdotnet.CreateNode ("talker");
+      INode node = RCLdotnet.CreateNode ("talker");
 
-      Publisher<std_msgs.msg.String> chatter_pub = node.CreatePublisher<std_msgs.msg.String> ("chatter");
+      IPublisher<std_msgs.msg.String> chatter_pub = node.CreatePublisher<std_msgs.msg.String> ("chatter");
 
       std_msgs.msg.String msg = new std_msgs.msg.String ();
 

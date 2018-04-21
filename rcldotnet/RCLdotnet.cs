@@ -202,7 +202,7 @@ namespace ROS2 {
       return node;
     }
 
-    public static void Spin (Node node) {
+    public static void Spin (INode node) {
       while (Ok ()) {
         SpinOnce (node, 500);
       }
@@ -269,7 +269,7 @@ namespace ROS2 {
       return status;
     }
 
-    public static void SpinOnce (Node node, long timeout) {
+    public static void SpinOnce (INode node, long timeout) {
       IntPtr waitSetHandle = GetZeroInitializedWaitSet ();
 
       long numberOfSubscriptions = node.Subscriptions.Count;
@@ -293,17 +293,17 @@ namespace ROS2 {
 
       WaitSetClearClients (waitSetHandle);
 
-      foreach (ISubscription subscription in node.Subscriptions) {
+      foreach (ISubscriptionBase subscription in node.Subscriptions) {
         WaitSetAddSubscription (waitSetHandle, subscription.Handle);
       }
 
       Wait (waitSetHandle, timeout);
 
-      foreach (ISubscription subscription in node.Subscriptions) {
+      foreach (ISubscriptionBase subscription in node.Subscriptions) {
         IMessage message = subscription.CreateMessage ();
         bool result = Take (subscription.Handle, message);
         if (result) {
-          subscription.CallbackFN (message);
+          subscription.TriggerCallback (message);
         }
       }
       DestroyWaitSet (waitSetHandle);

@@ -12,17 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-
 using ROS2.Interfaces;
 
 namespace ROS2 {
-    public interface INode {
-        IList<ISubscriptionBase> Subscriptions { get; }
-
-        IPublisher<T> CreatePublisher<T> (string topic) where T : IMessage;
-
-        ISubscription<T> CreateSubscription<T> (string topic, Action<T> callback) where T : IMessage, new ();
+    public interface ISubscriptionBase : IDisposable {
+        IMessage CreateMessage ();
+        void TriggerCallback (IMessage message);
     }
 }

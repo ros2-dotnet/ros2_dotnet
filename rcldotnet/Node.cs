@@ -68,20 +68,20 @@ namespace ROS2 {
 
   public class Node : INode {
 
-    private IList<ISubscription> subscriptions_;
+    private IList<ISubscriptionBase> subscriptions_;
 
     private IntPtr nodeHandle_;
 
     public Node (IntPtr node_handle) {
       nodeHandle_ = node_handle;
-      subscriptions_ = new List<ISubscription> ();
+      subscriptions_ = new List<ISubscriptionBase> ();
     }
 
-    public IList<ISubscription> Subscriptions { get { return subscriptions_; } }
+    public IList<ISubscriptionBase> Subscriptions { get { return subscriptions_; } }
 
     public IntPtr Handle { get { return nodeHandle_; } }
 
-    public Publisher<T> CreatePublisher<T> (string topic) where T : IMessage {
+    public IPublisher<T> CreatePublisher<T> (string topic) where T : IMessage {
       Type typeParametertype = typeof (T);
       MethodInfo m = typeParametertype.GetMethod ("_GET_TYPE_SUPPORT");
 
@@ -92,7 +92,7 @@ namespace ROS2 {
       return publisher;
     }
 
-    public Subscription<T> CreateSubscription<T> (string topic, Action<T> callback) where T : IMessage, new () {
+    public ISubscription<T> CreateSubscription<T> (string topic, Action<T> callback) where T : IMessage, new () {
       Type typeParametertype = typeof (T);
       MethodInfo m = typeParametertype.GetMethod ("_GET_TYPE_SUPPORT");
 

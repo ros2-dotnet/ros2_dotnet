@@ -9,8 +9,8 @@ using ROS2.Interfaces;
 using ROS2.Utils;
 
 namespace ROS2 {
-  public class Subscription<T> : ISubscription
-  where T : new () {
+  public class Subscription<T> : ISubscription<T>
+  where T : IMessage, new() {
     private IntPtr subscription_handle_;
     private Action<T> callback_;
 
@@ -22,11 +22,12 @@ namespace ROS2 {
     public IntPtr Handle { get { return subscription_handle_; } }
 
     public IMessage CreateMessage () {
-      IMessage msg = (IMessage) new T ();
-      return msg;
+      // IMessage msg = (IMessage) new T ();
+      // return msg;
+      return null;
     }
 
-    public void CallbackFN (IMessage message) {
+    public void TriggerCallback (IMessage message) {
       callback_ ((T) message);
     }
   }
