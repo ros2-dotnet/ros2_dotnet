@@ -30,7 +30,7 @@ namespace ROS2 {
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate void NativeRCLPublishType (
-      IntPtr publisher_handle, IntPtr message_struct);
+      IntPtr publisherHandle, IntPtr messageHandle);
 
     internal static NativeRCLPublishType native_rcl_publish = null;
 
@@ -49,24 +49,22 @@ namespace ROS2 {
   }
 
   public class Publisher<T> : IPublisher<T>
-  where T : IMessage {
+    where T : IMessage {
 
-    private IntPtr publisher_handle_;
+      public Publisher (IntPtr handle) {
+        Handle = handle;
+      }
 
-    public Publisher (IntPtr publisher_handle) {
-      publisher_handle_ = publisher_handle;
+      public IntPtr Handle { get; }
+
+      public void Publish (T msg) {
+        IntPtr messageHandle = msg._CREATE_NATIVE_MESSAGE ();
+
+        msg._WRITE_HANDLE (messageHandle);
+
+        PublisherDelegates.native_rcl_publish (Handle, messageHandle);
+
+        msg._DESTROY_NATIVE_MESSAGE (messageHandle);
+      }
     }
-
-    public IntPtr Handle { get { return publisher_handle_; } }
-
-    public void Publish (T msg) {
-      IntPtr message_handle = msg._CREATE_NATIVE_MESSAGE ();
-
-      msg._WRITE_HANDLE (message_handle);
-
-      PublisherDelegates.native_rcl_publish (publisher_handle_, message_handle);
-
-      msg._DESTROY_NATIVE_MESSAGE (message_handle);
-    }
-  }
 }

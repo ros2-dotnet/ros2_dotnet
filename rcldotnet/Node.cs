@@ -32,13 +32,13 @@ namespace ROS2 {
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate int NativeRCLCreatePublisherHandleType (
-      ref IntPtr publisherHandle, IntPtr node_handle, [MarshalAs (UnmanagedType.LPStr)] string node_name, IntPtr typesupport_ptr);
+      ref IntPtr publisherHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle);
 
     internal static NativeRCLCreatePublisherHandleType native_rcl_create_publisher_handle = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate int NativeRCLCreateSubscriptionHandleType (
-      ref IntPtr subscriptionHandle, IntPtr node_handle, [MarshalAs (UnmanagedType.LPStr)] string node_name, IntPtr typesupport_ptr);
+      ref IntPtr subscriptionHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle);
 
     internal static NativeRCLCreateSubscriptionHandleType native_rcl_create_subscription_handle = null;
 
@@ -71,16 +71,14 @@ namespace ROS2 {
 
     private IList<ISubscriptionBase> subscriptions_;
 
-    private IntPtr nodeHandle_;
-
-    public Node (IntPtr node_handle) {
-      nodeHandle_ = node_handle;
+    public Node (IntPtr handle) {
+      Handle = handle;
       subscriptions_ = new List<ISubscriptionBase> ();
     }
 
     public IList<ISubscriptionBase> Subscriptions { get { return subscriptions_; } }
 
-    public IntPtr Handle { get { return nodeHandle_; } }
+    public IntPtr Handle { get; }
 
     public IPublisher<T> CreatePublisher<T> (string topic) where T : IMessage {
       Type typeParametertype = typeof (T);
@@ -88,7 +86,7 @@ namespace ROS2 {
 
       IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
       IntPtr publisherHandle = IntPtr.Zero;
-      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_publisher_handle (ref publisherHandle, nodeHandle_, topic, typesupport);
+      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_publisher_handle (ref publisherHandle, Handle, topic, typesupport);
       Publisher<T> publisher = new Publisher<T> (publisherHandle);
       return publisher;
     }
@@ -99,7 +97,7 @@ namespace ROS2 {
 
       IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
       IntPtr subscriptionHandle = IntPtr.Zero;
-      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_subscription_handle (ref subscriptionHandle, nodeHandle_, topic, typesupport);
+      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_subscription_handle (ref subscriptionHandle, Handle, topic, typesupport);
       Subscription<T> subscription = new Subscription<T> (subscriptionHandle, callback);
       this.subscriptions_.Add (subscription);
       return subscription;
