@@ -4,48 +4,37 @@ steps:
     filename: python
     arguments: '-m pip install -U pip setuptools'
   displayName: python -m pip install -U pip setuptools
-
 - task: CmdLine@1
   inputs:
     filename: python
     arguments: '-m pip install pyparsing pyyaml'
   displayName: python -m pip install pyparsing pyyaml
-
 - task: CmdLine@1
   inputs:
     filename: python
     arguments: '-m pip install EmPy'
   displayName: python -m pip install EmPy
-
 - task: CmdLine@1
   inputs:
     filename: python
     arguments: '-m pip install vcstool'
   displayName: python -m pip install vcstool
-
 - task: BatchScript@1
   inputs:
-    filename: 'ci-scripts/build-uwp.bat'
+    arguments: '$(Build.SourceBranchName) $(ros2.arch)'
     modifyEnvironment: false
   displayName: Build ROS2 .Net
-
 - task: CopyFiles@2
   inputs:
-    SourceFolder: 'D:\dev\ament'
-    Contents: 'install\**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-  displayName: Copy Ament artifacts
-
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: 'D:\dev\ros2'
-    Contents: 'install\**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    SourceFolder: 'D:\dev'
+    Contents: |
+     ament\install\**
+     ros2\install\**
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\ros2-dotnet-uwp-$(ros2.arch)'
   displayName: Copy ROS2 .Net artifacts
-
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'ros2-dotnet'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\ros2-dotnet-uwp-$(ros2.arch)'
+    ArtifactName: 'ros2-dotnet-uwp-$(ros2.arch)'
     publishLocation: Container
   displayName: Publish ROS2 .Net artifacts
