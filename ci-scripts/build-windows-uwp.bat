@@ -22,9 +22,9 @@ cd \dev\ament
 curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/%1/ament_dotnet_uwp.repos -o ament_dotnet_uwp.repos
 vcs import src < ament_dotnet_uwp.repos
 python src\ament\ament_tools\scripts\ament.py build ^
+    --msbuild-executable %ROS2_DOTNET_MSBUILD_EXECUTABLE% ^
     --cmake-args ^
         -G "Visual Studio 15 2017 Win64" ^
-        -DMSBUILD_EXECUTABLE=%ROS2_DOTNET_MSBUILD_EXECUTABLE% ^
     --
 
 call \dev\ament\install\local_setup.bat
@@ -38,9 +38,9 @@ cd \dev\ros2\src\ros2_dotnet\ros2_dotnet
 git checkout %1
 cd \dev\ros2
 ament build ^
+    --msbuild-executable %ROS2_DOTNET_MSBUILD_EXECUTABLE% ^
     --cmake-args ^
         -G %ROS2_DOTNET_CMAKE_GENERATOR% ^
-        -DMSBUILD_EXECUTABLE=%ROS2_DOTNET_MSBUILD_EXECUTABLE% ^
         -DCMAKE_SYSTEM_NAME=WindowsStore ^
         -DCMAKE_SYSTEM_VERSION=10.0 ^
         -DTHIRDPARTY=ON ^
