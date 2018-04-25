@@ -27,16 +27,94 @@ namespace ROS2 {
       public UnsatisfiedLinkError (string message, System.Exception inner) : base (message, inner) { }
     }
 
+    public class UnknownPlatformError : System.Exception {
+      public UnknownPlatformError () : base () { }
+      public UnknownPlatformError (string message) : base (message) { }
+      public UnknownPlatformError (string message, System.Exception inner) : base (message, inner) { }
+    }
+
+    public enum Platform {
+      Unix,
+      WindowsDesktop,
+      UWP,
+      Unknown
+    }
+
     public class DllLoadUtilsFactory {
+      [DllImport ("api-ms-win-core-libraryloader-l2-1-0.dll", EntryPoint = "LoadPackagedLibrary", SetLastError = true, ExactSpelling = true)]
+      private static extern IntPtr LoadPackagedLibrary ([MarshalAs (UnmanagedType.LPWStr)] string fileName, int reserved = 0);
+
+      [DllImport ("api-ms-win-core-libraryloader-l1-2-0.dll", EntryPoint = "FreeLibrary", SetLastError = true, ExactSpelling = true)]
+      private static extern int FreeLibraryUWP (IntPtr handle);
+
+      [DllImport ("kernel32.dll", EntryPoint = "LoadLibrary", SetLastError = true, ExactSpelling = true)]
+      private static extern IntPtr LoadLibrary (string fileName, int reserved = 0);
+
+      [DllImport ("kernel32.dll", EntryPoint = "FreeLibrary", SetLastError = true, ExactSpelling = true)]
+      private static extern int FreeLibraryDesktop (IntPtr handle);
+
+      [DllImport ("libdl.so", ExactSpelling = true)]
+      private static extern IntPtr dlopen (String fileName, int flags);
+
+      [DllImport ("libdl.so", ExactSpelling = true)]
+      private static extern int dlclose (IntPtr handle);
+
+      const int RTLD_NOW = 2;
+
       public static DllLoadUtils GetDllLoadUtils () {
-        DllLoadUtils dllLoadUtils = IsUnix () ? (DllLoadUtils) new DllLoadUtilsUnix () : new DllLoadUtilsWindows ();
-        return dllLoadUtils;
+        switch (CheckPlatform ()) {
+          case Platform.Unix:
+            return new DllLoadUtilsUnix ();
+          case Platform.WindowsDesktop:
+            return new DllLoadUtilsWindowsDesktop ();
+          case Platform.UWP:
+            return new DllLoadUtilsUWP ();
+          case Platform.Unknown:
+          default:
+            throw new UnknownPlatformError ();
+        }
+      }
+
+      private static bool IsUWP () {
+        try {
+          IntPtr ptr = LoadPackagedLibrary ("api-ms-win-core-libraryloader-l2-1-0.dll");
+          FreeLibraryUWP (ptr);
+          return true;
+        } catch (TypeLoadException) {
+          return false;
+        }
+      }
+
+      private static bool IsWindowsDesktop () {
+        try {
+          IntPtr ptr = LoadLibrary ("kernel32.dll");
+          FreeLibraryDesktop (ptr);
+          return true;
+        } catch (TypeLoadException) {
+          return false;
+        }
       }
 
       private static bool IsUnix () {
-        // See http://www.mono-project.com/docs/faq/technical/#how-to-detect-the-execution-platform
-        var p = (int) Environment.OSVersion.Platform;
-        return (p == 4) || (p == 6) || (p == 128);
+        try {
+          IntPtr ptr = dlopen ("libdl.so", RTLD_NOW);
+          dlclose (ptr);
+          return true;
+        } catch (TypeLoadException) {
+          return false;
+        }
+      }
+
+      private static Platform CheckPlatform () {
+        if (IsUnix ()) {
+          return Platform.Unix;
+        } else if (IsWindowsDesktop ()) {
+          return Platform.WindowsDesktop;
+        } else if (IsUWP ()) {
+          return Platform.UWP;
+        } else {
+          return Platform.Unknown;
+        }
       }
     }
 
@@ -46,7 +124,17 @@ namespace ROS2 {
       IntPtr GetProcAddress (IntPtr dllHandle, string name);
     }
 
-    public class DllLoadUtilsWindows : DllLoadUtils {
+    public class DllLoadUtilsUWP : DllLoadUtils {
+
+      [DllImport ("api-ms-win-core-libraryloader-l2-1-0.dll", SetLastError = true, ExactSpelling = true)]
+      private static extern IntPtr LoadPackagedLibrary ([MarshalAs (UnmanagedType.LPWStr)] string fileName, int reserved = 0);
+
+      [DllImport ("api-ms-win-core-libraryloader-l1-2-0.dll", SetLastError = true, ExactSpelling = true)]
+      private static extern int FreeLibrary (IntPtr handle);
+
+      [DllImport ("api-ms-win-core-libraryloader-l1-2-0.dll", SetLastError = true, ExactSpelling = true)]
+      private static extern IntPtr GetProcAddress (IntPtr handle, string procedureName);
+
       void DllLoadUtils.FreeLibrary (IntPtr handle) {
         FreeLibrary (handle);
       }
@@ -57,33 +145,58 @@ namespace ROS2 {
 
       IntPtr DllLoadUtils.LoadLibrary (string fileName) {
         string libraryName = fileName + "_native.dll";
-        IntPtr ptr = LoadLibrary (libraryName);
+        IntPtr ptr = LoadPackagedLibrary (fileName);
         if (ptr == IntPtr.Zero) {
           throw new UnsatisfiedLinkError (libraryName);
         }
         return ptr;
       }
+    }
 
-      [DllImport ("kernel32.dll")]
-      private static extern IntPtr LoadLibrary (string fileName);
+    public class DllLoadUtilsWindowsDesktop : DllLoadUtils {
 
-      [DllImport ("kernel32.dll")]
+      [DllImport ("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+      private static extern IntPtr LoadLibrary (string fileName, int reserved = 0);
+
+      [DllImport ("kernel32.dll", SetLastError = true, ExactSpelling = true)]
       private static extern int FreeLibrary (IntPtr handle);
 
-      [DllImport ("kernel32.dll")]
+      [DllImport ("kernel32.dll", SetLastError = true, ExactSpelling = true)]
       private static extern IntPtr GetProcAddress (IntPtr handle, string procedureName);
+
+      void DllLoadUtils.FreeLibrary (IntPtr handle) {
+        FreeLibrary (handle);
+      }
+
+      IntPtr DllLoadUtils.GetProcAddress (IntPtr dllHandle, string name) {
+        return GetProcAddress (dllHandle, name);
+      }
+
+      IntPtr DllLoadUtils.LoadLibrary (string fileName) {
+        string libraryName = fileName + "_native.dll";
+        IntPtr ptr = LoadLibrary (fileName);
+        if (ptr == IntPtr.Zero) {
+          throw new UnsatisfiedLinkError (libraryName);
+        }
+        return ptr;
+      }
     }
 
     internal class DllLoadUtilsUnix : DllLoadUtils {
-      public IntPtr LoadLibrary (string fileName) {
-        string libraryName = "lib" + fileName + "_native.so";
-        Console.WriteLine ("Loading library: " + libraryName);
-        IntPtr ptr = dlopen (libraryName, RTLD_NOW);
-        if (ptr == IntPtr.Zero) {
-          throw new UnsatisfiedLinkError (libraryName);
-        }
-        return ptr;
-      }
+
+      [DllImport ("libdl.so", ExactSpelling = true)]
+      private static extern IntPtr dlopen (String fileName, int flags);
+
+      [DllImport ("libdl.so", ExactSpelling = true)]
+      private static extern IntPtr dlsym (IntPtr handle, String symbol);
+
+      [DllImport ("libdl.so", ExactSpelling = true)]
+      private static extern int dlclose (IntPtr handle);
+
+      [DllImport ("libdl.so", ExactSpelling = true)]
+      private static extern IntPtr dlerror ();
+
+      const int RTLD_NOW = 2;
 
       public void FreeLibrary (IntPtr handle) {
         dlclose (handle);
@@ -100,19 +213,14 @@ namespace ROS2 {
         return res;
       }
 
-      const int RTLD_NOW = 2;
-
-      [DllImport ("libdl.so")]
-      private static extern IntPtr dlopen (String fileName, int flags);
-
-      [DllImport ("libdl.so")]
-      private static extern IntPtr dlsym (IntPtr handle, String symbol);
-
-      [DllImport ("libdl.so")]
-      private static extern int dlclose (IntPtr handle);
-
-      [DllImport ("libdl.so")]
-      private static extern IntPtr dlerror ();
+      public IntPtr LoadLibrary (string fileName) {
+        string libraryName = "lib" + fileName + "_native.so";
+        IntPtr ptr = dlopen (libraryName, RTLD_NOW);
+        if (ptr == IntPtr.Zero) {
+          throw new UnsatisfiedLinkError (libraryName);
+        }
+        return ptr;
+      }
     }
   }
 }
