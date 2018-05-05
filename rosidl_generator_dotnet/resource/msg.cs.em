@@ -17,49 +17,44 @@ public class @(type_name) : IMessage {
     static @(type_name)()
     {
         dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
-        try {
-            IntPtr nativelibrary = dllLoadUtils.LoadLibrary("@(spec.base_type.pkg_name)_@(type_name)__rosidl_typesupport_c");
+        IntPtr nativelibrary = dllLoadUtils.LoadLibrary("@(spec.base_type.pkg_name)_@(type_name)__rosidl_typesupport_c");
 
-            IntPtr native_get_typesupport_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_get_typesupport");
+        IntPtr native_get_typesupport_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_get_typesupport");
 
-            @(type_name).native_get_typesupport = (NativeGetTypeSupportType)Marshal.GetDelegateForFunctionPointer(
-                native_get_typesupport_ptr, typeof(NativeGetTypeSupportType));
+        @(type_name).native_get_typesupport = (NativeGetTypeSupportType)Marshal.GetDelegateForFunctionPointer(
+            native_get_typesupport_ptr, typeof(NativeGetTypeSupportType));
 
-            IntPtr native_create_native_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_create_native_message");
+        IntPtr native_create_native_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_create_native_message");
 
-            @(type_name).native_create_native_message = (NativeCreateNativeMessageType)Marshal.GetDelegateForFunctionPointer(
-                native_create_native_message_ptr, typeof(NativeCreateNativeMessageType));
+        @(type_name).native_create_native_message = (NativeCreateNativeMessageType)Marshal.GetDelegateForFunctionPointer(
+            native_create_native_message_ptr, typeof(NativeCreateNativeMessageType));
 
-            IntPtr native_destroy_native_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_destroy_native_message");
+        IntPtr native_destroy_native_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_destroy_native_message");
 
-            @(type_name).native_destroy_native_message = (NativeDestroyNativeMessageType)Marshal.GetDelegateForFunctionPointer(
-                native_destroy_native_message_ptr, typeof(NativeDestroyNativeMessageType));
+        @(type_name).native_destroy_native_message = (NativeDestroyNativeMessageType)Marshal.GetDelegateForFunctionPointer(
+            native_destroy_native_message_ptr, typeof(NativeDestroyNativeMessageType));
 
 @[for field in spec.fields]@
 @[    if field.type.is_array]@
 // TODO(esteve): Arrays are not supported
 @[    else]@
 @[        if field.type.is_primitive_type()]@
-            IntPtr native_read_field_@(field.name)_ptr =
-                dllLoadUtils.GetProcAddress(nativelibrary, "native_read_field_@(field.name)");
-            @(type_name).native_read_field_@(field.name) =
-                (NativeReadField@(get_field_name(type_name, field.name))Type)Marshal.GetDelegateForFunctionPointer(
-                native_read_field_@(field.name)_ptr, typeof(NativeReadField@(get_field_name(type_name, field.name))Type));
+        IntPtr native_read_field_@(field.name)_ptr =
+            dllLoadUtils.GetProcAddress(nativelibrary, "native_read_field_@(field.name)");
+        @(type_name).native_read_field_@(field.name) =
+            (NativeReadField@(get_field_name(type_name, field.name))Type)Marshal.GetDelegateForFunctionPointer(
+            native_read_field_@(field.name)_ptr, typeof(NativeReadField@(get_field_name(type_name, field.name))Type));
 
-            IntPtr native_write_field_@(field.name)_ptr =
-                dllLoadUtils.GetProcAddress(nativelibrary, "native_write_field_@(field.name)");
-            @(type_name).native_write_field_@(field.name) =
-                (NativeWriteField@(get_field_name(type_name, field.name))Type)Marshal.GetDelegateForFunctionPointer(
-                native_write_field_@(field.name)_ptr, typeof(NativeWriteField@(get_field_name(type_name, field.name))Type));
+        IntPtr native_write_field_@(field.name)_ptr =
+            dllLoadUtils.GetProcAddress(nativelibrary, "native_write_field_@(field.name)");
+        @(type_name).native_write_field_@(field.name) =
+            (NativeWriteField@(get_field_name(type_name, field.name))Type)Marshal.GetDelegateForFunctionPointer(
+            native_write_field_@(field.name)_ptr, typeof(NativeWriteField@(get_field_name(type_name, field.name))Type));
 @[        else]@
 // TODO(esteve): Nested types are not supported
 @[        end if]@
 @[    end if]@
 @[end for]@
-        } catch (UnsatisfiedLinkError e) {
-            System.Console.WriteLine("Native code library failed to load.\n" + e);
-            Environment.Exit(1);
-        }
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]

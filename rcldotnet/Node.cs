@@ -44,26 +44,21 @@ namespace ROS2 {
 
     static NodeDelegates () {
       dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils ();
-      try {
-        IntPtr nativelibrary = dllLoadUtils.LoadLibrary ("rcldotnet_node");
+      IntPtr nativelibrary = dllLoadUtils.LoadLibrary ("rcldotnet_node");
 
-        IntPtr native_rcl_create_publisher_handle_ptr = dllLoadUtils.GetProcAddress (
-          nativelibrary, "native_rcl_create_publisher_handle");
+      IntPtr native_rcl_create_publisher_handle_ptr = dllLoadUtils.GetProcAddress (
+        nativelibrary, "native_rcl_create_publisher_handle");
 
-        NodeDelegates.native_rcl_create_publisher_handle =
-          (NativeRCLCreatePublisherHandleType) Marshal.GetDelegateForFunctionPointer (
-            native_rcl_create_publisher_handle_ptr, typeof (NativeRCLCreatePublisherHandleType));
+      NodeDelegates.native_rcl_create_publisher_handle =
+        (NativeRCLCreatePublisherHandleType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_create_publisher_handle_ptr, typeof (NativeRCLCreatePublisherHandleType));
 
-        IntPtr native_rcl_create_subscription_handle_ptr = dllLoadUtils.GetProcAddress (
-          nativelibrary, "native_rcl_create_subscription_handle");
+      IntPtr native_rcl_create_subscription_handle_ptr = dllLoadUtils.GetProcAddress (
+        nativelibrary, "native_rcl_create_subscription_handle");
 
-        NodeDelegates.native_rcl_create_subscription_handle =
-          (NativeRCLCreateSubscriptionHandleType) Marshal.GetDelegateForFunctionPointer (
-            native_rcl_create_subscription_handle_ptr, typeof (NativeRCLCreateSubscriptionHandleType));
-      } catch (UnsatisfiedLinkError e) {
-        System.Console.WriteLine ("Native code library failed to load.\n" + e);
-        Environment.Exit (1);
-      }
+      NodeDelegates.native_rcl_create_subscription_handle =
+        (NativeRCLCreateSubscriptionHandleType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_create_subscription_handle_ptr, typeof (NativeRCLCreateSubscriptionHandleType));
     }
   }
 

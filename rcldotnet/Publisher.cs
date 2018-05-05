@@ -36,15 +36,10 @@ namespace ROS2 {
 
     static PublisherDelegates () {
       dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils ();
-      try {
-        IntPtr nativelibrary = dllLoadUtils.LoadLibrary ("rcldotnet_publisher");
-        IntPtr native_rcl_publish_ptr = dllLoadUtils.GetProcAddress (nativelibrary, "native_rcl_publish");
-        PublisherDelegates.native_rcl_publish = (NativeRCLPublishType) Marshal.GetDelegateForFunctionPointer (
-          native_rcl_publish_ptr, typeof (NativeRCLPublishType));
-      } catch (UnsatisfiedLinkError e) {
-        System.Console.WriteLine ("Native code library failed to load.\n" + e);
-        Environment.Exit (1);
-      }
+      IntPtr nativelibrary = dllLoadUtils.LoadLibrary ("rcldotnet_publisher");
+      IntPtr native_rcl_publish_ptr = dllLoadUtils.GetProcAddress (nativelibrary, "native_rcl_publish");
+      PublisherDelegates.native_rcl_publish = (NativeRCLPublishType) Marshal.GetDelegateForFunctionPointer (
+        native_rcl_publish_ptr, typeof (NativeRCLPublishType));
     }
   }
 
