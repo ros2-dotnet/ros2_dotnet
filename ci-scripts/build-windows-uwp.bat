@@ -42,7 +42,7 @@ ament build ^
     --cmake-args ^
         -G %ROS2_DOTNET_CMAKE_GENERATOR% ^
         -DCMAKE_SYSTEM_NAME=WindowsStore ^
-        -DCMAKE_SYSTEM_VERSION=10.0 ^
+        -DCMAKE_SYSTEM_VERSION=10.0.14393 ^
         -DTHIRDPARTY=ON ^
         -DCOMPILE_EXAMPLES=OFF ^
         -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
