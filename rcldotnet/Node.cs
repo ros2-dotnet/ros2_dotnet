@@ -81,8 +81,7 @@ namespace ROS2 {
     public IntPtr Handle { get; }
 
     public IPublisher<T> CreatePublisher<T> (string topic) where T : IMessage {
-      Type typeParametertype = typeof (T);
-      MethodInfo m = typeParametertype.GetMethod ("_GET_TYPE_SUPPORT");
+      MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("_GET_TYPE_SUPPORT");
 
       IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
       IntPtr publisherHandle = IntPtr.Zero;
@@ -92,8 +91,7 @@ namespace ROS2 {
     }
 
     public ISubscription<T> CreateSubscription<T> (string topic, Action<T> callback) where T : IMessage, new () {
-      Type typeParametertype = typeof (T);
-      MethodInfo m = typeParametertype.GetMethod ("_GET_TYPE_SUPPORT");
+      MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("_GET_TYPE_SUPPORT");
 
       IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
       IntPtr subscriptionHandle = IntPtr.Zero;
