@@ -145,7 +145,7 @@ namespace ROS2 {
 
       IntPtr DllLoadUtils.LoadLibrary (string fileName) {
         string libraryName = fileName + "_native.dll";
-        IntPtr ptr = LoadPackagedLibrary (fileName);
+        IntPtr ptr = LoadPackagedLibrary (libraryName);
         if (ptr == IntPtr.Zero) {
           throw new UnsatisfiedLinkError (libraryName);
         }
@@ -174,7 +174,7 @@ namespace ROS2 {
 
       IntPtr DllLoadUtils.LoadLibrary (string fileName) {
         string libraryName = fileName + "_native.dll";
-        IntPtr ptr = LoadLibrary (fileName);
+        IntPtr ptr = LoadLibrary (libraryName);
         if (ptr == IntPtr.Zero) {
           throw new UnsatisfiedLinkError (libraryName);
         }
