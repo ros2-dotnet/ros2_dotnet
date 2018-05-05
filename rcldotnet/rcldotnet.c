@@ -26,13 +26,16 @@
 
 int32_t native_rcl_init() {
   // TODO(esteve): parse args
-  return rcl_init(0, NULL, rcl_get_default_allocator());
+  int num_args = 0;
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  const char ** arg_values = NULL;
+  rcl_ret_t ret = rcl_init(num_args, arg_values, allocator);
+  return ret;
 }
 
 const char *native_rcl_get_rmw_identifier() {
   return rmw_get_implementation_identifier();
 }
-
 
 const char *native_rcl_get_error_string_safe() {
   return rcl_get_error_string_safe();
