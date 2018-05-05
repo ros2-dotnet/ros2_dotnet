@@ -30,7 +30,7 @@ namespace ROS2 {
     internal static readonly DllLoadUtils dllLoadUtils;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate void NativeRCLInitType ();
+    internal delegate int NativeRCLInitType ();
 
     internal static NativeRCLInitType native_rcl_init = null;
 
