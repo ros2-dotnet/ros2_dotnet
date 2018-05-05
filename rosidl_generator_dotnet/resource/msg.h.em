@@ -36,6 +36,10 @@ void @(msg_prefix)_CDECL native_destroy_native_message(void *);
 @[if field.type.is_primitive_type()]@
 @(msg_prefix)_EXPORT
 @(primitive_msg_type_to_c(field.type.type)) @(msg_prefix)_CDECL native_read_field_@(field.name)(void *);
+
+@(msg_prefix)_EXPORT
+void native_write_field_@(field.name)(void *, @(primitive_msg_type_to_c(field.type.type)));
+
 @[end if]@
 @[end for]@
 
