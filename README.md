@@ -14,7 +14,7 @@ Introduction
 ------------
 
 This is a collection of projects (bindings, code generator, examples and more) for writing ROS2
-applications for .NET Core and .NET Standard 2.0
+applications for .NET Core and .NET Standard.
 
 Features
 --------
