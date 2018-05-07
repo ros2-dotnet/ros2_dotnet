@@ -3,7 +3,12 @@ ROS2 for .NET
 
 Build status
 ------------
-[![Build status](https://estevefernandez.visualstudio.com/_apis/public/build/definitions/eb47ae83-8d6a-4928-9220-843167919f4f/1/badge)](https://estevefernandez.visualstudio.com/ros2-dotnet/_build/index?definitionId=1)
+
+| Architecture  | Build status |
+|:--------------|--------------|
+| x86           | [![Build status for x86](https://estevefernandez.visualstudio.com/_apis/public/build/definitions/eb47ae83-8d6a-4928-9220-843167919f4f/12/badge)](https://estevefernandez.visualstudio.com/ros2-dotnet/_build/index?definitionId=12) |
+| x64           | [![Build status for x64](https://estevefernandez.visualstudio.com/_apis/public/build/definitions/eb47ae83-8d6a-4928-9220-843167919f4f/13/badge)](https://estevefernandez.visualstudio.com/ros2-dotnet/_build/index?definitionId=13) |
+| ARM           | [![Build status for ARM](https://estevefernandez.visualstudio.com/_apis/public/build/definitions/eb47ae83-8d6a-4928-9220-843167919f4f/7/badge)](https://estevefernandez.visualstudio.com/ros2-dotnet/_build/index?definitionId=7)  |
 
 Introduction
 ------------
