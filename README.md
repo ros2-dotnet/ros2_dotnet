@@ -1,15 +1,6 @@
 ROS2 for .NET
 =============
 
-Build status
-------------
-
-| Platform  | Build status |
-|:--------------|--------------|
-| UWP x86 | [![Build status for UWP x86](https://estevefernandez.visualstudio.com/_apis/public/build/definitions/eb47ae83-8d6a-4928-9220-843167919f4f/12/badge)](https://estevefernandez.visualstudio.com/ros2-dotnet/_build/index?definitionId=12) |
-| UWP x64 | [![Build status for UWP x64](https://estevefernandez.visualstudio.com/_apis/public/build/definitions/eb47ae83-8d6a-4928-9220-843167919f4f/13/badge)](https://estevefernandez.visualstudio.com/ros2-dotnet/_build/index?definitionId=13) |
-| UWP ARM | [![Build status for UWP ARM](https://estevefernandez.visualstudio.com/_apis/public/build/definitions/eb47ae83-8d6a-4928-9220-843167919f4f/7/badge)](https://estevefernandez.visualstudio.com/ros2-dotnet/_build/index?definitionId=7)  |
-
 Introduction
 ------------
 
