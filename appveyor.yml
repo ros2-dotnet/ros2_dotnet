@@ -12,7 +12,7 @@ environment:
 before_build:
   - SET PATH=%PYTHON%;%PYTHON%\Scripts;%path%
   - pip install vcstool
-  - pip install EmPy pyparsing pyyaml
+  - pip install -U catkin_pkg EmPy pyparsing pyyaml
 
 build_script:
   - md \dev\ament\src
