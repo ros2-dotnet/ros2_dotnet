@@ -50,9 +50,6 @@ md \dev\ros2_dotnet_ws\src
 cd \dev\ros2_dotnet_ws
 wget https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet.repos
 vcs import \dev\ros2_dotnet_ws\src < ros2_dotnet.repos
-cd \dev\ros2_dotnet_ws\src\ros2\rosidl_typesupport
-patch -p1 < ..\..\ros2_dotnet\ros2_dotnet\rosidl_typesupport_ros2_dotnet.patch
-cd \dev\ros2_dotnet_ws
 src\ament\ament_tools\scripts\ament.py build
 ```
 
@@ -64,9 +61,6 @@ mkdir -p ~/ros2_dotnet_ws/src
 cd ~/ros2_dotnet_ws
 wget https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet.repos
 vcs import ~/ros2_dotnet_ws/src < ros2_dotnet.repos
-cd ~/ros2_dotnet_ws/src/ros2/rosidl_typesupport
-patch -p1 < ../../ros2_dotnet/ros2_dotnet/rosidl_typesupport_ros2_dotnet.patch
-cd ~/ros2_dotnet_ws
 src/ament/ament_tools/scripts/ament.py build
 ```
 

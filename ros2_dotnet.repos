@@ -41,8 +41,8 @@ repositories:
     version: master
   eProsima/Fast-RTPS:
     type: git
-    url: https://github.com/eProsima/Fast-RTPS.git
-    version: master
+    url: https://github.com/esteve/Fast-RTPS.git
+    version: windows
   ros/angles:
     type: git
     url: https://github.com/ros/angles.git
@@ -54,6 +54,10 @@ repositories:
   ros/console_bridge:
     type: git
     url: https://github.com/ros/console_bridge.git
+    version: master
+  ros2/libyaml_vendor:
+    type: git
+    url: https://github.com/ros2/libyaml_vendor.git
     version: master
   ros/pluginlib:
     type: git
@@ -182,6 +186,10 @@ repositories:
   ros2/rosidl_dds:
     type: git
     url: https://github.com/ros2/rosidl_dds.git
+    version: master
+  ros2/rosidl_defaults:
+    type: git
+    url: https://github.com/ros2/rosidl_defaults.git
     version: master
   ros2/rosidl_typesupport:
     type: git

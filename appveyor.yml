@@ -26,16 +26,13 @@ build_script:
   - cd \dev\ros2
   - curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/%APPVEYOR_REPO_BRANCH%/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
   - vcs import src < ros2_dotnet_uwp.repos
-  - cd \dev\ros2\src\ros2\rosidl_typesupport
-  - patch -p1 < ..\..\ros2_dotnet/ros2_dotnet/rosidl_typesupport_ros2_uwp.patch
+  - cd \dev\ros2\src\ros2_dotnet
+  - vcs custom --git --args checkout %APPVEYOR_REPO_BRANCH% || VER>NUL
   - cd \dev\ros2
-  - type nul > src\ros2\common_interfaces\shape_msgs
-  - type nul > src\ros2\common_interfaces\actionlib_msgs
-  - type nul > src\ros2\common_interfaces\geometry_msgs
-  - type nul > src\ros2\common_interfaces\diagnostic_msgs
 
-  - ament build --cmake-args -G "Visual Studio 15 2017" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0 -DTHIRDPARTY=ON -DCOMPILE_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" --
+  - ament build --parallel --skip-packages actionlib_msgs diagnostic_msgs geometry_msgs nav_msgs sensor_msgs shape_msgs stereo_msgs trajectory_msgs visualization_msgs rosidl_typesupport_fastrtps_c rmw_fastrtps_cpp --cmake-args -G "Visual Studio 15 2017" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.14393 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" --
 
 after_build:
   - 7z a ros2_uwp.zip \dev\ros2\install
+  - 7z rn ros2_uwp.zip install ros2_uwp\install
   - appveyor PushArtifact ros2_uwp.zip

@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<package format="2">
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>rosidl_generator_dotnet</name>
   <version>0.0.0</version>
   <description>Generate the ROS interfaces in .NET</description>
@@ -35,6 +36,9 @@
   <test_depend>rosidl_typesupport_introspection_c</test_depend>
   <test_depend>rosidl_typesupport_opensplice_c</test_depend>
 -->
+
+  <member_of_group>rosidl_generator_packages</member_of_group>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>
