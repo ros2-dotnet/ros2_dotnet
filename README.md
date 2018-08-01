@@ -1,6 +1,13 @@
 ROS2 for .NET
 =============
 
+Build status
+------------
+
+| Target | Status |
+|----------|--------|
+| **UWP 32-bit** | [![Build status](https://ci.appveyor.com/api/projects/status/aj9c51d7xcps99pd/branch/master?svg=true)](https://ci.appveyor.com/project/esteve/ros2-dotnet/branch/master) |
+
 Introduction
 ------------
 
