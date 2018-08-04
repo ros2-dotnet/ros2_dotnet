@@ -6,7 +6,10 @@ Build status
 
 | Target | Status |
 |----------|--------|
-| **UWP 32-bit** | [![Build status](https://ci.appveyor.com/api/projects/status/aj9c51d7xcps99pd/branch/master?svg=true)](https://ci.appveyor.com/project/esteve/ros2-dotnet/branch/master) |
+| **Universal Windows Platform (x86)** | [![Build status](https://appveyor-matrix-badges.herokuapp.com/repos/esteve/ros2-dotnet/branch/master/1)](https://ci.appveyor.com/project/esteve/ros2-dotnet/branch/master) |
+| **Universal Windows Platform (x64)** | [![Build status](https://appveyor-matrix-badges.herokuapp.com/repos/esteve/ros2-dotnet/branch/master/2)](https://ci.appveyor.com/project/esteve/ros2-dotnet/branch/master) |
+| **Universal Windows Platform (ARM)** | [![Build status](https://appveyor-matrix-badges.herokuapp.com/repos/esteve/ros2-dotnet/branch/master/3)](https://ci.appveyor.com/project/esteve/ros2-dotnet/branch/master) |
+| **Windows Desktop**                  | [![Build status](https://appveyor-matrix-badges.herokuapp.com/repos/esteve/ros2-dotnet/branch/master/4)](https://ci.appveyor.com/project/esteve/ros2-dotnet/branch/master) |
 
 Introduction
 ------------

@@ -9,6 +9,12 @@ build: off
 environment:
   PYTHON: C:\Python36-x64
 
+  matrix:
+      - ros2_target: uwp-32
+      - ros2_target: uwp-64
+      - ros2_target: uwp-arm
+      - ros2_target: desktop
+
 before_build:
   - SET PATH=%PYTHON%;%PYTHON%\Scripts;%path%
   - pip install vcstool
@@ -29,9 +35,97 @@ build_script:
   - cd \dev\ros2\src\ros2_dotnet
   - vcs custom --git --args checkout %APPVEYOR_REPO_BRANCH% || VER>NUL
   - cd \dev\ros2
-
-  - ament build --parallel --skip-packages actionlib_msgs diagnostic_msgs geometry_msgs nav_msgs sensor_msgs shape_msgs stereo_msgs trajectory_msgs visualization_msgs rosidl_typesupport_fastrtps_c rmw_fastrtps_cpp --cmake-args -G "Visual Studio 15 2017" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.14393 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" --
-
+  - if "%ros2_target%" == "uwp-32" (
+      ament build ^
+      --parallel ^
+      --skip-packages ^
+      actionlib_msgs ^
+      diagnostic_msgs ^
+      geometry_msgs ^
+      nav_msgs ^
+      sensor_msgs ^
+      shape_msgs ^
+      stereo_msgs ^
+      trajectory_msgs ^
+      visualization_msgs ^
+      rosidl_typesupport_fastrtps_c ^
+      rmw_fastrtps_cpp ^
+      --cmake-args ^
+      -G "Visual Studio 15 2017" ^
+      -DCMAKE_SYSTEM_NAME=WindowsStore ^
+      -DCMAKE_SYSTEM_VERSION=10.0.14393 ^
+      -DTHIRDPARTY=ON ^
+      -DINSTALL_EXAMPLES=OFF ^
+      -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
+      --
+    ) else if "%ros2_target%" == "uwp-64" (
+      ament build ^
+      --parallel ^
+      --skip-packages ^
+      actionlib_msgs ^
+      diagnostic_msgs ^
+      geometry_msgs ^
+      nav_msgs ^
+      sensor_msgs ^
+      shape_msgs ^
+      stereo_msgs ^
+      trajectory_msgs ^
+      visualization_msgs ^
+      rosidl_typesupport_fastrtps_c ^
+      rmw_fastrtps_cpp ^
+      --cmake-args ^
+      -G "Visual Studio 15 2017 Win64" ^
+      -DCMAKE_SYSTEM_NAME=WindowsStore ^
+      -DCMAKE_SYSTEM_VERSION=10.0.14393 ^
+      -DTHIRDPARTY=ON ^
+      -DINSTALL_EXAMPLES=OFF ^
+      -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
+      --
+    ) else if "%ros2_target%" == "uwp-arm" (
+      ament build ^
+      --parallel ^
+      --skip-packages ^
+      actionlib_msgs ^
+      diagnostic_msgs ^
+      geometry_msgs ^
+      nav_msgs ^
+      sensor_msgs ^
+      shape_msgs ^
+      stereo_msgs ^
+      trajectory_msgs ^
+      visualization_msgs ^
+      rosidl_typesupport_fastrtps_c ^
+      rmw_fastrtps_cpp ^
+      --cmake-args ^
+      -G "Visual Studio 15 2017 ARM" ^
+      -DCMAKE_SYSTEM_NAME=WindowsStore ^
+      -DCMAKE_SYSTEM_VERSION=10.0.14393 ^
+      -DTHIRDPARTY=ON ^
+      -DINSTALL_EXAMPLES=OFF ^
+      -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
+      --
+    ) else if "%ros2_target%" == "desktop" (
+      ament build ^
+      --parallel ^
+      --skip-packages ^
+      actionlib_msgs ^
+      diagnostic_msgs ^
+      geometry_msgs ^
+      nav_msgs ^
+      sensor_msgs ^
+      shape_msgs ^
+      stereo_msgs ^
+      trajectory_msgs ^
+      visualization_msgs ^
+      rosidl_typesupport_fastrtps_c ^
+      rmw_fastrtps_cpp ^
+      --cmake-args ^
+      -G "Visual Studio 15 2017 Win64" ^
+      -DTHIRDPARTY=ON ^
+      -DINSTALL_EXAMPLES=OFF ^
+      -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
+      --
+    )
 after_build:
   - 7z a ros2_uwp.zip \dev\ros2\install
   - 7z rn ros2_uwp.zip install ros2_uwp\install
