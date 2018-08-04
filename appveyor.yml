@@ -30,7 +30,7 @@ build_script:
   - vcs custom --git --args checkout %APPVEYOR_REPO_BRANCH% || VER>NUL
   - cd \dev\ros2
 
-  - ament build --parallel --skip-packages actionlib_msgs diagnostic_msgs geometry_msgs nav_msgs sensor_msgs shape_msgs stereo_msgs trajectory_msgs visualization_msgs rosidl_typesupport_fastrtps_c rmw_fastrtps_cpp --cmake-args -G "Visual Studio 15 2017" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.14393 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" --
+  - ament build --parallel --skip-packages actionlib_msgs diagnostic_msgs geometry_msgs nav_msgs sensor_msgs shape_msgs stereo_msgs trajectory_msgs visualization_msgs --cmake-args -G "Visual Studio 15 2017" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.14393 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" --
 
 after_build:
   - 7z a ros2_uwp.zip \dev\ros2\install
