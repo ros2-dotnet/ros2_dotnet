@@ -63,6 +63,10 @@ repositories:
     type: git
     url: https://github.com/esteve/rosidl_typesupport.git
     version: uwp-noenv
+  ros2/rosidl_typesupport_fastrtps:
+    type: git
+    url: https://github.com/ros2/rosidl_typesupport_fastrtps.git
+    version: master
   ros2_dotnet/dotnet_cmake_module:
     type: git
     url: https://github.com/esteve/dotnet_cmake_module.git
