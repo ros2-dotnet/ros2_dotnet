@@ -75,14 +75,14 @@ ament build --cmake-args -G "Visual Studio 15 2017" -DCMAKE_SYSTEM_NAME=WindowsS
 
 ```
 cd \dev\ros2
-curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
+curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet.repos -o ros2_dotnet.repos
 vcs import src < ros2_dotnet_uwp.repos
 cd \dev\ros2\src\ros2_dotnet
 vcs custom --git --args checkout master || VER>NUL
 cd \dev\ament
 call install\local_setup.bat
 cd \dev\ros2
-ament build --cmake-args -G "Visual Studio 15 2017 Win64" -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" 
+ament build --cmake-args -G "Visual Studio 15 2017 Win64" -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install"
 ```
 
 Linux
