@@ -48,12 +48,41 @@ The following steps show how to build the examples on Windows and Linux:
 Windows
 -------
 
+* compiling ament for Win64
+
 ```
-md \dev\ros2_dotnet_ws\src
-cd \dev\ros2_dotnet_ws
-wget https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet.repos
-vcs import \dev\ros2_dotnet_ws\src < ros2_dotnet.repos
-src\ament\ament_tools\scripts\ament.py build
+cd \dev\ament
+curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ament_dotnet_uwp.repos -o ament_dotnet_uwp.repos
+vcs import src < ament_dotnet_uwp.repos
+python src\ament\ament_tools\scripts\ament.py build --cmake-args -G "Visual Studio 15 2017 Win64" --
+```
+
+* compiling ament for UWP 32
+
+```
+cd \dev\ros2
+curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
+vcs import src < ros2_dotnet_uwp.repos
+cd \dev\ros2\src\ros2_dotnet
+vcs custom --git --args checkout master || VER>NUL
+cd \dev\ament
+call install\local_setup.bat
+cd \dev\ros2
+ament build --cmake-args -G "Visual Studio 15 2017" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.14393 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install"
+```
+
+* compiling ament for Win64
+
+```
+cd \dev\ros2
+curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
+vcs import src < ros2_dotnet_uwp.repos
+cd \dev\ros2\src\ros2_dotnet
+vcs custom --git --args checkout master || VER>NUL
+cd \dev\ament
+call install\local_setup.bat
+cd \dev\ros2
+ament build --cmake-args -G "Visual Studio 15 2017 Win64" -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" 
 ```
 
 Linux
