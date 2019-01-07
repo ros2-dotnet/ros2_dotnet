@@ -48,8 +48,8 @@ namespace ROS2 {
       [DllImport ("api-ms-win-core-libraryloader-l1-2-0.dll", EntryPoint = "FreeLibrary", SetLastError = true, ExactSpelling = true)]
       private static extern int FreeLibraryUWP (IntPtr handle);
 
-      [DllImport ("kernel32.dll", EntryPoint = "LoadLibrary", SetLastError = true, ExactSpelling = true)]
-      private static extern IntPtr LoadLibrary (string fileName, int reserved = 0);
+      [DllImport ("kernel32.dll", EntryPoint = "LoadLibraryA", SetLastError = true, ExactSpelling = true)]
+      private static extern IntPtr LoadLibraryA (string fileName, int reserved = 0);
 
       [DllImport ("kernel32.dll", EntryPoint = "FreeLibrary", SetLastError = true, ExactSpelling = true)]
       private static extern int FreeLibraryDesktop (IntPtr handle);
@@ -96,7 +96,7 @@ namespace ROS2 {
 
       private static bool IsWindowsDesktop () {
         try {
-          IntPtr ptr = LoadLibrary ("kernel32.dll");
+          IntPtr ptr = LoadLibraryA ("kernel32.dll");
           FreeLibraryDesktop (ptr);
           return true;
         } catch (TypeLoadException) {
@@ -176,8 +176,8 @@ namespace ROS2 {
 
     public class DllLoadUtilsWindowsDesktop : DllLoadUtils {
 
-      [DllImport ("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-      private static extern IntPtr LoadLibrary (string fileName, int reserved = 0);
+      [DllImport ("kernel32.dll", EntryPoint = "LoadLibraryA", SetLastError = true, ExactSpelling = true)]
+      private static extern IntPtr LoadLibraryA (string fileName, int reserved = 0);
 
       [DllImport ("kernel32.dll", SetLastError = true, ExactSpelling = true)]
       private static extern int FreeLibrary (IntPtr handle);
@@ -195,7 +195,7 @@ namespace ROS2 {
 
       IntPtr DllLoadUtils.LoadLibrary (string fileName) {
         string libraryName = fileName + "_native.dll";
-        IntPtr ptr = LoadLibrary (libraryName);
+        IntPtr ptr = LoadLibraryA (libraryName);
         if (ptr == IntPtr.Zero) {
           throw new UnsatisfiedLinkError (libraryName);
         }
