@@ -87,7 +87,7 @@ call install\local_setup.bat
 UWP
 ---
 
-Replace %TARGET_GENERATOR% with "Visual Studio 15 2017" for Win32, "Visual Studio 15 2017 Win64" for Win64 and "Visual Studio 15 2017 ARM" for ARM
+Replace `%TARGET_GENERATOR%` with "Visual Studio 15 2017" for Win32, "Visual Studio 15 2017 Win64" for Win64 and "Visual Studio 15 2017 ARM" for ARM
 
 ```
 md \dev\ros2\src
