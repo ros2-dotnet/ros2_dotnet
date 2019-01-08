@@ -45,8 +45,8 @@ Next make sure you've either installed .Net Core (preferred) https://www.microso
 
 The following steps show how to build the examples on Windows and Linux:
 
-Windows
--------
+Windows (Desktop)
+-----------------
 
 ```
 md \dev\ros2_dotnet_ws\src
@@ -65,6 +65,39 @@ cd ~/ros2_dotnet_ws
 wget https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet.repos
 vcs import ~/ros2_dotnet_ws/src < ros2_dotnet.repos
 src/ament/ament_tools/scripts/ament.py build
+```
+
+Universal Windows Platform (ARM, Win32, Win64)
+----------------------------------------------
+
+We'll build this in two steps, first `ament` (the build system) and then ROS2 itself. This is because `ament` will run on the host platform, whereas `ros2-dotnet` on the target.
+
+ament
+-----
+
+```
+md \dev\ament\src
+cd \dev\ament
+curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/%BUILD_SOURCEBRANCHNAME%/ament_dotnet_uwp.repos -o ament_dotnet_uwp.repos
+vcs import src < ament_dotnet_uwp.repos
+python src\ament\ament_tools\scripts\ament.py build --cmake-args -G "Visual Studio 15 2017 Win64" --
+call install\local_setup.bat
+```
+
+UWP
+---
+
+Replace %TARGET_GENERATOR% with "Visual Studio 15 2017" for Win32, "Visual Studio 15 2017 Win64" for Win64 and "Visual Studio 15 2017 ARM" for ARM
+
+```
+md \dev\ros2\src
+cd \dev\ros2
+curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/%BUILD_SOURCEBRANCHNAME%/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
+vcs import src < ros2_dotnet_uwp.repos
+cd \dev\ament
+call install\local_setup.bat
+cd \dev\ros2
+ament build --parallel --cmake-args -G "%TARGET_GENERATOR%" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.14393 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" --
 ```
 
 Now you can just run a bunch of examples.
