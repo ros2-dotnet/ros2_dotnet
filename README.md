@@ -51,7 +51,7 @@ Windows (Desktop)
 ```
 md \dev\ros2_dotnet_ws\src
 cd \dev\ros2_dotnet_ws
-wget https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet.repos
+curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet.repos -o ros2_dotnet.repos
 vcs import \dev\ros2_dotnet_ws\src < ros2_dotnet.repos
 src\ament\ament_tools\scripts\ament.py build
 ```
