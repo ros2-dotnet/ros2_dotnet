@@ -12,7 +12,19 @@ namespace @(subfolder)
 public class @(type_name) : IMessage {
     private static readonly DllLoadUtils dllLoadUtils;
 
-    public @(type_name)() {}
+    public @(type_name)()
+    {
+@[for field in spec.fields]@
+@[    if field.type.is_array]@
+// TODO(fmrico): Arrays are not supported
+@[    else]@
+@[        if field.type.is_primitive_type()]@
+@[        else]@
+        @(get_field_name(type_name, field.name)) = new @(get_dotnet_type(field.type)) ();
+@[        end if]@
+@[    end if]@
+@[end for]@
+    }
 
     static @(type_name)()
     {
@@ -51,10 +63,10 @@ public class @(type_name) : IMessage {
             (NativeWriteField@(get_field_name(type_name, field.name))Type)Marshal.GetDelegateForFunctionPointer(
             native_write_field_@(field.name)_ptr, typeof(NativeWriteField@(get_field_name(type_name, field.name))Type));
 @[        else]@
-// TODO(esteve): Nested types are not supported
 @[        end if]@
 @[    end if]@
 @[end for]@
+
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -97,7 +109,6 @@ public class @(type_name) : IMessage {
 
     private static NativeWriteField@(get_field_name(type_name, field.name))Type native_write_field_@(field.name) = null;
 @[        else]@
-// TODO(esteve): Nested types are not supported
 @[        end if]@
 @[    end if]@
 @[end for]@
@@ -124,6 +135,7 @@ public class @(type_name) : IMessage {
         @(get_field_name(type_name, field.name)) = native_read_field_@(field.name)(messageHandle);
 @[            end if]@
 @[        else]@
+        @(get_field_name(type_name, field.name))._READ_HANDLE(messageHandle);
 @[        end if]@
 @[    end if]@
 @[end for]@
