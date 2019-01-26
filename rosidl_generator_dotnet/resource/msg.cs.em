@@ -136,6 +136,7 @@ public class @(type_name) : IMessage {
 @[        if field.type.is_primitive_type()]@
         native_write_field_@(field.name)(messageHandle, @(get_field_name(type_name, field.name)));
 @[        else]@
+        @(get_field_name(type_name, field.name))._WRITE_HANDLE(messageHandle);
 @[        end if]@
 @[    end if]@
 @[end for]@
@@ -155,10 +156,9 @@ public class @(type_name) : IMessage {
 // TODO(esteve): Arrays are not supported
 @[    else]@
 @[        if field.type.is_primitive_type()]@
-
     public @(get_dotnet_type(field.type)) @(get_field_name(type_name, field.name)) { get; set; }
 @[        else]@
-// TODO(esteve): Nested types are not supported
+    public @(get_dotnet_type(field.type)) @(get_field_name(type_name, field.name)) { get; set; }
 @[        end if]@
 @[    end if]@
 @[end for]@
