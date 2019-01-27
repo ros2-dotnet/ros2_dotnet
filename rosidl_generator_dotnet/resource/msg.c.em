@@ -69,6 +69,12 @@ void native_write_field_@(field.name)(void * message_handle, @(primitive_msg_typ
 @[        end if]@
 @[    end if]@
 }
+@[else]@
+
+void * native_get_field_@(field.name)_message(void * raw_ros_message) {
+    @(msg_typename) * ros_message = (@(msg_typename) *)raw_ros_message;
+    return &(ros_message->@(field.name));
+}
 @[end if]@
 
 @[end for]@
