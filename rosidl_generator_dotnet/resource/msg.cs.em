@@ -19,6 +19,9 @@ public class @(type_name) : IMessage {
 // TODO(fmrico): Arrays are not supported
 @[    else]@
 @[        if field.type.is_primitive_type()]@
+@[            if field.type.type == 'string']@
+        @(get_field_name(type_name, field.name)) = "";
+@[            end if]@
 @[        else]@
         @(get_field_name(type_name, field.name)) = new @(get_dotnet_type(field.type)) ();
 @[        end if]@
