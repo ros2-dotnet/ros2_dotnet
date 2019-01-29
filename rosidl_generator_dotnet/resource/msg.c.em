@@ -31,52 +31,68 @@ const void * native_get_typesupport() {
 }
 
 @[for field in spec.fields]@
-@[if field.type.is_primitive_type()]@
-
-@(primitive_msg_type_to_c(field.type.type)) native_read_field_@(field.name)(void * message_handle) {
 @[    if field.type.is_array]@
+void * native_get_field_@(field.name)_message(void *message_handle, int index) {
+  @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
+@[        if field.type.is_dynamic_array()]@
+  return &(ros_message->@(field.name).data[index]);
+@[        else]@
+  return &(ros_message->@(field.name)[index]);
+@[        end if]@
+}
+
+void * native_init_field_@(field.name)_message(void *message_handle, int size) {
+@{
+nested_type = '%s__%s__%s' % (field.type.pkg_name, 'msg', field.type.type)
+}@
+  @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
+@[        if field.type.is_primitive_type() or field.type.type == 'string']@
+  @(msg_typename)__Array__init(&(ros_message->@(field.name)), size);
+@[        else]@
+  @(nested_type)__Array__init(&(ros_message->@(field.name)), size);
+@[        end if]@
+}
+@[        if field.type.is_primitive_type()]@
+void native_write_field_@(field.name)(void *message_handle, @(primitive_msg_type_to_c(field.type.type)) value)
+{
+  @(primitive_msg_type_to_c(field.type.type))  * ros_message_ptr = (@(msg_typename) *)message_handle;
+@[            if field.type.type == 'string']@
+  rosidl_generator_c__String__assign(
+    ros_message_ptr, value);
+@[            else]@
+  *ros_message_ptr = value;
+@[            end if]@
+}
+@[        end if]@
 @[    else]@
 @[        if field.type.is_primitive_type()]@
+@(primitive_msg_type_to_c(field.type.type)) native_read_field_@(field.name)(void * message_handle) {
   @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
 @[            if field.type.type == 'string']@
   return ros_message->@(field.name).data;
 @[            else]@
   return ros_message->@(field.name);
 @[            end if]@
-@[        else]@
-@[        end if]@
-@[    end if]@
+
 }
-@[end if]@
-
-@[end for]@
-
-@[for field in spec.fields]@
-@[if field.type.is_primitive_type()]@
 
 void native_write_field_@(field.name)(void * message_handle, @(primitive_msg_type_to_c(field.type.type)) value) {
-@[    if field.type.is_array]@
-@[    else]@
-@[        if field.type.is_primitive_type()]@
   @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
 @[            if field.type.type == 'string']@
-  rosidl_generator_c__String__assign(
-    &ros_message->@(field.name), value);
+    rosidl_generator_c__String__assign(
+      &ros_message->@(field.name), value);
 @[            else]@
   ros_message->@(field.name) = value;
 @[            end if]@
-@[        else]@
-@[        end if]@
-@[    end if]@
 }
-@[else]@
+@[        else]@
 
 void * native_get_field_@(field.name)_message(void * raw_ros_message) {
-    @(msg_typename) * ros_message = (@(msg_typename) *)raw_ros_message;
-    return &(ros_message->@(field.name));
+  @(msg_typename) * ros_message = (@(msg_typename) *)raw_ros_message;
+  return &(ros_message->@(field.name));
 }
-@[end if]@
-
+@[        end if]@
+@[    end if]@
 @[end for]@
 
 void native_destroy_native_message(void * raw_ros_message) {
