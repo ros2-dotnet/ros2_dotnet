@@ -52,6 +52,24 @@ nested_type = '%s__%s__%s' % (field.type.pkg_name, 'msg', field.type.type)
   @(nested_type)__Array__init(&(ros_message->@(field.name)), size);
 @[        end if]@
 }
+
+int native_getsize_array_field_@(field.name)_message(void *message_handle)
+{
+  @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
+  int size = 0;
+
+@[    if field.type.is_array]@
+@[      if field.type.array_size is None or field.type.is_upper_bound]@
+  size = ros_message->@(field.name).size;
+@[      else]@
+  size = @(field.type.array_size);
+@[      end if]@
+@[    end if]@
+
+  return size;
+
+}
+
 @[        if field.type.is_primitive_type()]@
 void native_write_field_@(field.name)(void *message_handle, @(primitive_msg_type_to_c(field.type.type)) value)
 {
@@ -62,6 +80,11 @@ void native_write_field_@(field.name)(void *message_handle, @(primitive_msg_type
 @[            else]@
   *ros_message_ptr = value;
 @[            end if]@
+}
+
+@(primitive_msg_type_to_c(field.type.type)) native_read_field_@(field.name)(void * message_handle) {
+  @(primitive_msg_type_to_c(field.type.type)) * ros_message = (@(primitive_msg_type_to_c(field.type.type)) *)message_handle;
+  return *ros_message;
 }
 @[        end if]@
 @[    else]@

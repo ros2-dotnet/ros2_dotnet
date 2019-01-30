@@ -38,9 +38,13 @@ void @(msg_prefix)_CDECL native_destroy_native_message(void *);
 void * @(msg_prefix)_CDECL native_get_field_@(field.name)_message(void *, int);
 @(msg_prefix)_EXPORT
 void * @(msg_prefix)_CDECL native_init_field_@(field.name)_message(void *, int);
+@(msg_prefix)_EXPORT
+int @(msg_prefix)_CDECL native_getsize_array_field_@(field.name)_message(void *);
 @[        if field.type.is_primitive_type()]@
 @(msg_prefix)_EXPORT
 void native_write_field_@(field.name)(void *, @(primitive_msg_type_to_c(field.type.type)));
+@(msg_prefix)_EXPORT
+@(primitive_msg_type_to_c(field.type.type)) @(msg_prefix)_CDECL native_read_field_@(field.name)(void *);
 @[        end if]@
 @[    else]@
 @[        if field.type.is_primitive_type()]@
