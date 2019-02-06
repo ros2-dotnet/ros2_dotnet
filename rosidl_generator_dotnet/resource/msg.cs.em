@@ -67,10 +67,10 @@ public class @(type_name) : IMessage {
             native_write_field_@(field.name)_ptr, typeof(NativeWriteField@(get_field_name(type_name, field.name))Type));
 @[        else]@
 
-        IntPtr native_get_field_@(field.name)_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_get_field_@(field.name)");
+        IntPtr native_get_field_@(field.name)_HANDLE_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_get_field_@(field.name)_HANDLE");
 
-        @(type_name).native_get_field_@(field.name) = (NativeGetField@(get_field_name(type_name, field.name))MessageType)Marshal.GetDelegateForFunctionPointer(
-            native_get_field_@(field.name)_ptr, typeof(NativeGetField@(get_field_name(type_name, field.name))MessageType));
+        @(type_name).native_get_field_@(field.name)_HANDLE = (NativeGetField@(get_field_name(type_name, field.name))MessageType)Marshal.GetDelegateForFunctionPointer(
+            native_get_field_@(field.name)_HANDLE_ptr, typeof(NativeGetField@(get_field_name(type_name, field.name))MessageType));
 @[        end if]@
 @[    end if]@
 @[end for]@
@@ -117,7 +117,7 @@ public class @(type_name) : IMessage {
 
     private static NativeWriteField@(get_field_name(type_name, field.name))Type native_write_field_@(field.name) = null;
 @[        else]@
-    private static NativeGetField@(get_field_name(type_name, field.name))MessageType native_get_field_@(field.name) = null;
+    private static NativeGetField@(get_field_name(type_name, field.name))MessageType native_get_field_@(field.name)_HANDLE = null;
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate IntPtr NativeGetField@(get_field_name(type_name, field.name))MessageType(
@@ -148,7 +148,7 @@ public class @(type_name) : IMessage {
         @(get_field_name(type_name, field.name)) = native_read_field_@(field.name)(messageHandle);
 @[            end if]@
 @[        else]@
-        @(get_field_name(type_name, field.name))._READ_HANDLE(native_get_field_@(field.name)(messageHandle));
+        @(get_field_name(type_name, field.name))._READ_HANDLE(native_get_field_@(field.name)_HANDLE(messageHandle));
 @[        end if]@
 @[    end if]@
 @[end for]@
@@ -161,7 +161,7 @@ public class @(type_name) : IMessage {
 @[        if field.type.is_primitive_type()]@
         native_write_field_@(field.name)(messageHandle, @(get_field_name(type_name, field.name)));
 @[        else]@
-        @(get_field_name(type_name, field.name))._WRITE_HANDLE(native_get_field_@(field.name)(messageHandle));
+        @(get_field_name(type_name, field.name))._WRITE_HANDLE(native_get_field_@(field.name)_HANDLE(messageHandle));
 @[        end if]@
 @[    end if]@
 @[end for]@

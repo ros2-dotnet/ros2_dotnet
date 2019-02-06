@@ -41,7 +41,7 @@ void @(msg_prefix)_CDECL native_destroy_native_message(void *);
 void native_write_field_@(field.name)(void *, @(primitive_msg_type_to_c(field.type.type)));
 @[  else]@
 @(msg_prefix)_EXPORT
-void * @(msg_prefix)_CDECL native_get_field_@(field.name)(void *);
+void * @(msg_prefix)_CDECL native_get_field_@(field.name)_HANDLE(void *);
 @[  end if]@
 @[end for]@
 
