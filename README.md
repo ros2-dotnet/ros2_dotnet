@@ -161,7 +161,7 @@ Copy to output directory: Copy always
 ```
 This allows you to retrieve the files in the same directory as the assembly.
 
-Nest step, in Solution Explorer panel:
+Next step, in Solution Explorer panel:
 ```
 right click on References - Add reference...
 ```
@@ -239,10 +239,10 @@ Copy to output directory: Copy always
 ```
 This allows you to retrieve the files in the same directory as the assembly.
 
-Nest step, in Solution Explorer panel:
+Next step, in Solution Explorer panel:
 ```
 right click on References - Add reference...
 ```
 and include `{your_ros2_uwp_ws}\install\lib\rcldotnet\dotnet\rcldotnet_assemblies.dll`, `{your_ros2_uwp_ws}\install\lib\rcldotnet\dotnet\rcldotnet_common.dll` and `{your_ros2_uwp_ws}\install\lib\std_msgs\dotnet\std_msgs_assemblies.dll`.
 
-Finally compile your project and run it on HoloLens Emulator or HoloLens physical device.
+Finally compile your project for UWP (32 bits) and run it on HoloLens Emulator or HoloLens physical device.
