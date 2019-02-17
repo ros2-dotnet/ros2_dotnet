@@ -199,8 +199,14 @@ namespace ROS2 {
     public static Node CreateNode (string nodeName, string nodeNamespace) {
       IntPtr nodeHandle = IntPtr.Zero;
       int ret = RCLdotnetDelegates.native_rcl_create_node_handle (ref nodeHandle, nodeName, nodeNamespace);
-      Node node = new Node (nodeHandle);
-      return node;
+
+      if (ret != -1)
+      {
+        Node node = new Node (nodeHandle);
+        return node;
+      } else {
+        return null;
+      }
     }
 
     public static void Spin (INode node) {

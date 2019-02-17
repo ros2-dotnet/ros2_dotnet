@@ -19,6 +19,8 @@
 #include <rcl/node.h>
 #include <rcl/rcl.h>
 #include <rmw/rmw.h>
+#include <rmw/validate_node_name.h>
+#include <rmw/error_handling.h>
 
 #include "rosidl_generator_c/message_type_support_struct.h"
 
@@ -46,6 +48,27 @@ void native_rcl_reset_error() { rcl_reset_error(); }
 bool native_rcl_ok() { return rcl_ok(); }
 
 int32_t native_rcl_create_node_handle(void **node_handle, const char *name, const char *namespace) {
+
+  // Validate the node name
+  int validation_result;
+  size_t invalid_index;
+  rmw_ret_t rmw_ret =
+    rmw_validate_node_name(name, &validation_result, &invalid_index);
+
+  if (rmw_ret != RMW_RET_OK) {
+    if (rmw_ret == RMW_RET_BAD_ALLOC) {
+      fprintf(stderr, "Memory error: %s\n", rmw_get_error_string());
+    }else {
+      fprintf(stderr, "Runtime error: %s\n", rmw_get_error_string());
+    }
+    return -1;
+  }
+
+  if (validation_result != RMW_NODE_NAME_VALID) {
+    fprintf(stderr, "Invalid node name\n");
+    return -1;
+  }
+
   rcl_node_t *node = (rcl_node_t *)malloc(sizeof(rcl_node_t));
   *node = rcl_get_zero_initialized_node();
 
