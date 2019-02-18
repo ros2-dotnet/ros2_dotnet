@@ -65,4 +65,6 @@ int32_t RCLDOTNET_CDECL native_rcl_take(void *, void *);
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait(void *, int64_t);
 
+const int NODE_NAME_ERROR = -1;
+
 #endif // RCLDOTNET_H

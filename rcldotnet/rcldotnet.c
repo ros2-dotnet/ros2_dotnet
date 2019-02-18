@@ -61,12 +61,12 @@ int32_t native_rcl_create_node_handle(void **node_handle, const char *name, cons
     }else {
       fprintf(stderr, "Runtime error: %s\n", rmw_get_error_string());
     }
-    return -1;
+    return NODE_NAME_ERROR;
   }
 
   if (validation_result != RMW_NODE_NAME_VALID) {
     fprintf(stderr, "Invalid node name\n");
-    return -1;
+    return NODE_NAME_ERROR;
   }
 
   rcl_node_t *node = (rcl_node_t *)malloc(sizeof(rcl_node_t));
