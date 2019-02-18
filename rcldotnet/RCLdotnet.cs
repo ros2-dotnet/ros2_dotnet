@@ -188,6 +188,8 @@ namespace ROS2 {
     private static bool initialized = false;
     private static readonly object syncLock = new object ();
 
+    public const int NODE_NAME_ERROR = -1;
+
     public static bool Ok () {
       return RCLdotnetDelegates.native_rcl_ok ();
     }
@@ -200,12 +202,12 @@ namespace ROS2 {
       IntPtr nodeHandle = IntPtr.Zero;
       int ret = RCLdotnetDelegates.native_rcl_create_node_handle (ref nodeHandle, nodeName, nodeNamespace);
 
-      if (ret != -1)
+      if (ret != NODE_NAME_ERROR)
       {
         Node node = new Node (nodeHandle);
         return node;
       } else {
-        return null;
+        throw new InvalidNodeNameException(nodeName);
       }
     }
 
