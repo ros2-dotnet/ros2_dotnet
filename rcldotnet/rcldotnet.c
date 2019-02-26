@@ -25,6 +25,7 @@
 #include "rosidl_generator_c/message_type_support_struct.h"
 
 #include "rcldotnet.h"
+#include "rcldotnet_ret.h"
 
 int32_t native_rcl_init() {
   // TODO(esteve): parse args
@@ -39,6 +40,10 @@ const char *native_rcl_get_rmw_identifier() {
   return rmw_get_implementation_identifier();
 }
 
+const char * native_rmw_get_error_string() {
+  return rmw_get_error_string();
+}
+
 const char *native_rcl_get_error_string_safe() {
   return rcl_get_error_string_safe();
 }
@@ -51,22 +56,11 @@ int32_t native_rcl_create_node_handle(void **node_handle, const char *name, cons
 
   // Validate the node name
   int validation_result;
-  size_t invalid_index;
   rmw_ret_t rmw_ret =
-    rmw_validate_node_name(name, &validation_result, &invalid_index);
+    rmw_validate_node_name(name, &validation_result, NULL);
 
-  if (rmw_ret != RMW_RET_OK) {
-    if (rmw_ret == RMW_RET_BAD_ALLOC) {
-      fprintf(stderr, "Memory error: %s\n", rmw_get_error_string());
-    }else {
-      fprintf(stderr, "Runtime error: %s\n", rmw_get_error_string());
-    }
-    return NODE_NAME_ERROR;
-  }
-
-  if (validation_result != RMW_NODE_NAME_VALID) {
-    fprintf(stderr, "Invalid node name\n");
-    return NODE_NAME_ERROR;
+  if (rmw_ret != RMW_RET_OK || validation_result != RMW_NODE_NAME_VALID) {
+    return RCLDOTNET_NODEINVALIDNAME;
   }
 
   rcl_node_t *node = (rcl_node_t *)malloc(sizeof(rcl_node_t));

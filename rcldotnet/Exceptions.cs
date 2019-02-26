@@ -1,4 +1,4 @@
-/* Copyright 2019 Francisco Martín <fmrico@gmail.com>
+/* Copyright 2016-2018 Esteve Fernandez <esteve@apache.org>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,22 @@ namespace ROS2 {
 
   class InvalidNodeNameException : Exception
   {
+
+    string rmw_error_string_;
+
     public InvalidNodeNameException()
     {
     }
 
-    public InvalidNodeNameException(string name)
+    public InvalidNodeNameException(string name, string rmw_error_string)
         : base(String.Format("Invalid Node Name: {0}", name))
     {
+      rmw_error_string_ = rmw_error_string;
+    }
 
+    public string GetRMWErrorString()
+    {
+      return rmw_error_string_;
     }
   }
 }

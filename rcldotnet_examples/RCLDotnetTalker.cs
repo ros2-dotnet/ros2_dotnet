@@ -12,7 +12,7 @@ namespace ConsoleApplication {
     public static void Main (string[] args) {
       RCLdotnet.Init ();
 
-      INode node = RCLdotnet.CreateNode ("talker");
+      INode node = RCLdotnet.CreateNode ("tal~ker");
 
       IPublisher<std_msgs.msg.String> chatter_pub = node.CreatePublisher<std_msgs.msg.String> ("chatter");
 

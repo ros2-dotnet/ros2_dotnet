@@ -24,6 +24,9 @@ RCLDOTNET_EXPORT
 const char * RCLDOTNET_CDECL native_rcl_get_rmw_identifier();
 
 RCLDOTNET_EXPORT
+const char * RCLDOTNET_CDECL native_rcl_rmw_get_error_string();
+
+RCLDOTNET_EXPORT
 bool RCLDOTNET_CDECL native_rcl_ok();
 
 RCLDOTNET_EXPORT
@@ -64,7 +67,5 @@ int32_t RCLDOTNET_CDECL native_rcl_take(void *, void *);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait(void *, int64_t);
-
-const int NODE_NAME_ERROR = -1;
 
 #endif // RCLDOTNET_H

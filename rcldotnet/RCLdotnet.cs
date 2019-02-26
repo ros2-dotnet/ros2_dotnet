@@ -51,6 +51,12 @@ namespace ROS2 {
     internal static NativeRCLGetRMWIdentifierType native_rcl_get_rmw_identifier = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate IntPtr NativeRMWGetErrorStringType ();
+
+    internal static NativeRMWGetErrorStringType native_rmw_get_error_string = null;
+
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate IntPtr NativeRCLGetZeroInitializedWaitSetType ();
 
     internal static NativeRCLGetZeroInitializedWaitSetType native_rcl_get_zero_initialized_wait_set = null;
@@ -114,6 +120,12 @@ namespace ROS2 {
       RCLdotnetDelegates.native_rcl_get_rmw_identifier =
         (NativeRCLGetRMWIdentifierType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_get_rmw_identifier_ptr, typeof (NativeRCLGetRMWIdentifierType));
+
+      IntPtr native_rmw_get_error_string_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rmw_get_error_string");
+      RCLdotnetDelegates.native_rmw_get_error_string =
+        (NativeRMWGetErrorStringType) Marshal.GetDelegateForFunctionPointer (
+          native_rmw_get_error_string_ptr, typeof (NativeRMWGetErrorStringType));
 
       IntPtr native_rcl_ok_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_ok");
@@ -188,8 +200,6 @@ namespace ROS2 {
     private static bool initialized = false;
     private static readonly object syncLock = new object ();
 
-    public const int NODE_NAME_ERROR = -1;
-
     public static bool Ok () {
       return RCLdotnetDelegates.native_rcl_ok ();
     }
@@ -200,14 +210,16 @@ namespace ROS2 {
 
     public static Node CreateNode (string nodeName, string nodeNamespace) {
       IntPtr nodeHandle = IntPtr.Zero;
-      int ret = RCLdotnetDelegates.native_rcl_create_node_handle (ref nodeHandle, nodeName, nodeNamespace);
+      RCLRet ret = (RCLRet)RCLdotnetDelegates.native_rcl_create_node_handle (ref nodeHandle, nodeName, nodeNamespace);
 
-      if (ret != NODE_NAME_ERROR)
+      if (ret == RCLRet.Ok)
       {
         Node node = new Node (nodeHandle);
         return node;
+      } else if (ret == RCLRet.NodeInvalidName) {
+        throw new InvalidNodeNameException(nodeName, RMWGetErrorString());
       } else {
-        throw new InvalidNodeNameException(nodeName);
+        throw new Exception();
       }
     }
 
@@ -331,6 +343,12 @@ namespace ROS2 {
       IntPtr ptr = RCLdotnetDelegates.native_rcl_get_rmw_identifier ();
       string rmw_identifier = Marshal.PtrToStringAnsi (ptr);
       return rmw_identifier;
+    }
+
+    public static string RMWGetErrorString () {
+      IntPtr ptr = RCLdotnetDelegates.native_rmw_get_error_string ();
+      string rmw_error_string = Marshal.PtrToStringAnsi (ptr);
+      return rmw_error_string;
     }
   }
 }
