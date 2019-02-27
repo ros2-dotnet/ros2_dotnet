@@ -25,7 +25,6 @@
 #include "rosidl_generator_c/message_type_support_struct.h"
 
 #include "rcldotnet.h"
-#include "rcldotnet_ret.h"
 
 int32_t native_rcl_init() {
   // TODO(esteve): parse args
@@ -38,6 +37,10 @@ int32_t native_rcl_init() {
 
 const char *native_rcl_get_rmw_identifier() {
   return rmw_get_implementation_identifier();
+}
+
+const char * native_rcl_get_error_string() {
+  return rcl_get_error_string();
 }
 
 const char * native_rmw_get_error_string() {
@@ -59,8 +62,8 @@ int32_t native_rcl_create_node_handle(void **node_handle, const char *name, cons
   rmw_ret_t rmw_ret =
     rmw_validate_node_name(name, &validation_result, NULL);
 
-  if (rmw_ret != RMW_RET_OK || validation_result != RMW_NODE_NAME_VALID) {
-    return RCLDOTNET_NODEINVALIDNAME;
+  if (validation_result != RMW_RET_OK ) {
+    return validation_result;
   }
 
   rcl_node_t *node = (rcl_node_t *)malloc(sizeof(rcl_node_t));

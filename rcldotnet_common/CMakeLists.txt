@@ -11,7 +11,7 @@ find_package(DotNETExtra REQUIRED)
 set(CS_SOURCES
   DllLoadUtils.cs
   Interfaces.cs
-  RCLRet.cs
+  Ret.cs
 )
 
 add_dotnet_library(${PROJECT_NAME} ${CS_SOURCES})

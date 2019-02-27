@@ -55,6 +55,11 @@ namespace ROS2 {
 
     internal static NativeRMWGetErrorStringType native_rmw_get_error_string = null;
 
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate IntPtr NativeRCLGetErrorStringType ();
+
+    internal static NativeRCLGetErrorStringType native_rcl_get_error_string = null;
+
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate IntPtr NativeRCLGetZeroInitializedWaitSetType ();
@@ -126,6 +131,12 @@ namespace ROS2 {
       RCLdotnetDelegates.native_rmw_get_error_string =
         (NativeRMWGetErrorStringType) Marshal.GetDelegateForFunctionPointer (
           native_rmw_get_error_string_ptr, typeof (NativeRMWGetErrorStringType));
+
+      IntPtr native_rcl_get_error_string_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_get_error_string");
+      RCLdotnetDelegates.native_rcl_get_error_string =
+        (NativeRCLGetErrorStringType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_get_error_string_ptr, typeof (NativeRCLGetErrorStringType));
 
       IntPtr native_rcl_ok_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_ok");
@@ -210,17 +221,36 @@ namespace ROS2 {
 
     public static Node CreateNode (string nodeName, string nodeNamespace) {
       IntPtr nodeHandle = IntPtr.Zero;
-      RCLRet ret = (RCLRet)RCLdotnetDelegates.native_rcl_create_node_handle (ref nodeHandle, nodeName, nodeNamespace);
+      RMWRet ret = (RMWRet)RCLdotnetDelegates.native_rcl_create_node_handle (ref nodeHandle, nodeName, nodeNamespace);
 
-      if (ret == RCLRet.Ok)
-      {
-        Node node = new Node (nodeHandle);
-        return node;
-      } else if (ret == RCLRet.NodeInvalidName) {
-        throw new InvalidNodeNameException(nodeName, RMWGetErrorString());
-      } else {
-        throw new Exception();
-      }
+      switch (ret) {
+        case RMWRet.NodeNameValid:
+          Node node = new Node (nodeHandle);
+          return node;
+        case RMWRet.NodeNameInvalidIsEmptyString:
+          throw new NodeNameInvalidIsEmptyStringException(RMWGetErrorString());
+        case RMWRet.NodeNameInvalidContainsUnallowedCharacters:
+          throw new NodeNameInvalidContainsUnallowedCharactersException(RMWGetErrorString());
+        case RMWRet.NodeNameInvalidStartsWithNumber:
+          throw new NodeNameInvalidStartsWithNumberException(RMWGetErrorString());
+        case RMWRet.NodeNameInvalidTooLong:
+          throw new NodeNameInvalidTooLongException(RMWGetErrorString());
+        default:
+          switch((RCLRet)ret) {
+              case RCLRet.AlreadyInit:
+                throw new NodeNameInvalidTooLongException(RCLGetErrorString());
+              case RCLRet.InvalidArgument:
+                throw new InvalidArgumentException(RCLGetErrorString());
+              case RCLRet.BadAlloc:
+                throw new BadAllocException(RCLGetErrorString());
+              case RCLRet.NodeInvalidName:
+                throw new NodeInvalidNameException(RCLGetErrorString());
+              case RCLRet.NodeInvalidNamespace:
+                throw new NodeInvalidNamespaceException(RCLGetErrorString());
+              default:
+                return null;
+          }
+        }
     }
 
     public static void Spin (INode node) {
@@ -349,6 +379,12 @@ namespace ROS2 {
       IntPtr ptr = RCLdotnetDelegates.native_rmw_get_error_string ();
       string rmw_error_string = Marshal.PtrToStringAnsi (ptr);
       return rmw_error_string;
+    }
+
+    public static string RCLGetErrorString () {
+      IntPtr ptr = RCLdotnetDelegates.native_rcl_get_error_string ();
+      string rcl_error_string = Marshal.PtrToStringAnsi (ptr);
+      return rcl_error_string;
     }
   }
 }

@@ -17,24 +17,113 @@ using System;
 
 namespace ROS2 {
 
-  class InvalidNodeNameException : Exception
+
+  class NodeNameInvalidIsEmptyStringException : Exception
   {
-
-    string rmw_error_string_;
-
-    public InvalidNodeNameException()
+    public NodeNameInvalidIsEmptyStringException()
     {
     }
 
-    public InvalidNodeNameException(string name, string rmw_error_string)
-        : base(String.Format("Invalid Node Name: {0}", name))
+    public NodeNameInvalidIsEmptyStringException(string rmw_error_string)
+        : base(rmw_error_string)
     {
-      rmw_error_string_ = rmw_error_string;
-    }
-
-    public string GetRMWErrorString()
-    {
-      return rmw_error_string_;
     }
   }
+
+  class NodeNameInvalidContainsUnallowedCharactersException : Exception
+  {
+    public NodeNameInvalidContainsUnallowedCharactersException()
+    {
+    }
+
+    public NodeNameInvalidContainsUnallowedCharactersException(string rmw_error_string)
+        : base(rmw_error_string)
+    {
+    }
+  }
+
+  class NodeNameInvalidStartsWithNumberException : Exception
+  {
+    public NodeNameInvalidStartsWithNumberException()
+    {
+    }
+
+    public NodeNameInvalidStartsWithNumberException(string rmw_error_string)
+        : base(rmw_error_string)
+    {
+    }
+  }
+
+  class NodeNameInvalidTooLongException : Exception
+  {
+    public NodeNameInvalidTooLongException()
+    {
+    }
+
+    public NodeNameInvalidTooLongException(string rmw_error_string)
+        : base(rmw_error_string)
+    {
+    }
+  }
+
+  class AlreadyInitException : Exception
+  {
+    public AlreadyInitException()
+    {
+    }
+
+    public AlreadyInitException(string rcl_error_string)
+        : base(rcl_error_string)
+    {
+    }
+  }
+
+  class InvalidArgumentException : Exception
+  {
+    public InvalidArgumentException()
+    {
+    }
+
+    public InvalidArgumentException(string rcl_error_string)
+        : base(rcl_error_string)
+    {
+    }
+  }
+
+  class BadAllocException : Exception
+  {
+    public BadAllocException()
+    {
+    }
+
+    public BadAllocException(string rcl_error_string)
+        : base(rcl_error_string)
+    {
+    }
+  }
+
+  class NodeInvalidNameException : Exception
+  {
+    public NodeInvalidNameException()
+    {
+    }
+
+    public NodeInvalidNameException(string rcl_error_string)
+        : base(rcl_error_string)
+    {
+    }
+  }
+
+  class NodeInvalidNamespaceException : Exception
+  {
+    public NodeInvalidNamespaceException()
+    {
+    }
+
+    public NodeInvalidNamespaceException(string rcl_error_string)
+        : base(rcl_error_string)
+    {
+    }
+  }
+
 }
