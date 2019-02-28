@@ -145,3 +145,104 @@ ros2 run rcldotnet_examples rcldotnet_listener
 ```
 
 Enjoy!
+
+## Using generated DLLs in your UWP application from Visual Studio
+
+Create a new Visual Studio project (Visual C# - Windows Universal - Empty app).
+
+In Solution Explorer panel:
+```
+right click on Universal Windows project - Add - Existing item...
+```
+and include every DLL file from `{your_ros2_uwp_ws}\install\bin`. Now select all of these files in Solution Explorer and check/set the properties:
+```
+Build action: Content
+Copy to output directory: Copy always
+```
+This allows you to retrieve the files in the same directory as the assembly.
+
+Next step, in Solution Explorer panel:
+```
+right click on References - Add reference...
+```
+and include `{your_ros2_uwp_ws}\install\lib\rcldotnet\dotnet\rcldotnet_assemblies.dll`, `{your_ros2_uwp_ws}\install\lib\rcldotnet\dotnet\rcldotnet_common.dll` and `{your_ros2_uwp_ws}\install\lib\std_msgs\dotnet\std_msgs_assemblies.dll`.
+
+Now you can include your ROS2 code in MainPage.xaml.cs script, compile your project and run it on HoloLens Emulator or HoloLens physical device.
+
+## Using generated DLLs in your UWP application from Unity
+**NOTE: _Tested on `Unity 2018.2.8f1`_**
+
+Create a new Unity project and set up the following editor properties.
+
+### Build Settings
+Set your target platform properly:
+```
+File - Build Settings - Universal Windows Platform - Switch Platform
+```
+then set UWP build settings:
+```
+Target Device: HoloLens
+Build Type: D3D
+SDK: Latest installed
+Visual Studio Version: Latest installed
+Build and Run on: Local Machine and Windows Phone
+Build Configuration: Release
+```
+and let unchecked the rest.
+
+### Player Settings
+
+- Other Settings
+
+  **Configuration**
+  ```
+  Scripting Runtime Version: .NET 4.x Equivalent
+  Scripting Backend: .NET
+  Api Compatibility Level: .NET 4.x
+  ```
+
+- Publishing Settings
+
+  **Capabilities**
+  - [x] InternetClient
+  - [x] InternetClientServer
+  - [x] PrivateNetworkClientServer
+
+- XR Settings
+  - [x] Virtual Reality Supported
+
+  Virtual Reality SDKs
+    > Windows Mixed Reality
+
+### Add files
+Create Assets/Plugins and Assets/Scripts folders.
+
+In Plugins folder include every DLL file from `{your_ros2_uwp_ws}\install\bin`. Also include `{your_ros2_uwp_ws}\install\lib\rcldotnet\dotnet\rcldotnet_assemblies.dll`, `{your_ros2_uwp_ws}\install\lib\rcldotnet\dotnet\rcldotnet_common.dll` and `{your_ros2_uwp_ws}\install\lib\std_msgs\dotnet\std_msgs_assemblies.dll`.
+
+In Scripts folder create your C# scripts and attach them to a scene GameObject to execute them when the app starts.
+
+Finally, build your project to generate a Visual Studio solution.
+```
+File - Build Settings - Build
+```
+
+### Unity generated Visual Studio solution
+Open the VS solution generated after building your Unity project.
+In Solution Explorer panel:
+```
+right click on Universal Windows project - Add - Existing item...
+```
+and include every DLL file from `{your_ros2_uwp_ws}\install\bin`. Now select all of these files in Solution Explorer and check/set the properties:
+```
+Build action: Content
+Copy to output directory: Copy always
+```
+This allows you to retrieve the files in the same directory as the assembly.
+
+Next step, in Solution Explorer panel:
+```
+right click on References - Add reference...
+```
+and include `{your_ros2_uwp_ws}\install\lib\rcldotnet\dotnet\rcldotnet_assemblies.dll`, `{your_ros2_uwp_ws}\install\lib\rcldotnet\dotnet\rcldotnet_common.dll` and `{your_ros2_uwp_ws}\install\lib\std_msgs\dotnet\std_msgs_assemblies.dll`.
+
+Finally compile your project for UWP (32 bits) and run it on HoloLens Emulator or HoloLens physical device.
