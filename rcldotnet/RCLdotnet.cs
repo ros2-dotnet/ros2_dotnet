@@ -40,6 +40,11 @@ namespace ROS2 {
     internal static NativeRCLOkType native_rcl_ok = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
+    internal delegate int NativeRMWValidateNodeNameType ([MarshalAs (UnmanagedType.LPStr)] string nodeName);
+
+    internal static NativeRMWValidateNodeNameType native_rmw_validate_node_name = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     internal delegate int NativeRCLCreateNodeHandleType (
       ref IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, [MarshalAs (UnmanagedType.LPStr)] string nodeNamespace);
 
@@ -52,13 +57,19 @@ namespace ROS2 {
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate IntPtr NativeRMWGetErrorStringType ();
-
     internal static NativeRMWGetErrorStringType native_rmw_get_error_string = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate IntPtr NativeRCLGetErrorStringType ();
+    internal delegate IntPtr NativeRMWResetErrorType ();
+    internal static NativeRMWResetErrorType native_rmw_reset_error = null;
 
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate IntPtr NativeRCLGetErrorStringType ();
     internal static NativeRCLGetErrorStringType native_rcl_get_error_string = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate IntPtr NativeRCLResetErrorType ();
+    internal static NativeRCLResetErrorType native_rcl_reset_error = null;
 
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
@@ -132,17 +143,35 @@ namespace ROS2 {
         (NativeRMWGetErrorStringType) Marshal.GetDelegateForFunctionPointer (
           native_rmw_get_error_string_ptr, typeof (NativeRMWGetErrorStringType));
 
+      IntPtr native_rmw_reset_error_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rmw_reset_error");
+      RCLdotnetDelegates.native_rmw_reset_error =
+        (NativeRMWResetErrorType) Marshal.GetDelegateForFunctionPointer (
+        native_rmw_reset_error_ptr, typeof (NativeRMWResetErrorType));
+
       IntPtr native_rcl_get_error_string_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_get_error_string");
       RCLdotnetDelegates.native_rcl_get_error_string =
         (NativeRCLGetErrorStringType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_get_error_string_ptr, typeof (NativeRCLGetErrorStringType));
 
+      IntPtr native_rcl_reset_error_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_reset_error");
+      RCLdotnetDelegates.native_rcl_reset_error =
+        (NativeRCLResetErrorType) Marshal.GetDelegateForFunctionPointer (
+        native_rcl_reset_error_ptr, typeof (NativeRCLResetErrorType));
+
       IntPtr native_rcl_ok_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_ok");
       RCLdotnetDelegates.native_rcl_ok =
         (NativeRCLOkType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_ok_ptr, typeof (NativeRCLOkType));
+
+      IntPtr native_rmw_validate_node_name_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rmw_validate_node_name");
+      RCLdotnetDelegates.native_rmw_validate_node_name =
+        (NativeRMWValidateNodeNameType) Marshal.GetDelegateForFunctionPointer (
+          native_rmw_validate_node_name_ptr, typeof (NativeRMWValidateNodeNameType));
 
       IntPtr native_rcl_create_node_handle_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_create_node_handle");
@@ -221,36 +250,88 @@ namespace ROS2 {
 
     public static Node CreateNode (string nodeName, string nodeNamespace) {
       IntPtr nodeHandle = IntPtr.Zero;
-      RMWRet ret = (RMWRet)RCLdotnetDelegates.native_rcl_create_node_handle (ref nodeHandle, nodeName, nodeNamespace);
+      RMWNodeNameRet validNodeNameRet = (RMWNodeNameRet)RCLdotnetDelegates.native_rmw_validate_node_name (nodeName);
+
+      switch (validNodeNameRet) {
+        case RMWNodeNameRet.NodeNameValid:
+          break;
+        case RMWNodeNameRet.NodeNameInvalidIsEmptyString:
+          {
+            string errorString = RMWGetErrorString ();
+            RCLdotnetDelegates.native_rmw_reset_error ();
+            throw new NodeNameInvalidIsEmptyStringException(errorString);
+          }
+        case RMWNodeNameRet.NodeNameInvalidContainsUnallowedCharacters:
+          {
+            string errorString = RMWGetErrorString ();
+            RCLdotnetDelegates.native_rmw_reset_error ();
+            throw new NodeNameInvalidContainsUnallowedCharactersException(errorString);
+          }
+        case RMWNodeNameRet.NodeNameInvalidStartsWithNumber:
+          {
+            string errorString = RMWGetErrorString ();
+            RCLdotnetDelegates.native_rmw_reset_error ();
+            throw new NodeNameInvalidStartsWithNumberException(errorString);
+          }
+        case RMWNodeNameRet.NodeNameInvalidTooLong:
+          {
+            string errorString = RMWGetErrorString ();
+            RCLdotnetDelegates.native_rmw_reset_error ();
+            throw new NodeNameInvalidTooLongException(errorString);
+          }
+        default:
+          {
+            string errorString = RMWGetErrorString ();
+            RCLdotnetDelegates.native_rmw_reset_error ();
+            throw new InvalidOperationException(errorString);
+          }
+      }
+
+      RCLRet ret = (RCLRet)RCLdotnetDelegates.native_rcl_create_node_handle (ref nodeHandle, nodeName, nodeNamespace);
 
       switch (ret) {
-        case RMWRet.NodeNameValid:
-          Node node = new Node (nodeHandle);
-          return node;
-        case RMWRet.NodeNameInvalidIsEmptyString:
-          throw new NodeNameInvalidIsEmptyStringException(RMWGetErrorString());
-        case RMWRet.NodeNameInvalidContainsUnallowedCharacters:
-          throw new NodeNameInvalidContainsUnallowedCharactersException(RMWGetErrorString());
-        case RMWRet.NodeNameInvalidStartsWithNumber:
-          throw new NodeNameInvalidStartsWithNumberException(RMWGetErrorString());
-        case RMWRet.NodeNameInvalidTooLong:
-          throw new NodeNameInvalidTooLongException(RMWGetErrorString());
-        default:
-          switch((RCLRet)ret) {
-              case RCLRet.AlreadyInit:
-                throw new NodeNameInvalidTooLongException(RCLGetErrorString());
-              case RCLRet.InvalidArgument:
-                throw new InvalidArgumentException(RCLGetErrorString());
-              case RCLRet.BadAlloc:
-                throw new BadAllocException(RCLGetErrorString());
-              case RCLRet.NodeInvalidName:
-                throw new NodeInvalidNameException(RCLGetErrorString());
-              case RCLRet.NodeInvalidNamespace:
-                throw new NodeInvalidNamespaceException(RCLGetErrorString());
-              default:
-                return null;
+        case RCLRet.Ok:
+          break;
+        case RCLRet.AlreadyInit:
+          {
+            string errorString = RCLGetErrorString ();
+            RCLdotnetDelegates.native_rcl_reset_error ();
+            throw new NodeNameInvalidTooLongException(errorString);
           }
-        }
+        case RCLRet.InvalidArgument:
+          {
+            string errorString = RCLGetErrorString ();
+            RCLdotnetDelegates.native_rcl_reset_error ();
+            throw new InvalidArgumentException(errorString);
+          }
+        case RCLRet.BadAlloc:
+          {
+            string errorString = RCLGetErrorString ();
+            RCLdotnetDelegates.native_rcl_reset_error ();
+            throw new BadAllocException(errorString);
+          }
+        case RCLRet.NodeInvalidName:
+          {
+            string errorString = RCLGetErrorString ();
+            RCLdotnetDelegates.native_rcl_reset_error ();
+            throw new NodeInvalidNameException(errorString);
+          }
+        case RCLRet.NodeInvalidNamespace:
+          {
+            string errorString = RCLGetErrorString ();
+            RCLdotnetDelegates.native_rcl_reset_error ();
+            throw new NodeInvalidNamespaceException(errorString);
+          }
+        default:
+          {
+            string errorString = RCLGetErrorString ();
+            RCLdotnetDelegates.native_rmw_reset_error ();
+            throw new InvalidOperationException(errorString);
+          }
+      }
+
+      Node node = new Node (nodeHandle);
+      return node;
     }
 
     public static void Spin (INode node) {

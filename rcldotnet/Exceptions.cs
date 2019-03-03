@@ -24,8 +24,8 @@ namespace ROS2 {
     {
     }
 
-    public NodeNameInvalidIsEmptyStringException(string rmw_error_string)
-        : base(rmw_error_string)
+    public NodeNameInvalidIsEmptyStringException(string errorString)
+        : base(errorString)
     {
     }
   }
@@ -36,8 +36,8 @@ namespace ROS2 {
     {
     }
 
-    public NodeNameInvalidContainsUnallowedCharactersException(string rmw_error_string)
-        : base(rmw_error_string)
+    public NodeNameInvalidContainsUnallowedCharactersException(string errorString)
+        : base(errorString)
     {
     }
   }
@@ -48,8 +48,8 @@ namespace ROS2 {
     {
     }
 
-    public NodeNameInvalidStartsWithNumberException(string rmw_error_string)
-        : base(rmw_error_string)
+    public NodeNameInvalidStartsWithNumberException(string errorString)
+        : base(errorString)
     {
     }
   }
@@ -60,8 +60,8 @@ namespace ROS2 {
     {
     }
 
-    public NodeNameInvalidTooLongException(string rmw_error_string)
-        : base(rmw_error_string)
+    public NodeNameInvalidTooLongException(string errorString)
+        : base(errorString)
     {
     }
   }

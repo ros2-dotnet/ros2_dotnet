@@ -44,7 +44,7 @@ namespace ROS2 {
       WaitSetFull = 902,
     }
 
-    public enum RMWRet {
+    public enum RMWNodeNameRet {
       NodeNameValid = 0,
       NodeNameInvalidIsEmptyString = 1,
       NodeNameInvalidContainsUnallowedCharacters = 2,

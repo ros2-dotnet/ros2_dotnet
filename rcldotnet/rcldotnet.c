@@ -52,20 +52,21 @@ const char *native_rcl_get_error_string_safe() {
 }
 
 void native_rcl_reset_error() { rcl_reset_error(); }
+void native_rmw_reset_error() { rmw_reset_error(); }
 
 bool native_rcl_ok() { return rcl_ok(); }
 
-int32_t native_rcl_create_node_handle(void **node_handle, const char *name, const char *namespace) {
 
-  // Validate the node name
+int32_t native_rmw_validate_node_name(const char *name) {
   int validation_result;
   rmw_ret_t rmw_ret =
     rmw_validate_node_name(name, &validation_result, NULL);
 
-  if (validation_result != RMW_RET_OK ) {
-    return validation_result;
-  }
+  return validation_result;
+}
 
+
+int32_t native_rcl_create_node_handle(void **node_handle, const char *name, const char *namespace) {
   rcl_node_t *node = (rcl_node_t *)malloc(sizeof(rcl_node_t));
   *node = rcl_get_zero_initialized_node();
 
