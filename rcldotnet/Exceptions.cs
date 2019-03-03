@@ -20,110 +20,65 @@ namespace ROS2 {
 
   class NodeNameInvalidIsEmptyStringException : Exception
   {
-    public NodeNameInvalidIsEmptyStringException()
-    {
-    }
+    public NodeNameInvalidIsEmptyStringException() {}
 
-    public NodeNameInvalidIsEmptyStringException(string errorString)
-        : base(errorString)
-    {
-    }
+    public NodeNameInvalidIsEmptyStringException(string errorString) : base(errorString) {}
   }
 
   class NodeNameInvalidContainsUnallowedCharactersException : Exception
   {
-    public NodeNameInvalidContainsUnallowedCharactersException()
-    {
-    }
+    public NodeNameInvalidContainsUnallowedCharactersException() {}
 
-    public NodeNameInvalidContainsUnallowedCharactersException(string errorString)
-        : base(errorString)
-    {
-    }
+    public NodeNameInvalidContainsUnallowedCharactersException(string errorString) : base(errorString) {}
   }
 
   class NodeNameInvalidStartsWithNumberException : Exception
   {
-    public NodeNameInvalidStartsWithNumberException()
-    {
-    }
+    public NodeNameInvalidStartsWithNumberException() {}
 
-    public NodeNameInvalidStartsWithNumberException(string errorString)
-        : base(errorString)
-    {
-    }
+    public NodeNameInvalidStartsWithNumberException(string errorString) : base(errorString) {}
   }
 
   class NodeNameInvalidTooLongException : Exception
   {
-    public NodeNameInvalidTooLongException()
-    {
-    }
+    public NodeNameInvalidTooLongException() {}
 
-    public NodeNameInvalidTooLongException(string errorString)
-        : base(errorString)
-    {
-    }
+    public NodeNameInvalidTooLongException(string errorString) : base(errorString) {}
   }
 
   class AlreadyInitException : Exception
   {
-    public AlreadyInitException()
-    {
-    }
+    public AlreadyInitException() {}
 
-    public AlreadyInitException(string errorString)
-        : base(errorString)
-    {
-    }
+    public AlreadyInitException(string errorString) : base(errorString) {}
   }
 
   class InvalidArgumentException : Exception
   {
-    public InvalidArgumentException()
-    {
-    }
+    public InvalidArgumentException() {}
 
-    public InvalidArgumentException(string errorString)
-        : base(errorString)
-    {
-    }
+    public InvalidArgumentException(string errorString) : base(errorString) {}
   }
 
   class BadAllocException : Exception
   {
-    public BadAllocException()
-    {
-    }
+    public BadAllocException() {}
 
-    public BadAllocException(string errorString)
-        : base(errorString)
-    {
-    }
+    public BadAllocException(string errorString) : base(errorString) {}
   }
 
   class NodeInvalidNameException : Exception
   {
-    public NodeInvalidNameException()
-    {
-    }
+    public NodeInvalidNameException() {}
 
-    public NodeInvalidNameException(string errorString)
-        : base(errorString)
-    {
-    }
+    public NodeInvalidNameException(string errorString) : base(errorString) {}
   }
 
   class NodeInvalidNamespaceException : Exception
   {
-    public NodeInvalidNamespaceException()
-    {
-    }
+    public NodeInvalidNamespaceException() {}
 
-    public NodeInvalidNamespaceException(string errorString)
-        : base(errorString)
-    {
-    }
+    public NodeInvalidNamespaceException(string errorString) : base(errorString) {}
   }
 
 }
