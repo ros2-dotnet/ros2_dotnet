@@ -72,8 +72,8 @@ namespace ROS2 {
     {
     }
 
-    public AlreadyInitException(string rcl_error_string)
-        : base(rcl_error_string)
+    public AlreadyInitException(string errorString)
+        : base(errorString)
     {
     }
   }
@@ -84,8 +84,8 @@ namespace ROS2 {
     {
     }
 
-    public InvalidArgumentException(string rcl_error_string)
-        : base(rcl_error_string)
+    public InvalidArgumentException(string errorString)
+        : base(errorString)
     {
     }
   }
@@ -96,8 +96,8 @@ namespace ROS2 {
     {
     }
 
-    public BadAllocException(string rcl_error_string)
-        : base(rcl_error_string)
+    public BadAllocException(string errorString)
+        : base(errorString)
     {
     }
   }
@@ -108,8 +108,8 @@ namespace ROS2 {
     {
     }
 
-    public NodeInvalidNameException(string rcl_error_string)
-        : base(rcl_error_string)
+    public NodeInvalidNameException(string errorString)
+        : base(errorString)
     {
     }
   }
@@ -120,8 +120,8 @@ namespace ROS2 {
     {
     }
 
-    public NodeInvalidNamespaceException(string rcl_error_string)
-        : base(rcl_error_string)
+    public NodeInvalidNamespaceException(string errorString)
+        : base(errorString)
     {
     }
   }
