@@ -40,13 +40,16 @@ namespace ROS2 {
     internal static NativeRCLOkType native_rcl_ok = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-    internal delegate int NativeRMWValidateNodeNameType ([MarshalAs (UnmanagedType.LPStr)] string nodeName);
+    internal delegate int NativeRMWValidateNodeNameType ([MarshalAs (UnmanagedType.LPStr)] string nodeName,
+    [param: MarshalAs(UnmanagedType.I4), Out()] out RMWNodeNameRet validation_result,
+    [param: MarshalAs(UnmanagedType.I4), Out()] out int invalid_index);
 
     internal static NativeRMWValidateNodeNameType native_rmw_validate_node_name = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     internal delegate int NativeRCLCreateNodeHandleType (
-      ref IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, [MarshalAs (UnmanagedType.LPStr)] string nodeNamespace);
+      ref IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName,
+      [MarshalAs (UnmanagedType.LPStr)] string nodeNamespace);
 
     internal static NativeRCLCreateNodeHandleType native_rcl_create_node_handle = null;
 
@@ -250,83 +253,89 @@ namespace ROS2 {
 
     public static Node CreateNode (string nodeName, string nodeNamespace) {
       IntPtr nodeHandle = IntPtr.Zero;
-      RMWNodeNameRet validNodeNameRet = (RMWNodeNameRet)RCLdotnetDelegates.native_rmw_validate_node_name (nodeName);
 
-      switch (validNodeNameRet) {
-        case RMWNodeNameRet.NodeNameValid:
-          break;
-        case RMWNodeNameRet.NodeNameInvalidIsEmptyString:
+      RMWNodeNameRet validation_result;
+      int invalid_index;
+
+      RMWRet validNodeNameRet =
+        (RMWRet)RCLdotnetDelegates.native_rmw_validate_node_name (nodeName, out validation_result, out invalid_index);
+
+      if (validNodeNameRet != RMWRet.Ok)
+      {
+        string errorString = RMWGetErrorString ();
+        RCLdotnetDelegates.native_rmw_reset_error ();
+
+        switch (validNodeNameRet) {
+          case RMWRet.Error:
           {
-            string errorString = RMWGetErrorString ();
-            RCLdotnetDelegates.native_rmw_reset_error ();
-            throw new NodeNameInvalidIsEmptyStringException(errorString);
+            throw new RMWErrorException(errorString);
           }
-        case RMWNodeNameRet.NodeNameInvalidContainsUnallowedCharacters:
+          case RMWRet.TimeOut:
           {
-            string errorString = RMWGetErrorString ();
-            RCLdotnetDelegates.native_rmw_reset_error ();
-            throw new NodeNameInvalidContainsUnallowedCharactersException(errorString);
+            throw new RMWTimeOutException(errorString);
           }
-        case RMWNodeNameRet.NodeNameInvalidStartsWithNumber:
-          {
-            string errorString = RMWGetErrorString ();
-            RCLdotnetDelegates.native_rmw_reset_error ();
-            throw new NodeNameInvalidStartsWithNumberException(errorString);
-          }
-        case RMWNodeNameRet.NodeNameInvalidTooLong:
-          {
-            string errorString = RMWGetErrorString ();
-            RCLdotnetDelegates.native_rmw_reset_error ();
-            throw new NodeNameInvalidTooLongException(errorString);
-          }
-        default:
-          {
-            string errorString = RMWGetErrorString ();
-            RCLdotnetDelegates.native_rmw_reset_error ();
-            throw new InvalidOperationException(errorString);
-          }
+        }
+      }
+
+      if (validation_result != RMWNodeNameRet.NodeNameValid) {
+        string errorString = RMWGetErrorString ();
+        RCLdotnetDelegates.native_rmw_reset_error ();
+
+        switch (validation_result) {
+          case RMWNodeNameRet.NodeNameInvalidIsEmptyString:
+            {
+              throw new NodeNameInvalidIsEmptyStringException(errorString);
+            }
+          case RMWNodeNameRet.NodeNameInvalidContainsUnallowedCharacters:
+            {
+              throw new NodeNameInvalidContainsUnallowedCharactersException(errorString);
+            }
+          case RMWNodeNameRet.NodeNameInvalidStartsWithNumber:
+            {
+              throw new NodeNameInvalidStartsWithNumberException(errorString);
+            }
+          case RMWNodeNameRet.NodeNameInvalidTooLong:
+            {
+              throw new NodeNameInvalidTooLongException(errorString);
+            }
+          default:
+            {
+              throw new InvalidOperationException(errorString);
+            }
+        }
       }
 
       RCLRet ret = (RCLRet)RCLdotnetDelegates.native_rcl_create_node_handle (ref nodeHandle, nodeName, nodeNamespace);
 
-      switch (ret) {
-        case RCLRet.Ok:
-          break;
-        case RCLRet.AlreadyInit:
-          {
-            string errorString = RCLGetErrorString ();
-            RCLdotnetDelegates.native_rcl_reset_error ();
-            throw new NodeNameInvalidTooLongException(errorString);
-          }
-        case RCLRet.InvalidArgument:
-          {
-            string errorString = RCLGetErrorString ();
-            RCLdotnetDelegates.native_rcl_reset_error ();
-            throw new InvalidArgumentException(errorString);
-          }
-        case RCLRet.BadAlloc:
-          {
-            string errorString = RCLGetErrorString ();
-            RCLdotnetDelegates.native_rcl_reset_error ();
-            throw new BadAllocException(errorString);
-          }
-        case RCLRet.NodeInvalidName:
-          {
-            string errorString = RCLGetErrorString ();
-            RCLdotnetDelegates.native_rcl_reset_error ();
-            throw new NodeInvalidNameException(errorString);
-          }
-        case RCLRet.NodeInvalidNamespace:
-          {
-            string errorString = RCLGetErrorString ();
-            RCLdotnetDelegates.native_rcl_reset_error ();
-            throw new NodeInvalidNamespaceException(errorString);
-          }
-        default:
-          {
-            string errorString = RCLGetErrorString ();
-            RCLdotnetDelegates.native_rmw_reset_error ();
-            throw new InvalidOperationException(errorString);
+      if (ret != RCLRet.Ok) {
+        string errorString = RCLGetErrorString ();
+        RCLdotnetDelegates.native_rcl_reset_error ();
+
+        switch (ret) {
+          case RCLRet.AlreadyInit:
+            {
+              throw new AlreadyInitException(errorString);
+            }
+          case RCLRet.InvalidArgument:
+            {
+              throw new InvalidArgumentException(errorString);
+            }
+          case RCLRet.BadAlloc:
+            {
+              throw new BadAllocException(errorString);
+            }
+          case RCLRet.NodeInvalidName:
+            {
+              throw new NodeInvalidNameException(errorString);
+            }
+          case RCLRet.NodeInvalidNamespace:
+            {
+              throw new NodeInvalidNamespaceException(errorString);
+            }
+          default:
+            {
+              throw new InvalidOperationException(errorString);
+            }
           }
       }
 

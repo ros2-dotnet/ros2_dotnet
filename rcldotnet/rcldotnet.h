@@ -39,7 +39,8 @@ RCLDOTNET_EXPORT
 bool RCLDOTNET_CDECL native_rcl_ok();
 
 RCLDOTNET_EXPORT
-int32_t RCLDOTNET_CDECL native_rmw_validate_node_name(const char *);
+int32_t RCLDOTNET_CDECL native_rmw_validate_node_name(const char *, int *, int *);
+
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_create_node_handle(void **, const char *, const char *);

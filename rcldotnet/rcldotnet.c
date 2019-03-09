@@ -57,12 +57,11 @@ void native_rmw_reset_error() { rmw_reset_error(); }
 bool native_rcl_ok() { return rcl_ok(); }
 
 
-int32_t native_rmw_validate_node_name(const char *name) {
-  int validation_result;
+int32_t native_rmw_validate_node_name(const char *name, int * validation_result, int * invalid_index) {
   rmw_ret_t rmw_ret =
-    rmw_validate_node_name(name, &validation_result, NULL);
+    rmw_validate_node_name(name, validation_result, NULL);
 
-  return validation_result;
+  return rmw_ret;
 }
 
 

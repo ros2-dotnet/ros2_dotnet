@@ -81,4 +81,17 @@ namespace ROS2 {
     public NodeInvalidNamespaceException(string errorString) : base(errorString) {}
   }
 
+  class RMWErrorException : Exception
+  {
+    public RMWErrorException() {}
+
+    public RMWErrorException(string errorString) : base(errorString) {}
+  }
+
+  class RMWTimeOutException : Exception
+  {
+    public RMWTimeOutException() {}
+
+    public RMWTimeOutException(string errorString) : base(errorString) {}
+  }
 }
