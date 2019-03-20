@@ -78,7 +78,7 @@ ament
 ```
 md \dev\ament\src
 cd \dev\ament
-curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/%BUILD_SOURCEBRANCHNAME%/ament_dotnet_uwp.repos -o ament_dotnet_uwp.repos
+curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ament_dotnet_uwp.repos -o ament_dotnet_uwp.repos
 vcs import src < ament_dotnet_uwp.repos
 python src\ament\ament_tools\scripts\ament.py build --cmake-args -G "Visual Studio 15 2017 Win64" --
 call install\local_setup.bat
@@ -92,7 +92,7 @@ Replace `%TARGET_GENERATOR%` with "Visual Studio 15 2017" for Win32, "Visual Stu
 ```
 md \dev\ros2\src
 cd \dev\ros2
-curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/%BUILD_SOURCEBRANCHNAME%/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
+curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
 vcs import src < ros2_dotnet_uwp.repos
 cd \dev\ament
 call install\local_setup.bat
