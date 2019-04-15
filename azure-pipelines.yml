@@ -1,80 +1,52 @@
-pool:
-  vmImage: 'vs2017-win2016'
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    exclude:
+    - README.md
 
-strategy:
-  matrix:
-    uwp_32:
-      target_platform: 'uwp-32'
-      target_generator: 'Visual Studio 15 2017'
-    uwp_64:
-      target_platform: 'uwp-64'
-      target_generator: 'Visual Studio 15 2017 Win64'
-    uwp_arm:
-      target_platform: 'uwp_arm'
-      target_generator: 'Visual Studio 15 2017 ARM'
-    desktop:
-      target_platform: 'desktop'
-      target_generator: 'Visual Studio 15 2017 Win64'
-  maxParallel: 4
+jobs:
+- job: 'uwp_32'
+  displayName: 'Build all tasks (UWP 32)'
+  condition: and(succeeded(), not(variables.task), eq(variables.platform, 'uwp_32'))
+  pool:
+    vmImage: vs2017-win2016
+  steps:
+  - template: ci/build-all-steps.yml
+    parameters:
+      generator: 'Visual Studio 15 2017'
+      platform: 'uwp_32'
 
-steps:
-- script: |
-    pip install vcstool
-    pip install -U catkin_pkg EmPy pyparsing pyyaml
-  displayName: 'Install dependencies'
+- job: 'uwp_64'
+  displayName: 'Build all tasks (UWP 64)'
+  condition: and(succeeded(), not(variables.task), eq(variables.platform, 'uwp_64'))
+  pool:
+    vmImage: vs2017-win2016
+  steps:
+  - template: ci/build-all-steps.yml
+    parameters:
+      generator: 'Visual Studio 15 2017 Win64'
+      platform: 'uwp_64'
 
-- script: |
-    set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin
-    md \dev\ament\src
-    cd \dev\ament
-    curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/%BUILD_SOURCEBRANCHNAME%/ament_dotnet_uwp.repos -o ament_dotnet_uwp.repos
-    vcs import src < ament_dotnet_uwp.repos
-    python src\ament\ament_tools\scripts\ament.py build --cmake-args -G "Visual Studio 15 2017 Win64" --
-    call install\local_setup.bat
-  displayName: 'Build ament'
+- job: 'uwp_arm'
+  displayName: 'Build all tasks (UWP ARM)'
+  condition: and(succeeded(), not(variables.task), eq(variables.platform, 'uwp_arm'))
+  pool:
+    vmImage: vs2017-win2016
+  steps:
+  - template: ci/build-all-steps.yml
+    parameters:
+      generator: 'Visual Studio 15 2017 ARM'
+      platform: 'uwp_arm'
 
-- script: |
-    set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin
-    md \dev\ros2\src
-    cd \dev\ros2
-    curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/%BUILD_SOURCEBRANCHNAME%/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
-    vcs import src < ros2_dotnet_uwp.repos
-    cd \dev\ros2\src\ros2_dotnet
-    vcs custom --git --args checkout %BUILD_SOURCEBRANCHNAME% || VER>NUL
-    cd \dev\ament
-    call install\local_setup.bat
-    cd \dev\ros2
-    ament build ^
-      --parallel ^
-      --cmake-args ^
-      -G "%TARGET_GENERATOR%" ^
-      -DCMAKE_SYSTEM_NAME=WindowsStore ^
-      -DCMAKE_SYSTEM_VERSION=10.0.14393 ^
-      -DTHIRDPARTY=ON ^
-      -DINSTALL_EXAMPLES=OFF ^
-      -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
-      --
-  displayName: 'Build ros2-dotnet for UWP'
-  condition: startsWith(variables.TARGET_PLATFORM, 'uwp')
-
-- script: |
-    set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin
-    md \dev\ros2\src
-    cd \dev\ros2
-    curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/%BUILD_SOURCEBRANCHNAME%/ros2_dotnet.repos -o ros2_dotnet.repos
-    vcs import src < ros2_dotnet.repos
-    cd \dev\ros2\src\ros2_dotnet
-    vcs custom --git --args checkout %BUILD_SOURCEBRANCHNAME% || VER>NUL
-    cd \dev\ament
-    call install\local_setup.bat
-    cd \dev\ros2
-    ament build ^
-      --parallel ^
-      --cmake-args ^
-      -G "%TARGET_GENERATOR%" ^
-      -DTHIRDPARTY=ON ^
-      -DINSTALL_EXAMPLES=OFF ^
-      -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
-      --
-  displayName: 'Build ros2-dotnet for Desktop'
-  condition: eq(variables.TARGET_PLATFORM, 'desktop')
+- job: 'desktop'
+  displayName: 'Build all tasks (Desktop)'
+  condition: and(succeeded(), not(variables.task), eq(variables.platform, 'desktop'))
+  pool:
+    vmImage: vs2017-win2016
+  steps:
+  - template: ci/build-all-steps.yml
+    parameters:
+      generator: 'Visual Studio 15 2017 Win64'
+      platform: 'desktop'
