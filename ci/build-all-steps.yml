@@ -3,8 +3,34 @@ parameters:
 
 steps:
 - script: |
-    pip install vcstool
-    pip install -U catkin_pkg EmPy pyparsing pyyaml
+    python3 -m pip install -U ^
+      setuptools ^
+      pip
+    pip install -U ^
+      vcstool
+    pip install -U ^
+      catkin_pkg ^
+      EmPy ^
+      lark-parser ^
+      pyparsing pyyaml
+    pip install -U ^
+      pytest ^
+      coverage ^
+      mock
+    pip install -U ^
+      flake8 ^
+      flake8-blind-except ^
+      flake8-builtins ^
+      flake8-class-newline ^
+      flake8-comprehensions ^
+      flake8-deprecated ^
+      flake8-docstrings ^
+      flake8-import-order ^
+      flake8-quotes ^
+      pep8 ^
+      pydocstyle
+    choco install -y ^
+      cppcheck
   displayName: 'Install dependencies'
 
 - script: |
@@ -35,12 +61,12 @@ steps:
       ament build ^
         --parallel ^
         --cmake-args ^
-        -G "${{ parameters.generator }}" ^
-        -DCMAKE_SYSTEM_NAME=WindowsStore ^
-        -DCMAKE_SYSTEM_VERSION=10.0.14393 ^
-        -DTHIRDPARTY=ON ^
-        -DINSTALL_EXAMPLES=OFF ^
-        -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
+          -G "${{ parameters.generator }}" ^
+          -DCMAKE_SYSTEM_NAME=WindowsStore ^
+          -DCMAKE_SYSTEM_VERSION=10.0.14393 ^
+          -DTHIRDPARTY=ON ^
+          -DINSTALL_EXAMPLES=OFF ^
+          -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
         --
     displayName: 'Build ros2-dotnet for UWP'
 
@@ -61,9 +87,30 @@ steps:
       ament build ^
         --parallel ^
         --cmake-args ^
-        -G "${{ parameters.generator }}" ^
-        -DTHIRDPARTY=ON ^
-        -DINSTALL_EXAMPLES=OFF ^
-        -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
+          -G "${{ parameters.generator }}" ^
+          -DTHIRDPARTY=ON ^
+          -DINSTALL_EXAMPLES=OFF ^
+          -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
         --
     displayName: 'Build ros2-dotnet for Desktop'
+
+  - script: |
+      set PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\MSBuild\15.0\Bin
+      cd \dev\ament
+      call install\local_setup.bat
+      cd \dev\ros2
+      vcs branch
+      ament test ^
+        --only-packages ^
+          rcldotnet ^
+          rcldotnet_common ^
+          rcldotnet_examples ^
+          rosidl_generator_dotnet ^
+        --parallel ^
+        --cmake-args ^
+          -G "${{ parameters.generator }}" ^
+          -DTHIRDPARTY=ON ^
+          -DINSTALL_EXAMPLES=OFF ^
+          -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
+        --
+    displayName: 'Test ros2-dotnet for Desktop'
