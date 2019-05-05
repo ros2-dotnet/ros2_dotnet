@@ -6,10 +6,10 @@ Build status
 
 | Target | Status |
 |----------|--------|
-| **Universal Windows Platform (x86)** | [![Build status](http://vsts-matrix-badges.herokuapp.com/repos/ros2-dotnet/ros2-dotnet/2/branches/master/1)](https://dev.azure.com/ros2-dotnet/ros2-dotnet/_build?definitionId=2) |
-| **Universal Windows Platform (x64)** | [![Build status](http://vsts-matrix-badges.herokuapp.com/repos/ros2-dotnet/ros2-dotnet/2/branches/master/2)](https://dev.azure.com/ros2-dotnet/ros2-dotnet/_build?definitionId=2) |
-| **Universal Windows Platform (ARM)** | [![Build status](http://vsts-matrix-badges.herokuapp.com/repos/ros2-dotnet/ros2-dotnet/2/branches/master/3)](https://dev.azure.com/ros2-dotnet/ros2-dotnet/_build?definitionId=2) |
-| **Windows Desktop**                  | [![Build status](http://vsts-matrix-badges.herokuapp.com/repos/ros2-dotnet/ros2-dotnet/2/branches/master/4)](https://dev.azure.com/ros2-dotnet/ros2-dotnet/_build?definitionId=2) |
+| **Universal Windows Platform (x86)** | [![Build Status](https://dev.azure.com/ros2-dotnet/ros2-dotnet/_apis/build/status/ros2-dotnet-CI%20UWP32?branchName=master)](https://dev.azure.com/ros2-dotnet/ros2-dotnet/_build/latest?definitionId=2&branchName=master) |
+| **Universal Windows Platform (x64)** | [![Build Status](https://dev.azure.com/ros2-dotnet/ros2-dotnet/_apis/build/status/ros2-dotnet-CI%20UWP64?branchName=master)](https://dev.azure.com/ros2-dotnet/ros2-dotnet/_build/latest?definitionId=7&branchName=master) |
+| **Universal Windows Platform (ARM)** | [![Build Status](https://dev.azure.com/ros2-dotnet/ros2-dotnet/_apis/build/status/ros2-dotnet-CI%20UWPARM?branchName=master)](https://dev.azure.com/ros2-dotnet/ros2-dotnet/_build/latest?definitionId=8&branchName=master) |
+| **Windows Desktop**                  | [![Build Status](https://dev.azure.com/ros2-dotnet/ros2-dotnet/_apis/build/status/ros2-dotnet-CI%20Desktop?branchName=master)](https://dev.azure.com/ros2-dotnet/ros2-dotnet/_build/latest?definitionId=9&branchName=master) |
 
 Introduction
 ------------
