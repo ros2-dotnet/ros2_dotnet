@@ -17,6 +17,8 @@ find_package(DotNETExtra REQUIRED)
 
 find_package(rcldotnet_common REQUIRED)
 
+message(FATAL_ERROR "Test fail")
+
 if(NOT WIN32)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
