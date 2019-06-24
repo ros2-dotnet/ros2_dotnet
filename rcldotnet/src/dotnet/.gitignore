@@ -1,0 +1,4 @@
+*.sln
+*.userprefs
+.vs
+packages

@@ -29,10 +29,8 @@ What's missing?
 ---------------
 
 Lots of things!
-- Nested types
 - Component nodes
 - Clients and services
-- Tests
 - Documentation
 - More examples (e.g. IoT, VB, UWP, HoloLens, etc.)
 
@@ -64,7 +62,8 @@ mkdir -p ~/ros2_dotnet_ws/src
 cd ~/ros2_dotnet_ws
 wget https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet.repos
 vcs import ~/ros2_dotnet_ws/src < ros2_dotnet.repos
-src/ament/ament_tools/scripts/ament.py build
+colcon build
+
 ```
 
 Universal Windows Platform (ARM, Win32, Win64)

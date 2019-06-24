@@ -1,0 +1,9 @@
+src/rclcs.xml
+src/dotnet/bin
+src/dotnet/obj
+src/dotnet/Scripts
+.vs
+*.dll
+*.exe
+*.mdb
+*mono_crash*

@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>rosidl_generator_cs</name>
+  <version>0.0.0</version>
+  <description>Generate the ROS interfaces in C#.</description>
+  <maintainer email="lennart.nachtigall@student.kit.edu">Lennart Nachtigall</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <build_export_depend>rmw</build_export_depend>
+
+  <buildtool_depend>ament_cmake_export_assemblies</buildtool_depend>
+  <buildtool_depend>dotnet_cmake_module</buildtool_depend>
+  <buildtool_depend>rcldotnet_common</buildtool_depend>
+
+  <buildtool_export_depend>ament_cmake</buildtool_export_depend>
+  <buildtool_export_depend>ament_index_python</buildtool_export_depend>
+  <buildtool_export_depend>python_cmake_module</buildtool_export_depend>
+  <buildtool_export_depend>rosidl_cmake</buildtool_export_depend>
+  <buildtool_export_depend>rosidl_typesupport_c</buildtool_export_depend>
+  <buildtool_export_depend>rosidl_typesupport_interface</buildtool_export_depend>
+  <buildtool_export_depend>ament_cmake_export_assemblies</buildtool_export_depend>
+  <buildtool_export_depend>dotnet_cmake_module</buildtool_export_depend>
+  <buildtool_export_depend>rcldotnet_common</buildtool_export_depend>
+
+  <exec_depend>rmw_implementation</exec_depend>
+  <exec_depend>rmw_implementation_cmake</exec_depend>
+  <exec_depend>rosidl_generator_c</exec_depend>
+  <exec_depend>rosidl_parser</exec_depend>
+
+  <exec_depend>rmw_implementation</exec_depend>
+  <exec_depend>rmw_implementation_cmake</exec_depend>
+  <exec_depend>rosidl_generator_c</exec_depend>
+  <exec_depend>rosidl_parser</exec_depend>
+
+  <test_depend>ament_cmake_pytest</test_depend>
+  <test_depend>ament_index_python</test_depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+  <test_depend>python3-pytest</test_depend>
+  <test_depend>python_cmake_module</test_depend>
+  <test_depend>rmw</test_depend>
+  <test_depend>rmw_implementation</test_depend>
+  <test_depend>rmw_implementation_cmake</test_depend>
+  <test_depend>rosidl_cmake</test_depend>
+  <test_depend>rosidl_generator_c</test_depend>
+  <test_depend>rosidl_parser</test_depend>
+  <test_depend>rosidl_typesupport_c</test_depend>
+
+  <member_of_group>rosidl_generator_packages</member_of_group>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

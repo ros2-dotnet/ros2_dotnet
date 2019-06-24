@@ -48,10 +48,10 @@ namespace ROS2 {
       [DllImport ("api-ms-win-core-libraryloader-l1-2-0.dll", EntryPoint = "FreeLibrary", SetLastError = true, ExactSpelling = true)]
       private static extern int FreeLibraryUWP (IntPtr handle);
 
-      [DllImport ("kernel32.dll", EntryPoint = "LoadLibraryA", SetLastError = true, ExactSpelling = true)]
-      private static extern IntPtr LoadLibraryA (string fileName, int reserved = 0);
+      [DllImport ("kernel32.dll", SetLastError = true)]
+      private static extern IntPtr LoadLibrary (string fileName);
 
-      [DllImport ("kernel32.dll", EntryPoint = "FreeLibrary", SetLastError = true, ExactSpelling = true)]
+      [DllImport ("kernel32.dll", EntryPoint = "FreeLibrary", SetLastError = true)]
       private static extern int FreeLibraryDesktop (IntPtr handle);
 
       [DllImport ("libdl.so", EntryPoint = "dlopen")]
@@ -96,7 +96,7 @@ namespace ROS2 {
 
       private static bool IsWindowsDesktop () {
         try {
-          IntPtr ptr = LoadLibraryA ("kernel32.dll");
+          IntPtr ptr = LoadLibrary ("kernel32.dll");
           FreeLibraryDesktop (ptr);
           return true;
         } catch (TypeLoadException) {
@@ -125,22 +125,32 @@ namespace ROS2 {
       }
 
       private static Platform CheckPlatform () {
-        if (IsUnix ()) {
-          return Platform.Unix;
-        } else if (IsMacOSX ()) {
-          return Platform.MacOSX;
-        } else if (IsWindowsDesktop ()) {
-          return Platform.WindowsDesktop;
-        } else if (IsUWP ()) {
-          return Platform.UWP;
-        } else {
-          return Platform.Unknown;
-        }
+            if (IsUnix())
+            {
+                return Platform.Unix;
+            }
+            else if (IsMacOSX())
+            {
+                return Platform.MacOSX;
+            }
+            else if (IsWindowsDesktop())
+            {
+                return Platform.WindowsDesktop;
+            }
+            else if (IsUWP())
+            {
+                return Platform.UWP;
+            }
+            else
+            {
+                return Platform.Unknown;
+            }
       }
     }
 
     public interface DllLoadUtils {
       IntPtr LoadLibrary (string fileName);
+      IntPtr LoadLibraryNoSuffix (string fileName);
       void FreeLibrary (IntPtr handle);
       IntPtr GetProcAddress (IntPtr dllHandle, string name);
     }
@@ -172,12 +182,21 @@ namespace ROS2 {
         }
         return ptr;
       }
+
+      IntPtr DllLoadUtils.LoadLibraryNoSuffix (string fileName) {
+        string libraryName = fileName + ".dll";
+        IntPtr ptr = LoadPackagedLibrary (libraryName);
+        if (ptr == IntPtr.Zero) {
+          throw new UnsatisfiedLinkError (libraryName);
+        }
+        return ptr;
+      }
     }
 
     public class DllLoadUtilsWindowsDesktop : DllLoadUtils {
 
-      [DllImport ("kernel32.dll", EntryPoint = "LoadLibraryA", SetLastError = true, ExactSpelling = true)]
-      private static extern IntPtr LoadLibraryA (string fileName, int reserved = 0);
+      [DllImport ("kernel32.dll", SetLastError = true)]
+      private static extern IntPtr LoadLibrary (string fileName);
 
       [DllImport ("kernel32.dll", SetLastError = true, ExactSpelling = true)]
       private static extern int FreeLibrary (IntPtr handle);
@@ -195,7 +214,16 @@ namespace ROS2 {
 
       IntPtr DllLoadUtils.LoadLibrary (string fileName) {
         string libraryName = fileName + "_native.dll";
-        IntPtr ptr = LoadLibraryA (libraryName);
+        IntPtr ptr = LoadLibrary (libraryName);
+        if (ptr == IntPtr.Zero) {
+          throw new UnsatisfiedLinkError (libraryName);
+        }
+        return ptr;
+      }
+
+      IntPtr DllLoadUtils.LoadLibraryNoSuffix (string fileName) {
+        string libraryName = fileName + ".dll";
+        IntPtr ptr = LoadLibrary (libraryName);
         if (ptr == IntPtr.Zero) {
           throw new UnsatisfiedLinkError (libraryName);
         }
@@ -242,6 +270,15 @@ namespace ROS2 {
         }
         return ptr;
       }
+
+      public IntPtr LoadLibraryNoSuffix (string fileName) {
+        string libraryName = "lib" + fileName + ".so";
+        IntPtr ptr = dlopen (libraryName, RTLD_NOW);
+        if (ptr == IntPtr.Zero) {
+          throw new UnsatisfiedLinkError (libraryName);
+        }
+        return ptr;
+      }
     }
 
     internal class DllLoadUtilsMacOSX : DllLoadUtils {
@@ -277,6 +314,15 @@ namespace ROS2 {
 
       public IntPtr LoadLibrary (string fileName) {
         string libraryName = "lib" + fileName + "_native.dylib";
+        IntPtr ptr = dlopen (libraryName, RTLD_NOW);
+        if (ptr == IntPtr.Zero) {
+          throw new UnsatisfiedLinkError (libraryName);
+        }
+        return ptr;
+      }
+
+      public IntPtr LoadLibraryNoSuffix (string fileName) {
+        string libraryName = "lib" + fileName + ".dylib";
         IntPtr ptr = dlopen (libraryName, RTLD_NOW);
         if (ptr == IntPtr.Zero) {
           throw new UnsatisfiedLinkError (libraryName);

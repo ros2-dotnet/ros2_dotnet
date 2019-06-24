@@ -1,34 +1,35 @@
 using System;
-using System.Reflection;
-using System.Runtime;
-using System.Runtime.InteropServices;
 using System.Threading;
 
-using ROS2;
+using rclcs;
 using ROS2.Utils;
 
-namespace ConsoleApplication {
-  public class RCLDotnetTalker {
-    public static void Main (string[] args) {
-      RCLdotnet.Init ();
+namespace ConsoleApplication
+{
+    public class RCLDotnetTalker
+    {
+        public static void Main(string[] args)
+        {
+            Context ctx = new Context();
+            Rclcs.Init(ctx);
+            INode node = Rclcs.CreateNode("talker", ctx);
+            IPublisher<std_msgs.msg.String> chatter_pub = node.CreatePublisher<std_msgs.msg.String>("chatter");
 
-      INode node = RCLdotnet.CreateNode ("talker");
+            std_msgs.msg.String msg = new std_msgs.msg.String();
 
-      IPublisher<std_msgs.msg.String> chatter_pub = node.CreatePublisher<std_msgs.msg.String> ("chatter");
+            int i = 1;
 
-      std_msgs.msg.String msg = new std_msgs.msg.String ();
+            while (Rclcs.Ok(ctx))
+            {
+                msg.data = "Hello World: " + i;
+                i++;
+                Console.WriteLine("Publishing: \"" + msg.data + "\"");
+                chatter_pub.Publish(msg);
 
-      int i = 1;
-
-      while (RCLdotnet.Ok ()) {
-        msg.Data = "Hello World: " + i;
-        i++;
-        Console.WriteLine ("Publishing: \"" + msg.Data + "\"");
-        chatter_pub.Publish (msg);
-
-        // Sleep a little bit between each message
-        Thread.Sleep (1000);
-      }
+                // Sleep a little bit between each message
+                Thread.Sleep(1000);
+            }
+            Rclcs.Shutdown(ctx);
+        }
     }
-  }
 }

@@ -4,13 +4,11 @@ project(rcldotnet_examples C)
 
 find_package(ament_cmake REQUIRED)
 find_package(rcldotnet REQUIRED)
-
 find_package(rcldotnet_common REQUIRED)
-
 find_package(std_msgs REQUIRED)
 find_package(rcldotnet REQUIRED)
-
 find_package(dotnet_cmake_module REQUIRED)
+find_package(rosidl_generator_cs REQUIRED)
 
 set(CSHARP_TARGET_FRAMEWORK "netcoreapp2.0")
 find_package(DotNETExtra REQUIRED)
@@ -19,7 +17,7 @@ set(_assemblies_dep_dlls
     ${rcldotnet_common_ASSEMBLIES_DLL}
     ${rcldotnet_ASSEMBLIES_DLL}
     ${std_msgs_ASSEMBLIES_DLL}
-    ${rcldotnet_ASSEMBLIES_DLL}
+    ${rosidl_generator_ASSEMBLIES_DLL}
 )
 
 message("Included assemblies: ${_assemblies_dep_dlls}")

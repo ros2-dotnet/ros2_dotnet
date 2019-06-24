@@ -19,17 +19,21 @@ namespace ROS2 {
   namespace Interfaces {
     public interface IMessageStruct { }
 
-    public interface IMessage {
-      IntPtr _CREATE_NATIVE_MESSAGE ();
-      void _READ_HANDLE (IntPtr messageHandle);
-      void _DESTROY_NATIVE_MESSAGE (IntPtr messageHandle);
-      void _WRITE_HANDLE (IntPtr messageHandle);
+    public interface IRclcsMessage: System.IDisposable
+    {
+      IntPtr Handle { get; }
+      IntPtr TypeSupportHandle { get; }
     }
 
-    public interface IDisposable {
-      IntPtr Handle {
-        get;
-      }
+    // rosidl
+    #pragma warning disable 0169
+    public struct rosidl_message_type_support_t
+    {
+        private IntPtr typesupport_indentifier;
+        private IntPtr data;
+        private IntPtr func;
     }
+    #pragma warning restore 0169
+
   }
 }

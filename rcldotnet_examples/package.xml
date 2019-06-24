@@ -11,6 +11,7 @@
 
   <buildtool_depend>dotnet_cmake_module</buildtool_depend>
   <buildtool_depend>rcldotnet_common</buildtool_depend>
+  <buildtool_depend>rosidl_generator_cs</buildtool_depend>
   <buildtool_export_depend>rosidl_cmake</buildtool_export_depend>
 
   <build_depend>example_interfaces</build_depend>

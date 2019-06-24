@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('packages\NUnit.3.11.0\build\NUnit.props')" />
+  <Import Project="packages\NUnit3TestAdapter.3.12.0\build\net35\NUnit3TestAdapter.props" Condition="Exists('packages\NUnit3TestAdapter.3.12.0\build\net35\NUnit3TestAdapter.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <ProjectGuid>{CC0D4875-60FA-4318-854B-1924FED1C85B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>rclcs</RootNamespace>
+    <AssemblyName>rclcs</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <AssemblyOriginatorKeyFile>rclcs.snk</AssemblyOriginatorKeyFile>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="Clock.cs" />
+    <Compile Include="Exceptions.cs" />
+    <Compile Include="QualityOfServiceProfile.cs" />
+    <Compile Include="Test\InitShutdownTest.cs" />
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="Rclcs.cs" />
+    <Compile Include="NativeTypes.cs" />
+    <Compile Include="Test\ClockTest.cs" />
+    <Compile Include="Test\LargeMessageTest.cs" />
+    <Compile Include="Utils.cs" />
+    <Compile Include="Enums.cs" />
+    <Compile Include="Test\NativeMetodsTest.cs" />
+    <Compile Include="MarshallingHelpers.cs" />
+    <Compile Include="Test\CreateNodeTest.cs" />
+    <Compile Include="Context.cs" />
+    <Compile Include="Node.cs" />
+    <Compile Include="Test\MessagesTest.cs" />
+    <Compile Include="Test\NodeTest.cs" />
+    <Compile Include="Publisher.cs" />
+    <Compile Include="Subscription.cs" />
+    <Compile Include="INode.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Test\WaitSetTest.cs" />
+    <Compile Include="Test\TestUtils.cs" />
+    <Compile Include="WaitSet.cs" />
+    <Compile Include="ISubscriptionBase.cs" />
+    <Compile Include="ISubscription.cs" />
+    <Compile Include="IPublisherBase.cs" />
+    <Compile Include="IPublisher.cs" />
+    <Compile Include="Test\SubscriptionTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Mono.Cecil, Version=0.9.6.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>packages\NUnit.Engine.3.9.0\lib\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit-agent, Version=3.9.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\NUnit.Engine.3.9.0\lib\nunit-agent.exe</HintPath>
+    </Reference>
+    <Reference Include="nunit-agent-x86, Version=3.9.0.0, Culture=neutral, processorArchitecture=x86">
+      <HintPath>packages\NUnit.Engine.3.9.0\lib\nunit-agent-x86.exe</HintPath>
+    </Reference>
+    <Reference Include="nunit.engine, Version=3.9.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>packages\NUnit.Engine.3.9.0\lib\nunit.engine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.engine.api, Version=3.0.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>packages\NUnit.Engine.3.9.0\lib\nunit.engine.api.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.11.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="rcldotnet_common">
+      <HintPath>..\..\..\..\..\install\lib\dotnet\rcldotnet_common.dll</HintPath>
+    </Reference>
+    <Reference Include="rosgraph_msgs_assembly">
+      <HintPath>..\..\..\..\..\install\lib\dotnet\rosgraph_msgs_assembly.dll</HintPath>
+    </Reference>
+    <Reference Include="std_msgs_assembly">
+      <HintPath>..\..\..\..\..\install\lib\dotnet\std_msgs_assembly.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="test_msgs_assembly">
+      <HintPath>..\..\..\..\..\install\lib\dotnet\test_msgs_assembly.dll</HintPath>
+    </Reference>
+    <Reference Include="builtin_interfaces_assembly">
+      <HintPath>..\..\..\..\..\install\lib\dotnet\builtin_interfaces_assembly.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\NUnit3TestAdapter.3.12.0\build\net35\NUnit3TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\NUnit3TestAdapter.3.12.0\build\net35\NUnit3TestAdapter.props'))" />
+    <Error Condition="!Exists('packages\NUnit.3.11.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\NUnit.3.11.0\build\NUnit.props'))" />
+  </Target>
+</Project>
