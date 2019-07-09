@@ -6,6 +6,9 @@ trigger:
     exclude:
     - README.md
 
+variables:
+  VisualStudioVersion: 15.0
+
 jobs:
 - job: 'uwp_32'
   displayName: 'Build all tasks (UWP 32)'
@@ -15,7 +18,7 @@ jobs:
   steps:
   - template: ci/build-all-steps.yml
     parameters:
-      generator: 'Visual Studio 15 2017'
+      arch: 'Win32'
       platform: 'uwp_32'
 
 - job: 'uwp_64'
@@ -26,7 +29,7 @@ jobs:
   steps:
   - template: ci/build-all-steps.yml
     parameters:
-      generator: 'Visual Studio 15 2017 Win64'
+      arch: 'x64'
       platform: 'uwp_64'
 
 - job: 'uwp_arm'
@@ -37,7 +40,7 @@ jobs:
   steps:
   - template: ci/build-all-steps.yml
     parameters:
-      generator: 'Visual Studio 15 2017 ARM'
+      arch: 'ARM'
       platform: 'uwp_arm'
 
 - job: 'desktop'
@@ -48,5 +51,5 @@ jobs:
   steps:
   - template: ci/build-all-steps.yml
     parameters:
-      generator: 'Visual Studio 15 2017 Win64'
+      arch: 'x64'
       platform: 'desktop'
