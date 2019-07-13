@@ -9,8 +9,8 @@
 #include <rosidl_generator_c/string.h>
 #include <rosidl_generator_c/string_functions.h>
 
-#include <rosidl_generator_c/primitives_array.h>
-#include <rosidl_generator_c/primitives_array_functions.h>
+#include <rosidl_generator_c/primitives_sequence.h>
+#include <rosidl_generator_c/primitives_sequence_functions.h>
 
 @{
 struct_type_name = 'rcldotnet_{}_{}_{}_t'.format(spec.base_type.pkg_name, subfolder, type_name)
