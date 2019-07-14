@@ -64,19 +64,9 @@ namespace ROS2 {
     internal static NativeRCLWaitSetInitType native_rcl_wait_set_init = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate void NativeRCLWaitSetClearSubscriptionsType (IntPtr waitSetHandle);
+    internal delegate void NativeRCLWaitSetClearType (IntPtr waitSetHandle);
 
-    internal static NativeRCLWaitSetClearSubscriptionsType native_rcl_wait_set_clear_subscriptions = null;
-
-    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate void NativeRCLWaitSetClearServicesType (IntPtr waitSetHandle);
-
-    internal static NativeRCLWaitSetClearServicesType native_rcl_wait_set_clear_services = null;
-
-    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate void NativeRCLWaitSetClearClientsType (IntPtr waitSetHandle);
-
-    internal static NativeRCLWaitSetClearClientsType native_rcl_wait_set_clear_clients = null;
+    internal static NativeRCLWaitSetClearType native_rcl_wait_set_clear = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate void NativeRCLWaitSetAddSubscriptionType (IntPtr waitSetHandle, IntPtr subscriptionHandle);
@@ -139,23 +129,11 @@ namespace ROS2 {
         (NativeRCLWaitSetInitType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_wait_set_init_ptr, typeof (NativeRCLWaitSetInitType));
 
-      IntPtr native_rcl_wait_set_clear_subscriptions_ptr =
-        dllLoadUtils.GetProcAddress (pDll, "native_rcl_wait_set_clear_subscriptions");
-      RCLdotnetDelegates.native_rcl_wait_set_clear_subscriptions =
-        (NativeRCLWaitSetClearSubscriptionsType) Marshal.GetDelegateForFunctionPointer (
-          native_rcl_wait_set_clear_subscriptions_ptr, typeof (NativeRCLWaitSetClearSubscriptionsType));
-
-      IntPtr native_rcl_wait_set_clear_services_ptr =
-        dllLoadUtils.GetProcAddress (pDll, "native_rcl_wait_set_clear_services");
-      RCLdotnetDelegates.native_rcl_wait_set_clear_services =
-        (NativeRCLWaitSetClearServicesType) Marshal.GetDelegateForFunctionPointer (
-          native_rcl_wait_set_clear_services_ptr, typeof (NativeRCLWaitSetClearServicesType));
-
-      IntPtr native_rcl_wait_set_clear_clients_ptr =
-        dllLoadUtils.GetProcAddress (pDll, "native_rcl_wait_set_clear_clients");
-      RCLdotnetDelegates.native_rcl_wait_set_clear_clients =
-        (NativeRCLWaitSetClearClientsType) Marshal.GetDelegateForFunctionPointer (
-          native_rcl_wait_set_clear_clients_ptr, typeof (NativeRCLWaitSetClearClientsType));
+      IntPtr native_rcl_wait_set_clear_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_wait_set_clear");
+      RCLdotnetDelegates.native_rcl_wait_set_clear =
+        (NativeRCLWaitSetClearType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_wait_set_clear_ptr, typeof (NativeRCLWaitSetClearType));
 
       IntPtr native_rcl_wait_set_add_subscription_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_wait_set_add_subscription");
@@ -225,16 +203,8 @@ namespace ROS2 {
         numberOfTimers, numberOfClients, numberOfServices);
     }
 
-    private static void WaitSetClearSubscriptions (IntPtr waitSetHandle) {
-      RCLdotnetDelegates.native_rcl_wait_set_clear_subscriptions (waitSetHandle);
-    }
-
-    private static void WaitSetClearServices (IntPtr waitSetHandle) {
-      RCLdotnetDelegates.native_rcl_wait_set_clear_services (waitSetHandle);
-    }
-
-    private static void WaitSetClearClients (IntPtr waitSetHandle) {
-      RCLdotnetDelegates.native_rcl_wait_set_clear_clients (waitSetHandle);
+    private static void WaitSetClear (IntPtr waitSetHandle) {
+      RCLdotnetDelegates.native_rcl_wait_set_clear (waitSetHandle);
     }
 
     private static void WaitSetAddSubscription (IntPtr waitSetHandle, IntPtr subscriptionHandle) {
@@ -288,11 +258,7 @@ namespace ROS2 {
         numberOfServices
       );
 
-      WaitSetClearSubscriptions (waitSetHandle);
-
-      WaitSetClearServices (waitSetHandle);
-
-      WaitSetClearClients (waitSetHandle);
+      WaitSetClear (waitSetHandle);
 
       foreach (ISubscriptionBase subscription in node.Subscriptions) {
         WaitSetAddSubscription (waitSetHandle, subscription.Handle);
