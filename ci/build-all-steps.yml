@@ -73,8 +73,7 @@ steps:
           -DCMAKE_SYSTEM_NAME=WindowsStore ^
           -DCMAKE_SYSTEM_VERSION=10.0.14393 ^
           -DTHIRDPARTY=ON ^
-          -DINSTALL_EXAMPLES=OFF ^
-          -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install"
+          -DINSTALL_EXAMPLES=OFF
     displayName: 'Build ros2-dotnet for UWP'
 
 - ${{ if eq(parameters.platform, 'desktop') }}:
@@ -98,8 +97,7 @@ steps:
           -A "${{ parameters.arch }}" ^
           -DBUILD_TESTING=OFF ^
           -DTHIRDPARTY=ON ^
-          -DINSTALL_EXAMPLES=OFF ^
-          -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install"
+          -DINSTALL_EXAMPLES=OFF
     displayName: 'Build ros2-dotnet for Desktop'
 
   - script: |
@@ -119,7 +117,6 @@ steps:
           -A "${{ parameters.arch }}" ^
           -DBUILD_TESTING=OFF ^
           -DTHIRDPARTY=ON ^
-          -DINSTALL_EXAMPLES=OFF ^
-          -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install"
+          -DINSTALL_EXAMPLES=OFF
       colcon test-result --verbose
     displayName: 'Test ros2-dotnet for Desktop'

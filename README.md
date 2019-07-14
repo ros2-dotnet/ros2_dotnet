@@ -97,7 +97,7 @@ vcs import src < ros2_dotnet_uwp.repos
 cd \dev\ament
 call install\local_setup.bat
 cd \dev\ros2
-colcon build --merge-install --cmake-args -A "%TARGET_ARCH%" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.14393 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install"
+colcon build --merge-install --cmake-args -A "%TARGET_ARCH%" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.14393 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF
 ```
 
 Now you can just run a bunch of examples.
