@@ -6,6 +6,9 @@ trigger:
     exclude:
     - README.md
 
+variables:
+  VisualStudioVersion: 15.0
+
 jobs:
 - job: 'uwp_32'
   displayName: 'Build all tasks (UWP 32)'
