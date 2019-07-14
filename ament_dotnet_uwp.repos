@@ -2,35 +2,31 @@ repositories:
   ament/ament_cmake:
     type: git
     url: https://github.com/ament/ament_cmake.git
-    version: 0.5.1
+    version: crystal
   ament/ament_index:
     type: git
     url: https://github.com/ament/ament_index.git
-    version: 0.5.1
+    version: crystal
   ament/ament_lint:
     type: git
     url: https://github.com/ament/ament_lint.git
-    version: 0.5.2
+    version: crystal
   ament/ament_package:
     type: git
-    url: https://github.com/esteve/ament_package.git
-    version: windows-escape-values
-  ament/ament_tools:
-    type: git
-    url: https://github.com/esteve/ament_tools.git
-    version: win32-platform
+    url: https://github.com/ament/ament_package.git
+    version: crystal
   ament/googletest:
     type: git
     url: https://github.com/ament/googletest.git
-    version: 4b6e624e78ba3d43c1602ffc80478ee7253e0b04
+    version: crystal
   ament/osrf_pycommon:
     type: git
     url: https://github.com/osrf/osrf_pycommon.git
-    version: 0.1.5
-  ament/uncrustify:
+    version: crystal
+  ament/uncrustify_vendor:
     type: git
-    url: https://github.com/ament/uncrustify.git
-    version: 0.66.1
+    url: https://github.com/ament/uncrustify_vendor.git
+    version: crystal
   ament_dotnet/ament_cmake_export_assemblies:
     type: git
     url: https://github.com/esteve/ament_cmake_export_assemblies.git
