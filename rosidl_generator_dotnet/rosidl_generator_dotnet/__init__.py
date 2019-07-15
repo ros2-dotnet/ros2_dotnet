@@ -20,6 +20,7 @@ from rosidl_cmake import convert_camel_case_to_lower_case_underscore
 from rosidl_cmake import expand_template
 from rosidl_cmake import get_newest_modification_time
 from rosidl_cmake import read_generator_arguments
+from rosidl_parser import parse_action_file
 from rosidl_parser import parse_message_file
 from rosidl_parser import parse_service_file
 
@@ -32,8 +33,7 @@ class Underscorer(string.Formatter):
         return super(Underscorer, self).format_field(value, spec)
 
 
-def generate_dotnet(generator_arguments_file, typesupport_impl,
-                    typesupport_impls):
+def generate_dotnet(generator_arguments_file, typesupport_impls):
     args = read_generator_arguments(generator_arguments_file)
     typesupport_impls = typesupport_impls.split(';')
 
@@ -50,6 +50,7 @@ def generate_dotnet(generator_arguments_file, typesupport_impl,
     }
 
     mapping_srvs = {os.path.join(template_dir, 'srv.cs.em'): ['{0}.cs'], }
+    mapping_actions = {os.path.join(template_dir, 'action.cs.em'): ['{0}.cs'], }
 
     for template_file in mapping_msgs.keys():
         assert os.path.exists(template_file), \
@@ -57,6 +58,9 @@ def generate_dotnet(generator_arguments_file, typesupport_impl,
     for template_file in mapping_srvs.keys():
         assert os.path.exists(template_file), \
             'Services template file %s not found' % template_file
+    for template_file in mapping_actions.keys():
+        assert os.path.exists(template_file), \
+            'Actions template file %s not found' % template_file
 
     functions = {'get_dotnet_type': get_dotnet_type, }
     latest_target_timestamp = get_newest_modification_time(
@@ -74,6 +78,10 @@ def generate_dotnet(generator_arguments_file, typesupport_impl,
             spec = parse_service_file(args['package_name'], ros_interface_file)
             mapping = mapping_srvs
             type_name = spec.srv_name
+        elif extension == '.action':
+            spec = parse_action_file(args['package_name'], ros_interface_file)
+            mapping = mapping_actions
+            type_name = spec.action_name
         else:
             continue
 

@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(ament_cmake_export_assemblies REQUIRED)
-find_package(rosidl_generator_c REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 find_package(rmw REQUIRED)
+find_package(ament_cmake_export_assemblies REQUIRED)
+find_package(rosidl_generator_c REQUIRED)
+find_package(rosidl_typesupport_c REQUIRED)
+find_package(rosidl_typesupport_interface REQUIRED)
 
 find_package(dotnet_cmake_module REQUIRED)
 find_package(DotNETExtra REQUIRED)
@@ -35,6 +37,7 @@ set(_generated_msg_c_files "")
 set(_generated_msg_c_ts_files "")
 set(_generated_msg_h_files "")
 set(_generated_srv_cs_files "")
+set(_generated_action_cs_files "")
 
 if(NOT WIN32)
   if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -48,6 +51,7 @@ foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
   get_filename_component(_parent_folder "${_idl_file}" DIRECTORY)
   get_filename_component(_parent_folder "${_parent_folder}" NAME)
   get_filename_component(_module_name "${_idl_file}" NAME_WE)
+  get_filename_component(_extension "${_idl_file}" EXT)
   string_camel_case_to_lower_case_underscore("${_module_name}" _header_name)
 
   if(_parent_folder STREQUAL "msg")
@@ -67,6 +71,10 @@ foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
     endforeach()
   elseif(_parent_folder STREQUAL "srv")
     list(APPEND _generated_srv_cs_files
+      "${_output_path}/${_parent_folder}/${_module_name}.cs"
+    )
+  elseif(_parent_folder STREQUAL "action")
+    list(APPEND _generated_action_cs_files
       "${_output_path}/${_parent_folder}/${_module_name}.cs"
     )
   else()
@@ -92,11 +100,15 @@ set(target_dependencies
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.c.em"
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.cs.em"
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/srv.cs.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/action.cs.em"
   ${rosidl_generate_interfaces_IDL_FILES}
   ${_dependency_files})
 foreach(dep ${target_dependencies})
   if(NOT EXISTS "${dep}")
-    message(FATAL_ERROR "Target dependency '${dep}' does not exist")
+    get_property(is_generated SOURCE "${dep}" PROPERTY GENERATED)
+    if(NOT ${_is_generated})
+      message(FATAL_ERROR "Target dependency '${dep}' does not exist")
+    endif()
   endif()
 endforeach()
 
@@ -119,14 +131,13 @@ set(_target_suffix "__dotnet")
 
 set_property(
   SOURCE
-  ${_generated_msg_cs_files} ${_generated_msg_h_files} ${_generated_msg_c_ts_files} ${_generated_srv_cs_files}
+  ${_generated_msg_cs_files} ${_generated_msg_h_files} ${_generated_msg_c_ts_files} ${_generated_srv_cs_files} ${_generated_action_cs_files}
   PROPERTY GENERATED 1)
 
 add_custom_command(
-  OUTPUT ${_generated_msg_cs_files} ${_generated_msg_h_files} ${_generated_msg_c_ts_files} ${_generated_srv_cs_files}
+  OUTPUT ${_generated_msg_cs_files} ${_generated_msg_h_files} ${_generated_msg_c_ts_files} ${_generated_srv_cs_files} ${_generated_action_cs_files}
   COMMAND ${PYTHON_EXECUTABLE} ${rosidl_generator_dotnet_BIN}
   --generator-arguments-file "${generator_arguments_file}"
-  --typesupport-impl "${_typesupport_impl}"
   --typesupport-impls "${_typesupport_impls}"
   DEPENDS ${target_dependencies}
   COMMENT "Generating C# code for ROS interfaces"
@@ -143,6 +154,7 @@ else()
     ${_generated_msg_h_files}
     ${_generated_msg_c_ts_files}
     ${_generated_srv_cs_files}
+    ${_generated_action_cs_files}
   )
 endif()
 
@@ -302,6 +314,7 @@ add_dotnet_library(${PROJECT_NAME}_assemblies
   SOURCES
   ${_generated_msg_cs_files}
   ${_generated_srv_cs_files}
+  ${_generated_action_cs_files}
   INCLUDE_DLLS
   ${_assembly_deps_dll}
 )

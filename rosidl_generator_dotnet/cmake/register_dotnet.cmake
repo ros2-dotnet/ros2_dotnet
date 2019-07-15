@@ -19,6 +19,11 @@ macro(rosidl_generator_dotnet_extras BIN GENERATOR_FILES TEMPLATE_DIR)
     "rosidl_generator_dotnet"
     "rosidl_generator_dotnet_generate_interfaces.cmake")
 
+  ament_register_extension(
+    "rosidl_generate_action_interfaces"
+    "rosidl_generator_dotnet"
+    "rosidl_generator_dotnet_generate_action_interfaces.cmake")
+
   normalize_path(BIN "${BIN}")
   set(rosidl_generator_dotnet_BIN "${BIN}")
 
