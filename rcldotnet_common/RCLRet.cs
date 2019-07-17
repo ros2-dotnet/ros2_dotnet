@@ -19,6 +19,7 @@ namespace ROS2 {
       Ok = 0,
       Error = 1,
       Timeout = 2,
+      Unsupported = 3,
       BadAlloc = 10,
       InvalidArgument = 11,
       AlreadyInit = 100,
@@ -27,6 +28,7 @@ namespace ROS2 {
       TopicNameInvalid = 103,
       ServiceNameInvalid = 104,
       UnknownSubstitution = 105,
+      AlreadyShutdown = 106,
       NodeInvalid = 200,
       NodeInvalidName = 201,
       NodeInvalidNamespace = 202,
@@ -42,6 +44,12 @@ namespace ROS2 {
       WaitSetInvalid = 900,
       WaitSetEmpty = 901,
       WaitSetFull = 902,
+      InvalidRemapRule = 1001,
+      WrongLexme = 1002,
+      InvalidParamRule = 1010,
+      InvalidLogLevelRule = 1020,
+      EventInvalid = 2000,
+      EventTakeFailed = 2001
     }
   }
 }
