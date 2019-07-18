@@ -53,7 +53,7 @@ md \dev\ros2_dotnet_ws\src
 cd \dev\ros2_dotnet_ws
 curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet.repos -o ros2_dotnet.repos
 vcs import \dev\ros2_dotnet_ws\src < ros2_dotnet.repos
-src\ament\ament_tools\scripts\ament.py build
+colcon build --merge-install
 ```
 
 Linux
@@ -64,7 +64,7 @@ mkdir -p ~/ros2_dotnet_ws/src
 cd ~/ros2_dotnet_ws
 wget https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet.repos
 vcs import ~/ros2_dotnet_ws/src < ros2_dotnet.repos
-src/ament/ament_tools/scripts/ament.py build
+colcon build --merge-install
 ```
 
 Universal Windows Platform (ARM, Win32, Win64)
@@ -80,14 +80,14 @@ md \dev\ament\src
 cd \dev\ament
 curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ament_dotnet_uwp.repos -o ament_dotnet_uwp.repos
 vcs import src < ament_dotnet_uwp.repos
-python src\ament\ament_tools\scripts\ament.py build --cmake-args -G "Visual Studio 15 2017 Win64" --
+colcon build --merge-install
 call install\local_setup.bat
 ```
 
 UWP
 ---
 
-Replace `%TARGET_GENERATOR%` with "Visual Studio 15 2017" for Win32, "Visual Studio 15 2017 Win64" for Win64 and "Visual Studio 15 2017 ARM" for ARM
+Replace `%TARGET_ARCH%` with Win32, x64 or ARM
 
 ```
 md \dev\ros2\src
@@ -97,7 +97,7 @@ vcs import src < ros2_dotnet_uwp.repos
 cd \dev\ament
 call install\local_setup.bat
 cd \dev\ros2
-ament build --parallel --cmake-args -G "%TARGET_GENERATOR%" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.14393 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" --
+colcon build --merge-install --cmake-args -A "%TARGET_ARCH%" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.14393 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DBUILD_TESTING=OFF
 ```
 
 Now you can just run a bunch of examples.

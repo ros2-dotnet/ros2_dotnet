@@ -13,12 +13,8 @@ repositories:
     version: 0.5.2
   ament/ament_package:
     type: git
-    url: https://github.com/esteve/ament_package.git
-    version: windows-escape-values
-  ament/ament_tools:
-    type: git
-    url: https://github.com/esteve/ament_tools.git
-    version: win32-platform
+    url: https://github.com/ament/ament_package.git
+    version: 0.5.2
   ament/googletest:
     type: git
     url: https://github.com/ament/googletest.git

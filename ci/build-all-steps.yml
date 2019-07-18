@@ -1,5 +1,7 @@
 parameters:
   platform: ''
+  arch: ''
+  generator: 'Visual Studio 15 2017'
 
 steps:
 - script: |
@@ -8,6 +10,8 @@ steps:
       pip
     pip install -U ^
       vcstool
+    pip install -U ^
+      colcon-common-extensions
     pip install -U ^
       catkin_pkg ^
       EmPy ^
@@ -40,7 +44,9 @@ steps:
     copy $(Build.Repository.LocalPath)\ament_dotnet_uwp.repos \dev\ament\ament_dotnet_uwp.repos
     vcs import src < ament_dotnet_uwp.repos
     vcs branch
-    python src\ament\ament_tools\scripts\ament.py build --cmake-args -G "Visual Studio 15 2017 Win64" --
+    colcon build ^
+      --merge-install ^
+      --cmake-args -A x64
     call install\local_setup.bat
   displayName: 'Build ament'
 
@@ -58,16 +64,16 @@ steps:
       call install\local_setup.bat
       cd \dev\ros2
       vcs branch
-      ament build ^
-        --parallel ^
+      colcon build ^
+        --merge-install ^
         --cmake-args ^
           -G "${{ parameters.generator }}" ^
+          -A "${{ parameters.arch }}" ^
+          -DBUILD_TESTING=OFF ^
           -DCMAKE_SYSTEM_NAME=WindowsStore ^
           -DCMAKE_SYSTEM_VERSION=10.0.14393 ^
           -DTHIRDPARTY=ON ^
-          -DINSTALL_EXAMPLES=OFF ^
-          -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
-        --
+          -DINSTALL_EXAMPLES=OFF
     displayName: 'Build ros2-dotnet for UWP'
 
 - ${{ if eq(parameters.platform, 'desktop') }}:
@@ -84,14 +90,14 @@ steps:
       call install\local_setup.bat
       cd \dev\ros2
       vcs branch
-      ament build ^
-        --parallel ^
+      colcon build ^
+        --merge-install ^
         --cmake-args ^
           -G "${{ parameters.generator }}" ^
+          -A "${{ parameters.arch }}" ^
+          -DBUILD_TESTING=OFF ^
           -DTHIRDPARTY=ON ^
-          -DINSTALL_EXAMPLES=OFF ^
-          -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
-        --
+          -DINSTALL_EXAMPLES=OFF
     displayName: 'Build ros2-dotnet for Desktop'
 
   - script: |
@@ -100,17 +106,17 @@ steps:
       call install\local_setup.bat
       cd \dev\ros2
       vcs branch
-      ament test ^
-        --only-packages ^
+      colcon test ^
+        --packages-select ^
           rcldotnet ^
           rcldotnet_common ^
           rcldotnet_examples ^
           rosidl_generator_dotnet ^
-        --parallel ^
         --cmake-args ^
           -G "${{ parameters.generator }}" ^
+          -A "${{ parameters.arch }}" ^
+          -DBUILD_TESTING=OFF ^
           -DTHIRDPARTY=ON ^
-          -DINSTALL_EXAMPLES=OFF ^
-          -DCMAKE_FIND_ROOT_PATH="\dev\ament\install;\dev\ros2\install" ^
-        --
+          -DINSTALL_EXAMPLES=OFF
+      colcon test-result --verbose
     displayName: 'Test ros2-dotnet for Desktop'
