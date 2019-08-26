@@ -79,9 +79,11 @@ def generate_dotnet(generator_arguments_file, typesupport_impls):
             mapping = mapping_srvs
             type_name = spec.srv_name
         elif extension == '.action':
+            print("$$$ Processing action for package: %s" % args['package_name'])
             spec = parse_action_file(args['package_name'], ros_interface_file)
             mapping = mapping_actions
             type_name = spec.action_name
+            print("$$$ action name: %s" % type_name)
         else:
             continue
 
@@ -115,6 +117,7 @@ def generate_dotnet(generator_arguments_file, typesupport_impls):
                 generated_file = os.path.join(
                     args['output_dir'], subfolder,
                     Underscorer().format(generated_filename, type_name))
+                print("$$$ Genrated File: %s" % generated_file)
                 expand_template(
                     template_file,
                     data,

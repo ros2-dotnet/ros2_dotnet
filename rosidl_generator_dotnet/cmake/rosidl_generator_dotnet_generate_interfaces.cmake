@@ -39,15 +39,12 @@ set(_generated_msg_h_files "")
 set(_generated_srv_cs_files "")
 set(_generated_action_cs_files "")
 
-if(NOT WIN32)
-  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
-  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined,error")
-  endif()
-endif()
+foreach(_typesupport_impl ${_typesupport_impls})
+  set(_generated_extension_${_typesupport_impl}_files "")
+endforeach()
 
 foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
+  message(STATUS "### Processing ${_idl_file}")
   get_filename_component(_parent_folder "${_idl_file}" DIRECTORY)
   get_filename_component(_parent_folder "${_parent_folder}" NAME)
   get_filename_component(_module_name "${_idl_file}" NAME_WE)
@@ -100,15 +97,10 @@ set(target_dependencies
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.c.em"
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.cs.em"
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/srv.cs.em"
-  "${rosidl_generator_dotnet_TEMPLATE_DIR}/action.cs.em"
-  ${rosidl_generate_interfaces_IDL_FILES}
   ${_dependency_files})
 foreach(dep ${target_dependencies})
   if(NOT EXISTS "${dep}")
-    get_property(is_generated SOURCE "${dep}" PROPERTY GENERATED)
-    if(NOT ${_is_generated})
-      message(FATAL_ERROR "Target dependency '${dep}' does not exist")
-    endif()
+    message(FATAL_ERROR "Target dependency '${dep}' does not exist")
   endif()
 endforeach()
 
@@ -122,6 +114,7 @@ rosidl_write_generator_arguments(
   TEMPLATE_DIR "${rosidl_generator_dotnet_TEMPLATE_DIR}"
   TARGET_DEPENDENCIES ${target_dependencies}
 )
+set(extra_generator_dependencies "")
 
 file(MAKE_DIRECTORY "${_output_path}")
 
