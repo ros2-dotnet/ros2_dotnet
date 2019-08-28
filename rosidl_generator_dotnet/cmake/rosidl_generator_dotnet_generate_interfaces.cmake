@@ -69,6 +69,7 @@ foreach(_idl_file ${rosidl_generate_interfaces_IDL_FILES})
     list(APPEND _generated_srv_cs_files
       "${_output_path}/${_parent_folder}/${_module_name}.cs"
     )
+  elseif(_parent_folder STREQUAL "action")
   else()
     message(FATAL_ERROR "Interface file with unknown parent folder: ${_idl_file}")
   endif()
@@ -96,7 +97,10 @@ set(target_dependencies
   ${_dependency_files})
 foreach(dep ${target_dependencies})
   if(NOT EXISTS "${dep}")
-    message(FATAL_ERROR "Target dependency '${dep}' does not exist")
+    get_property(is_generated SOURCE "${dep}" PROPERTY GENERATED)
+    if(NOT ${_is_generated})
+      message(FATAL_ERROR "Target dependency '${dep}' does not exist")
+    endif()
   endif()
 endforeach()
 

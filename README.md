@@ -32,6 +32,7 @@ Lots of things!
 - Nested types
 - Component nodes
 - Clients and services
+- Actions
 - Tests
 - Documentation
 - More examples (e.g. IoT, VB, UWP, HoloLens, etc.)
