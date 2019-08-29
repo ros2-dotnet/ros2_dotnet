@@ -92,5 +92,5 @@ repositories:
     version: master
   ros2_dotnet/ros2_dotnet:
     type: git
-    url: https://github.com/theseankelly/ros2_dotnet.git
+    url: https://github.com/esteve/ros2_dotnet.git
     version: crystal
