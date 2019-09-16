@@ -59,7 +59,7 @@ namespace ROS2 {
     internal delegate int NativeRCLWaitSetInitType (
       IntPtr waitSetHandle, long numberOfSubscriptions,
       long numberOfGuardConditions, long numberOfTimers,
-      long numberOfClients, long numberOfServices);
+      long numberOfClients, long numberOfServices, long numberOfEvents);
 
     internal static NativeRCLWaitSetInitType native_rcl_wait_set_init = null;
 
@@ -197,10 +197,11 @@ namespace ROS2 {
       long numberOfGuardConditions,
       long numberOfTimers,
       long numberOfClients,
-      long numberOfServices) {
+      long numberOfServices,
+      long numberOfEvents) {
       RCLdotnetDelegates.native_rcl_wait_set_init (
         waitSetHandle, numberOfSubscriptions, numberOfGuardConditions,
-        numberOfTimers, numberOfClients, numberOfServices);
+        numberOfTimers, numberOfClients, numberOfServices, numberOfEvents);
     }
 
     private static void WaitSetClear (IntPtr waitSetHandle) {
@@ -248,6 +249,7 @@ namespace ROS2 {
       long numberOfTimers = 0;
       long numberOfClients = 0;
       long numberOfServices = 0;
+      long numberOfEvents = 0;
 
       WaitSetInit (
         waitSetHandle,
@@ -255,7 +257,8 @@ namespace ROS2 {
         numberOfGuardConditions,
         numberOfTimers,
         numberOfClients,
-        numberOfServices
+        numberOfServices,
+        numberOfEvents
       );
 
       WaitSetClear (waitSetHandle);

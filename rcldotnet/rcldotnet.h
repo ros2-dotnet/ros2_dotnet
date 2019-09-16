@@ -39,7 +39,8 @@ int32_t RCLDOTNET_CDECL native_rcl_wait_set_init(
     long numberOfGuardConditions,
     long numberOfTimers,
     long numberOfClients,
-    long numberOfServices);
+    long numberOfServices,
+    long numberOfEvents);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_clear(void *);
