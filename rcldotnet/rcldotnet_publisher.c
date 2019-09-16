@@ -29,7 +29,7 @@ void native_rcl_publish(void * publisher_handle, void * raw_ros_message)
 {
   rcl_publisher_t * publisher = (rcl_publisher_t *)publisher_handle;
 
-  rcl_ret_t ret = rcl_publish(publisher, raw_ros_message);
+  rcl_ret_t ret = rcl_publish(publisher, raw_ros_message, NULL);
 
   // TODO(esteve): handle error
   if (ret != RCL_RET_OK) {

@@ -116,7 +116,7 @@ int32_t native_rcl_wait_set(void *wait_set_handle, long timeout) {
 int32_t native_rcl_take(void *subscription_handle, void *message_handle) {
   rcl_subscription_t * subscription = (rcl_subscription_t *)subscription_handle;
 
-  rcl_ret_t ret = rcl_take(subscription, message_handle, NULL);
+  rcl_ret_t ret = rcl_take(subscription, message_handle, NULL, NULL);
   return ret;
 }
 
