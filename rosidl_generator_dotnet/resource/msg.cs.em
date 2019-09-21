@@ -1,13 +1,30 @@
+@{
+from rosidl_generator_dotnet import get_field_name
+from rosidl_generator_dotnet import get_dotnet_type
+from rosidl_generator_dotnet import get_builtin_dotnet_type
+from rosidl_generator_dotnet import constant_value_to_dotnet
+
+from rosidl_parser.definition import AbstractNestedType
+from rosidl_parser.definition import AbstractGenericString
+from rosidl_parser.definition import AbstractString
+from rosidl_parser.definition import AbstractWString
+from rosidl_parser.definition import AbstractSequence
+from rosidl_parser.definition import Array
+from rosidl_parser.definition import BasicType
+from rosidl_parser.definition import NamespacedType
+
+type_name = message.structure.namespaced_type.name
+}
 using System;
 using System.Runtime.InteropServices;
 
 using ROS2.Interfaces;
 using ROS2.Utils;
 
-namespace @(package_name)
+@[for ns in message.structure.namespaced_type.namespaces]@
+namespace @(ns)
 {
-namespace @(subfolder)
-{
+@[end for]@
 
 public class @(type_name) : IMessage {
     private static readonly DllLoadUtils dllLoadUtils;
@@ -17,7 +34,7 @@ public class @(type_name) : IMessage {
     static @(type_name)()
     {
         dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
-        IntPtr nativelibrary = dllLoadUtils.LoadLibrary("@(spec.base_type.pkg_name)_@(type_name)__rosidl_typesupport_c");
+        IntPtr nativelibrary = dllLoadUtils.LoadLibrary("@(package_name)_@(type_name)__rosidl_typesupport_c");
 
         IntPtr native_get_typesupport_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_get_typesupport");
 
@@ -34,25 +51,27 @@ public class @(type_name) : IMessage {
         @(type_name).native_destroy_native_message = (NativeDestroyNativeMessageType)Marshal.GetDelegateForFunctionPointer(
             native_destroy_native_message_ptr, typeof(NativeDestroyNativeMessageType));
 
-@[for field in spec.fields]@
-@[    if field.type.is_array]@
-// TODO(esteve): Arrays are not supported
-@[    else]@
-@[        if field.type.is_primitive_type()]@
-        IntPtr native_read_field_@(field.name)_ptr =
-            dllLoadUtils.GetProcAddress(nativelibrary, "native_read_field_@(field.name)");
-        @(type_name).native_read_field_@(field.name) =
-            (NativeReadField@(get_field_name(type_name, field.name))Type)Marshal.GetDelegateForFunctionPointer(
-            native_read_field_@(field.name)_ptr, typeof(NativeReadField@(get_field_name(type_name, field.name))Type));
+@[for member in message.structure.members]@
+@[    if isinstance(member.type, Array)]@
+// TODO: Array types are not supported
+@[    elif isinstance(member.type, AbstractSequence)]@
+// TODO: Sequence types are not supported
+@[    elif isinstance(member.type, AbstractWString)]@
+// TODO: Unicode types are not supported
+@[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
+        IntPtr native_read_field_@(member.name)_ptr =
+            dllLoadUtils.GetProcAddress(nativelibrary, "native_read_field_@(member.name)");
+        @(type_name).native_read_field_@(member.name) =
+            (NativeReadField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
+            native_read_field_@(member.name)_ptr, typeof(NativeReadField@(get_field_name(type_name, member.name))Type));
 
-        IntPtr native_write_field_@(field.name)_ptr =
-            dllLoadUtils.GetProcAddress(nativelibrary, "native_write_field_@(field.name)");
-        @(type_name).native_write_field_@(field.name) =
-            (NativeWriteField@(get_field_name(type_name, field.name))Type)Marshal.GetDelegateForFunctionPointer(
-            native_write_field_@(field.name)_ptr, typeof(NativeWriteField@(get_field_name(type_name, field.name))Type));
-@[        else]@
-// TODO(esteve): Nested types are not supported
-@[        end if]@
+        IntPtr native_write_field_@(member.name)_ptr =
+            dllLoadUtils.GetProcAddress(nativelibrary, "native_write_field_@(member.name)");
+        @(type_name).native_write_field_@(member.name) =
+            (NativeWriteField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
+            native_write_field_@(member.name)_ptr, typeof(NativeWriteField@(get_field_name(type_name, member.name))Type));
+@[    else]@
+// TODO: Nested types are not supported
 @[    end if]@
 @[end for]@
     }
@@ -72,33 +91,35 @@ public class @(type_name) : IMessage {
 
     private static NativeDestroyNativeMessageType native_destroy_native_message = null;
 
-@[for field in spec.fields]@
-@[    if field.type.is_array]@
-// TODO(esteve): Arrays are not supported
-@[    else]@
-@[        if field.type.is_primitive_type()]@
-@[            if field.type.type == 'string']@
+@[for member in message.structure.members]@
+@[    if isinstance(member.type, Array)]@
+// TODO: Array types are not supported
+@[    elif isinstance(member.type, AbstractSequence)]@
+// TODO: Sequence types are not supported
+@[   elif isinstance(member.type, AbstractWString)]@
+// TODO: Unicode types are not supported
+@[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
+@[        if isinstance(member.type, AbstractString)]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr NativeReadField@(get_field_name(type_name, field.name))Type(IntPtr messageHandle);
+    private delegate IntPtr NativeReadField@(get_field_name(type_name, member.name))Type(IntPtr messageHandle);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void NativeWriteField@(get_field_name(type_name, field.name))Type(
+    private delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
         IntPtr messageHandle, [MarshalAs (UnmanagedType.LPStr)] string value);
-@[            else]@
+@[        else]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate @(get_dotnet_type(field.type)) NativeReadField@(get_field_name(type_name, field.name))Type(
+    private delegate @(get_dotnet_type(member.type)) NativeReadField@(get_field_name(type_name, member.name))Type(
         IntPtr messageHandle);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void NativeWriteField@(get_field_name(type_name, field.name))Type(
-        IntPtr messageHandle, @(get_dotnet_type(field.type)) value);
-@[            end if]@
-    private static NativeReadField@(get_field_name(type_name, field.name))Type native_read_field_@(field.name) = null;
-
-    private static NativeWriteField@(get_field_name(type_name, field.name))Type native_write_field_@(field.name) = null;
-@[        else]@
-// TODO(esteve): Nested types are not supported
+    private delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
+        IntPtr messageHandle, @(get_dotnet_type(member.type)) value);
 @[        end if]@
+    private static NativeReadField@(get_field_name(type_name, member.name))Type native_read_field_@(member.name) = null;
+
+    private static NativeWriteField@(get_field_name(type_name, member.name))Type native_write_field_@(member.name) = null;
+@[    else]@
+// TODO: Nested types are not supported
 @[    end if]@
 @[end for]@
 
@@ -111,32 +132,38 @@ public class @(type_name) : IMessage {
     }
 
     public void _READ_HANDLE(IntPtr messageHandle) {
-@[for field in spec.fields]@
-@[    if field.type.is_array]@
-@[    else]@
-@[        if field.type.is_primitive_type()]@
-@[            if field.type.type == 'string']@
-        {
-            IntPtr pStr = native_read_field_@(field.name)(messageHandle);
-            @(get_field_name(type_name, field.name)) = Marshal.PtrToStringAnsi(pStr);
-        }
-@[            else]@
-        @(get_field_name(type_name, field.name)) = native_read_field_@(field.name)(messageHandle);
-@[            end if]@
+@[for member in message.structure.members]@
+@[    if isinstance(member.type, Array)]@
+// TODO: Array types are not supported
+@[    elif isinstance(member.type, AbstractSequence)]@
+// TODO: Sequence types are not supported
+@[    elif isinstance(member.type, AbstractWString)]@
+// TODO: Unicode types are not supported
+@[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
+@[        if isinstance(member.type, AbstractString)]@
+        IntPtr pStr_@(get_field_name(type_name, member.name)) = native_read_field_@(member.name)(messageHandle);
+        @(get_field_name(type_name, member.name)) = Marshal.PtrToStringAnsi(pStr_@(get_field_name(type_name, member.name)));
 @[        else]@
+        @(get_field_name(type_name, member.name)) = native_read_field_@(member.name)(messageHandle);
 @[        end if]@
+@[    else]@
+// TODO: Nested types are not supported
 @[    end if]@
 @[end for]@
     }
 
     public void _WRITE_HANDLE(IntPtr messageHandle) {
-@[for field in spec.fields]@
-@[    if field.type.is_array]@
+@[for member in message.structure.members]@
+@[    if isinstance(member.type, Array)]@
+// TODO: Array types are not supported
+@[    elif isinstance(member.type, AbstractSequence)]@
+// TODO: Sequence types are not supported
+@[    elif isinstance(member.type, AbstractWString)]@
+// TODO: Unicode types are not supported
+@[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
+        native_write_field_@(member.name)(messageHandle, @(get_field_name(type_name, member.name)));
 @[    else]@
-@[        if field.type.is_primitive_type()]@
-        native_write_field_@(field.name)(messageHandle, @(get_field_name(type_name, field.name)));
-@[        else]@
-@[        end if]@
+// TODO: Nested types are not supported
 @[    end if]@
 @[end for]@
     }
@@ -145,25 +172,26 @@ public class @(type_name) : IMessage {
         native_destroy_native_message(messageHandle);
     }
 
-@[for constant in spec.constants]@
-    public static readonly @(get_builtin_dotnet_type(constant.type)) @(constant.name) =
+@[for constant in message.constants]@
+    public static readonly @(get_dotnet_type(constant.type)) @(constant.name) =
         @(constant_value_to_dotnet(constant.type, constant.value));
 @[end for]@
 
-@[for field in spec.fields]@
-@[    if field.type.is_array]@
-// TODO(esteve): Arrays are not supported
+@[for member in message.structure.members]@
+@[    if isinstance(member.type, Array)]@
+// TODO: Array types are not supported
+@[    elif isinstance(member.type, AbstractSequence)]@
+// TODO: Sequence types are not supported
+@[    elif isinstance(member.type, AbstractWString)]@
+// TODO: Unicode types are not supported
+@[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
+    public @(get_dotnet_type(member.type)) @(get_field_name(type_name, member.name)) { get; set; }
 @[    else]@
-@[        if field.type.is_primitive_type()]@
-
-    public @(get_dotnet_type(field.type)) @(get_field_name(type_name, field.name)) { get; set; }
-@[        else]@
-// TODO(esteve): Nested types are not supported
-@[        end if]@
+// TODO: Nested types are not supported
 @[    end if]@
 @[end for]@
 }
 
-} // @(subfolder)
-
-} // @(package_name)
+@[for ns in reversed(message.structure.namespaced_type.namespaces)]@
+}  // namespace @(ns)
+@[end for]@

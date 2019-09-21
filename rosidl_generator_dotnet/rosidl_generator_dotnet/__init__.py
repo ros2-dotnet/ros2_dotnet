@@ -12,17 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from collections import defaultdict
 import os
 import string
 
 from rosidl_cmake import convert_camel_case_to_lower_case_underscore
 from rosidl_cmake import expand_template
+from rosidl_cmake import generate_files
 from rosidl_cmake import get_newest_modification_time
 from rosidl_cmake import read_generator_arguments
-from rosidl_parser import parse_message_file
-from rosidl_parser import parse_service_file
-
+from rosidl_generator_c import BASIC_IDL_TYPES_TO_C
+from rosidl_parser.definition import AbstractGenericString
+from rosidl_parser.definition import AbstractString
+from rosidl_parser.definition import AbstractWString
+from rosidl_parser.definition import AbstractNestedType
+from rosidl_parser.definition import AbstractSequence
+from rosidl_parser.definition import BasicType
+from rosidl_parser.definition import IdlContent
+from rosidl_parser.definition import IdlLocator
+from rosidl_parser.definition import NamespacedType
+from rosidl_parser.parser import parse_idl_file
 
 class Underscorer(string.Formatter):
     def format_field(self, value, spec):
@@ -32,86 +40,20 @@ class Underscorer(string.Formatter):
         return super(Underscorer, self).format_field(value, spec)
 
 
-def generate_dotnet(generator_arguments_file, typesupport_impl,
-                    typesupport_impls):
-    args = read_generator_arguments(generator_arguments_file)
+def generate_dotnet(generator_arguments_file, typesupport_impls):
+    mapping = {
+        'idl.cs.em': '%s.cs',
+        'idl.h.em': 'rcldotnet_%s.h'
+    }
+    generate_files(generator_arguments_file, mapping)
+
     typesupport_impls = typesupport_impls.split(';')
+    for impl in typesupport_impls:
+        typesupport_mapping = {
+            'idl.c.em' : '%s.ep.{0}.c'.format(impl)
+        }
+        generate_files(generator_arguments_file, typesupport_mapping)
 
-    template_dir = args['template_dir']
-    type_support_impl_by_filename = {
-        '{{}}.ep.{impl}.c'.format(impl=impl): impl
-        for impl in typesupport_impls
-    }
-    mapping_msgs = {
-        os.path.join(template_dir, 'msg.cs.em'): ['{0}.cs'],
-        os.path.join(template_dir, 'msg.c.em'):
-        type_support_impl_by_filename.keys(),
-        os.path.join(template_dir, 'msg.h.em'): ['rcldotnet_{0:underscore}.h'],
-    }
-
-    mapping_srvs = {os.path.join(template_dir, 'srv.cs.em'): ['{0}.cs'], }
-
-    for template_file in mapping_msgs.keys():
-        assert os.path.exists(template_file), \
-            'Messages template file %s not found' % template_file
-    for template_file in mapping_srvs.keys():
-        assert os.path.exists(template_file), \
-            'Services template file %s not found' % template_file
-
-    functions = {'get_dotnet_type': get_dotnet_type, }
-    latest_target_timestamp = get_newest_modification_time(
-        args['target_dependencies'])
-
-    modules = defaultdict(list)
-    for ros_interface_file in args['ros_interface_files']:
-        extension = os.path.splitext(ros_interface_file)[1]
-        subfolder = os.path.basename(os.path.dirname(ros_interface_file))
-        if extension == '.msg':
-            spec = parse_message_file(args['package_name'], ros_interface_file)
-            mapping = mapping_msgs
-            type_name = spec.base_type.type
-        elif extension == '.srv':
-            spec = parse_service_file(args['package_name'], ros_interface_file)
-            mapping = mapping_srvs
-            type_name = spec.srv_name
-        else:
-            continue
-
-        module_name = convert_camel_case_to_lower_case_underscore(type_name)
-        modules[subfolder].append((module_name, type_name))
-        package_name = args['package_name']
-        jni_package_name = package_name.replace('_', '_1')
-        for template_file, generated_filenames in mapping.items():
-            for generated_filename in generated_filenames:
-                data = {
-                    'constant_value_to_dotnet': constant_value_to_dotnet,
-                    'convert_camel_case_to_lower_case_underscore':
-                    convert_camel_case_to_lower_case_underscore,
-                    'get_builtin_dotnet_type': get_builtin_dotnet_type,
-                    'module_name': module_name,
-                    'package_name': package_name,
-                    'jni_package_name': jni_package_name,
-                    'spec': spec,
-                    'subfolder': subfolder,
-                    'typesupport_impl':
-                    type_support_impl_by_filename.get(generated_filename, ''),
-                    'typesupport_impls': typesupport_impls,
-                    'type_name': type_name,
-                    'primitive_msg_type_to_c': primitive_msg_type_to_c,
-                    'get_field_name': get_field_name,
-                    'header_name': 'rcldotnet_{}'.format(
-                        convert_camel_case_to_lower_case_underscore(
-                            module_name)),
-                }
-                data.update(functions)
-                generated_file = os.path.join(
-                    args['output_dir'], subfolder,
-                    Underscorer().format(generated_filename, type_name))
-                expand_template(
-                    template_file,
-                    data,
-                    generated_file,
-                    minimum_timestamp=latest_target_timestamp)
 
     return 0
 
@@ -125,35 +67,37 @@ def escape_string(s):
 def constant_value_to_dotnet(type_, value):
     assert value is not None
 
-    if type_ == 'bool':
-        return 'true' if value else 'false'
+    if isinstance(type_, BasicType):
+        if type_.typename == 'boolean':
+            return 'true' if value else 'false'
 
-    if type_ in [
-            'byte',
-            'char',
-            'int8',
-            'uint8',
-            'int16',
-            'uint16',
-            'int32',
-            'uint32',
-            'int64',
-            'uint64',
-            'float64',
-    ]:
-        return str(value)
+        if type_.typename == 'float':
+            return '%sf' % value
 
-    if type_ == 'float32':
-        return '%sf' % value
+        if type_.typename in [
+                'double',
+                'long double',
+                'char',
+                'wchar',
+                'octet',
+                'int8',
+                'uint8',
+                'int16',
+                'uint16',
+                'int32',
+                'uint32',
+                'int64',
+                'uint64',
+        ]:
+            return str(value)
 
-    if type_ == 'string':
+    if isinstance(type_, AbstractGenericString):
         return '"%s"' % escape_string(value)
 
     assert False, "unknown constant type '%s'" % type_
 
-
 def get_builtin_dotnet_type(type_, use_primitives=True):
-    if type_ == 'bool':
+    if type_ == 'boolean':
         return 'bool' if use_primitives else 'System.Boolean'
 
     if type_ == 'byte':
@@ -162,10 +106,13 @@ def get_builtin_dotnet_type(type_, use_primitives=True):
     if type_ == 'char':
         return 'char' if use_primitives else 'System.Char'
 
-    if type_ == 'float32':
+    if type_ == 'octet':
+        return 'byte' if use_primitives else 'System.Byte'
+
+    if type_ == 'float':
         return 'float' if use_primitives else 'System.Single'
 
-    if type_ == 'float64':
+    if type_ == 'double':
         return 'double' if use_primitives else 'System.Double'
 
     if type_ == 'int8':
@@ -192,72 +139,22 @@ def get_builtin_dotnet_type(type_, use_primitives=True):
     if type_ == 'uint64':
         return 'ulong' if use_primitives else 'System.UInt64'
 
-    if type_ == 'string':
-        return 'System.String'
-
     assert False, "unknown type '%s'" % type_
 
 
 def get_dotnet_type(type_, use_primitives=True):
-    if not type_.is_primitive_type():
-        return type_.pkg_name + ".msg." + type_.type
+    if isinstance(type_, AbstractGenericString):
+        return 'System.String'
 
-    return get_builtin_dotnet_type(type_.type, use_primitives=use_primitives)
+    return get_builtin_dotnet_type(type_.typename, use_primitives=use_primitives)
 
-
-MSG_TYPE_TO_C = {
-    'bool': 'bool',
-    'byte': 'uint8_t',
-    'char': 'char',
-    'float32': 'float',
-    'float64': 'double',
-    'uint8': 'uint8_t',
-    'int8': 'int8_t',
-    'uint16': 'uint16_t',
-    'int16': 'int16_t',
-    'uint32': 'uint32_t',
-    'int32': 'int32_t',
-    'uint64': 'uint64_t',
-    'int64': 'int64_t',
-    'string': "const char *",
-}
-
-
-def primitive_msg_type_to_c(type_):
-    return MSG_TYPE_TO_C[type_]
-
-
-def msg_type_to_c(type_, name_):
-    """
-    Convert a message type into the C declaration.
-
-    Example input: uint32, std_msgs/String
-    Example output: uint32_t, char *
-
-    @param type_: The message type
-    @type type_: rosidl_parser.Type
-    @param type_: The field name
-    @type type_: str
-    """
-    c_type = None
-    if type_.is_primitive_type():
-        c_type = MSG_TYPE_TO_C[type_.type]
-    else:
-        c_type = '%s__msg__%s' % (type_.pkg_name, type_.type)
-
-    if type_.is_array:
-        if type_.array_size is None or type_.is_upper_bound:
-            # Dynamic sized array
-            if type_.is_primitive_type() and type_.type != 'string':
-                c_type = 'rosidl_generator_c__%s' % type_.type
-            return '%s__Array %s' % (c_type, name_)
-        else:
-            # Static sized array (field specific)
-            return '%s %s[%d]' % \
-                (c_type, name_, type_.array_size)
-    else:
-        return '%s %s' % (c_type, name_)
-
+def msg_type_to_c(type_):
+    if isinstance(type_, AbstractString):
+        return 'char *'
+    if isinstance(type_, AbstractWString):
+        assert False, "Unicode strings not supported"
+    assert isinstance(type_, BasicType)
+    return BASIC_IDL_TYPES_TO_C[type_.typename]
 
 def upperfirst(s):
     return s[0].capitalize() + s[1:]

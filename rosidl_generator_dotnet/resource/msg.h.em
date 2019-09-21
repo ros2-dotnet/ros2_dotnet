@@ -1,12 +1,23 @@
 @{
-msg_prefix = "RCLDOTNET_{0}_{1}_{2}".format(package_name, subfolder, convert_camel_case_to_lower_case_underscore(type_name)).upper()
+from rosidl_parser.definition import AbstractNestedType
+from rosidl_parser.definition import AbstractGenericString
+from rosidl_parser.definition import AbstractString
+from rosidl_parser.definition import AbstractWString
+from rosidl_parser.definition import AbstractSequence
+from rosidl_parser.definition import Array
+from rosidl_parser.definition import BasicType
+from rosidl_parser.definition import NamespacedType
+from rosidl_generator_dotnet import msg_type_to_c
+
+type_name = message.structure.namespaced_type.name
+msg_prefix = "RCLDOTNET_{0}_{1}_{2}".format(package_name, '_'.join(message.structure.namespaced_type.namespaces), type_name).upper()
 header_guard = "{0}_H".format(msg_prefix)
 }@
 #ifndef @(header_guard)
 #define @(header_guard)
 
 #if defined(_MSC_VER)
-    //  Microsoft 
+    //  Microsoft
     #define @(msg_prefix)_EXPORT __declspec(dllexport)
     #define @(msg_prefix)_IMPORT __declspec(dllimport)
     #define @(msg_prefix)_CDECL __cdecl
@@ -32,15 +43,21 @@ void * @(msg_prefix)_CDECL native_create_native_message();
 @(msg_prefix)_EXPORT
 void @(msg_prefix)_CDECL native_destroy_native_message(void *);
 
-@[for field in spec.fields]@
-@[if field.type.is_primitive_type()]@
+@[for member in message.structure.members]@
+@[    if isinstance(member.type, Array)]@
+// TODO: Array types are not supported
+@[    elif isinstance(member.type, AbstractSequence)]@
+// TODO: Sequence types are not supported
+@[    elif isinstance(member.type, AbstractWString)]@
+// TODO: Unicode types are not supported
+@[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
 @(msg_prefix)_EXPORT
-@(primitive_msg_type_to_c(field.type.type)) @(msg_prefix)_CDECL native_read_field_@(field.name)(void *);
+@(msg_type_to_c(member.type)) @(msg_prefix)_CDECL native_read_field_@(member.name)(void *);
 
 @(msg_prefix)_EXPORT
-void native_write_field_@(field.name)(void *, @(primitive_msg_type_to_c(field.type.type)));
+void native_write_field_@(member.name)(void *, @(msg_type_to_c(member.type)));
 
-@[end if]@
+@[    end if]@
 @[end for]@
 
 #endif // @(header_guard)
