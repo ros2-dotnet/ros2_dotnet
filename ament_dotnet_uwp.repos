@@ -2,31 +2,31 @@ repositories:
   ament/ament_cmake:
     type: git
     url: https://github.com/ament/ament_cmake.git
-    version: crystal
+    version: dashing
   ament/ament_index:
     type: git
     url: https://github.com/ament/ament_index.git
-    version: crystal
+    version: dashing
   ament/ament_lint:
     type: git
     url: https://github.com/ament/ament_lint.git
-    version: crystal
+    version: dashing
   ament/ament_package:
     type: git
     url: https://github.com/ament/ament_package.git
-    version: crystal
+    version: dashing
   ament/googletest:
     type: git
     url: https://github.com/ament/googletest.git
-    version: crystal
+    version: dashing
   ament/osrf_pycommon:
     type: git
     url: https://github.com/osrf/osrf_pycommon.git
-    version: crystal
+    version: dashing
   ament/uncrustify_vendor:
     type: git
     url: https://github.com/ament/uncrustify_vendor.git
-    version: crystal
+    version: dashing
   ament_dotnet/ament_cmake_export_assemblies:
     type: git
     url: https://github.com/esteve/ament_cmake_export_assemblies.git

@@ -2,79 +2,91 @@ repositories:
   eProsima/Fast-CDR:
     type: git
     url: https://github.com/eProsima/Fast-CDR.git
-    version: v1.0.8
+    version: v1.0.11
   eProsima/Fast-RTPS:
     type: git
     url: https://github.com/ros2-dotnet/Fast-RTPS.git
-    version: crystal-windows
+    version: dashing-windows
   ros2/ament_cmake_ros:
     type: git
     url: https://github.com/ros2/ament_cmake_ros.git
-    version: crystal
+    version: dashing
+  ros2/rcpputils:
+    type: git
+    url: https://github.com/ros2/rcpputils.git
+    version: dashing
   ros2/rcutils:
     type: git
     url: https://github.com/ros2-dotnet/rcutils.git
-    version: crystal-windows
+    version: dashing-windows
   ros2/common_interfaces:
     type: git
     url: https://github.com/ros2/common_interfaces.git
-    version: crystal
+    version: dashing
   ros2/example_interfaces:
     type: git
     url: https://github.com/ros2/example_interfaces.git
-    version: crystal
+    version: dashing
   ros2/libyaml_vendor:
     type: git
     url: https://github.com/ros2/libyaml_vendor.git
-    version: crystal
+    version: dashing
   ros2/rcl:
     type: git
     url: https://github.com/ros2-dotnet/rcl.git
-    version: crystal-windows
+    version: dashing-windows
   ros2/rcl_interfaces:
     type: git
     url: https://github.com/ros2/rcl_interfaces.git
-    version: crystal
+    version: dashing
   ros2/rcl_logging:
     type: git
     url: https://github.com/ros2/rcl_logging.git
-    version: crystal
+    version: dashing
   ros2/rmw:
     type: git
     url: https://github.com/ros2/rmw.git
-    version: crystal
+    version: dashing
   ros2/rmw_fastrtps:
     type: git
     url: https://github.com/ros2/rmw_fastrtps.git
-    version: crystal
+    version: dashing
   ros2/rmw_implementation:
     type: git
     url: https://github.com/ros2/rmw_implementation.git
-    version: crystal
+    version: dashing
   ros2/rosidl:
     type: git
     url: https://github.com/ros2/rosidl.git
-    version: crystal
+    version: dashing
   ros2/rosidl_dds:
     type: git
     url: https://github.com/ros2/rosidl_dds.git
-    version: crystal
+    version: dashing
   ros2/rosidl_defaults:
     type: git
     url: https://github.com/ros2/rosidl_defaults.git
-    version: crystal
+    version: dashing
   ros2/rosidl_typesupport:
     type: git
     url: https://github.com/ros2-dotnet/rosidl_typesupport.git
-    version: crystal-windows
+    version: dashing-windows
   ros2/rosidl_typesupport_fastrtps:
     type: git
     url: https://github.com/ros2/rosidl_typesupport_fastrtps.git
-    version: crystal
+    version: dashing
+  ros2/test_interface_files:
+    type: git
+    url: https://github.com/ros2/test_interface_files.git
+    version: dashing
+  ros2/tinydir_vendor:
+    type: git
+    url: https://github.com/ros2/tinydir_vendor.git
+    version: dashing
   ros2/unique_identifier_msgs:
     type: git
     url: https://github.com/ros2/unique_identifier_msgs.git
-    version: crystal
+    version: dashing
   ros2_dotnet/dotnet_cmake_module:
     type: git
     url: https://github.com/ros2-dotnet/dotnet_cmake_module.git
@@ -82,4 +94,4 @@ repositories:
   ros2_dotnet/ros2_dotnet:
     type: git
     url: https://github.com/ros2-dotnet/ros2_dotnet.git
-    version: crystal
+    version: dashing
