@@ -55,7 +55,7 @@ repositories:
     type: git
     url: https://github.com/ros2/example_interfaces.git
     version: crystal
-  ros2/launch
+  ros2/launch:
     type: git
     url: https://github.com/ros2/launch.git
     version: crystal
@@ -75,6 +75,10 @@ repositories:
     type: git
     url: https://github.com/ros2/rcl_interfaces.git
     version: crystal
+  ros2/rclpy:
+    type: git
+    url: https://github.com/ros2/rclpy.git
+    version: crystal
   ros2/rcl_logging:
     type: git
     url: https://github.com/ros2/rcl_logging.git
@@ -91,6 +95,10 @@ repositories:
     type: git
     url: https://github.com/ros2/rmw_implementation.git
     version: crystal
+  ros2/ros2cli:
+    type: git
+    url: https://github.com/ros2/ros2cli.git
+    version: crystal
   ros2/rosidl:
     type: git
     url: https://github.com/ros2/rosidl.git
@@ -102,6 +110,10 @@ repositories:
   ros2/rosidl_defaults:
     type: git
     url: https://github.com/ros2/rosidl_defaults.git
+    version: crystal
+  ros2/rosidl_python:
+    type: git
+    url: https://github.com/ros2/rosidl_python.git
     version: crystal
   ros2/rosidl_typesupport:
     type: git
@@ -128,5 +140,5 @@ repositories:
     version: master
   ros2_dotnet/ros2_dotnet:
     type: git
-    url: https://github.com/esteve/ros2_dotnet.git
+    url: https://github.com/ros2-dotnet/ros2_dotnet.git
     version: crystal
