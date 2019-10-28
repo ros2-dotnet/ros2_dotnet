@@ -42,13 +42,7 @@ int32_t RCLDOTNET_CDECL native_rcl_wait_set_init(
     long numberOfServices);
 
 RCLDOTNET_EXPORT
-int32_t RCLDOTNET_CDECL native_rcl_wait_set_clear_subscriptions(void *);
-
-RCLDOTNET_EXPORT
-int32_t RCLDOTNET_CDECL native_rcl_wait_set_clear_services(void *);
-
-RCLDOTNET_EXPORT
-int32_t RCLDOTNET_CDECL native_rcl_wait_set_clear_clients(void *);
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_clear(void *);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_subscription(void *, void *);
