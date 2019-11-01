@@ -27,10 +27,6 @@ repositories:
     type: git
     url: https://github.com/ros2/libyaml_vendor.git
     version: crystal
-  ros2/poco_vendor:
-    type: git
-    url: https://github.com/ros2/poco_vendor.git
-    version: crystal
   ros2/rcl:
     type: git
     url: https://github.com/ros2-dotnet/rcl.git
@@ -75,17 +71,10 @@ repositories:
     type: git
     url: https://github.com/ros2/rosidl_typesupport_fastrtps.git
     version: crystal
-  ros2/test_interface_files:
-    type: git
-    url: https://github.com/ros2/test_interface_files.git
-  ros2/tinydir_vendor:
-    type: git
-    url: https://github.com/ros2/tinydir_vendor.git
-    version: 1.1.0
   ros2/unique_identifier_msgs:
     type: git
     url: https://github.com/ros2/unique_identifier_msgs.git
-    version: 2.1.0
+    version: crystal
   ros2_dotnet/dotnet_cmake_module:
     type: git
     url: https://github.com/ros2-dotnet/dotnet_cmake_module.git
