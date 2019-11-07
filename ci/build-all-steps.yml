@@ -93,6 +93,7 @@ steps:
       vcs branch
       colcon build ^
         --merge-install ^
+        --packages-ignore rmw_fastrtps_dynamic_cpp rcl_logging_log4cxx ^
         --cmake-args ^
           -G "${{ parameters.generator }}" ^
           -A "${{ parameters.arch }}" ^
