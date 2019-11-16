@@ -16,7 +16,8 @@ steps:
       catkin_pkg ^
       EmPy ^
       lark-parser ^
-      pyparsing pyyaml
+      pyparsing pyyaml ^
+      numpy
     pip install -U ^
       pytest ^
       coverage ^
