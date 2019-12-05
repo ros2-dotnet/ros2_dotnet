@@ -34,12 +34,12 @@ header_filename = "{0}/rcldotnet_{1}.h".format('/'.join(message.structure.namesp
 
 #include "@(header_filename)"
 
-void * native_create_native_message() {
+void * @(msg_typename)__create_native_message() {
    @(msg_typename) * ros_message = @(msg_typename)__create();
    return ros_message;
 }
 
-const void * native_get_typesupport() {
+const void * @(msg_typename)__get_typesupport() {
   const void * ptr = ROSIDL_GET_MSG_TYPE_SUPPORT(@(package_name), msg, @(type_name));
   return ptr;
 }
@@ -52,7 +52,7 @@ const void * native_get_typesupport() {
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
-@(msg_type_to_c(member.type)) native_read_field_@(member.name)(void * message_handle) {
+@(msg_type_to_c(member.type)) @(msg_typename)__read_field_@(member.name)(void * message_handle) {
   @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
 @[        if isinstance(member.type, AbstractGenericString)]@
   return ros_message->@(member.name).data;
@@ -74,7 +74,7 @@ const void * native_get_typesupport() {
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
-void native_write_field_@(member.name)(void * message_handle, @(msg_type_to_c(member.type)) value) {
+void @(msg_typename)__write_field_@(member.name)(void * message_handle, @(msg_type_to_c(member.type)) value) {
   @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
 @[        if isinstance(member.type, AbstractGenericString)]@
   rosidl_generator_c__String__assign(
@@ -88,7 +88,7 @@ void native_write_field_@(member.name)(void * message_handle, @(msg_type_to_c(me
 @[    end if]@
 @[end for]@
 
-void native_destroy_native_message(void * raw_ros_message) {
+void @(msg_typename)__destroy_native_message(void * raw_ros_message) {
   @(msg_typename) * ros_message = raw_ros_message;
   @(msg_typename)__destroy(ros_message);
 }

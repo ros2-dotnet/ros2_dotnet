@@ -10,6 +10,7 @@ from rosidl_parser.definition import NamespacedType
 from rosidl_generator_dotnet import msg_type_to_c
 
 type_name = message.structure.namespaced_type.name
+msg_typename = '%s__%s' % ('__'.join(message.structure.namespaced_type.namespaces), type_name)
 msg_prefix = "RCLDOTNET_{0}_{1}_{2}".format(package_name, '_'.join(message.structure.namespaced_type.namespaces), type_name).upper()
 header_guard = "{0}_H".format(msg_prefix)
 }@
@@ -35,13 +36,13 @@ header_guard = "{0}_H".format(msg_prefix)
 #endif
 
 @(msg_prefix)_EXPORT
-const void * @(msg_prefix)_CDECL native_get_typesupport();
+const void * @(msg_prefix)_CDECL @(msg_typename)__get_typesupport();
 
 @(msg_prefix)_EXPORT
-void * @(msg_prefix)_CDECL native_create_native_message();
+void * @(msg_prefix)_CDECL @(msg_typename)__create_native_message();
 
 @(msg_prefix)_EXPORT
-void @(msg_prefix)_CDECL native_destroy_native_message(void *);
+void @(msg_prefix)_CDECL @(msg_typename)__destroy_native_message(void *);
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
@@ -52,10 +53,10 @@ void @(msg_prefix)_CDECL native_destroy_native_message(void *);
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
 @(msg_prefix)_EXPORT
-@(msg_type_to_c(member.type)) @(msg_prefix)_CDECL native_read_field_@(member.name)(void *);
+@(msg_type_to_c(member.type)) @(msg_prefix)_CDECL @(msg_typename)__read_field_@(member.name)(void *);
 
 @(msg_prefix)_EXPORT
-void native_write_field_@(member.name)(void *, @(msg_type_to_c(member.type)));
+void @(msg_typename)__write_field_@(member.name)(void *, @(msg_type_to_c(member.type)));
 
 @[    end if]@
 @[end for]@
