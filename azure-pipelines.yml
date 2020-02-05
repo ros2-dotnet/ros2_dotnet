@@ -11,6 +11,7 @@ variables:
 
 jobs:
 - job: 'uwp_32'
+  timeoutInMinutes: 90
   displayName: 'Build all tasks (UWP 32)'
   condition: and(succeeded(), not(variables.task), eq(variables.platform, 'uwp_32'))
   pool:
@@ -23,6 +24,7 @@ jobs:
 
 - job: 'uwp_64'
   displayName: 'Build all tasks (UWP 64)'
+  timeoutInMinutes: 90
   condition: and(succeeded(), not(variables.task), eq(variables.platform, 'uwp_64'))
   pool:
     vmImage: vs2017-win2016
@@ -34,6 +36,7 @@ jobs:
 
 - job: 'uwp_arm'
   displayName: 'Build all tasks (UWP ARM)'
+  timeoutInMinutes: 90
   condition: and(succeeded(), not(variables.task), eq(variables.platform, 'uwp_arm'))
   pool:
     vmImage: vs2017-win2016
@@ -45,6 +48,7 @@ jobs:
 
 - job: 'desktop'
   displayName: 'Build all tasks (Desktop)'
+  timeoutInMinutes: 90
   condition: and(succeeded(), not(variables.task), eq(variables.platform, 'desktop'))
   pool:
     vmImage: vs2017-win2016

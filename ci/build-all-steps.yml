@@ -16,7 +16,8 @@ steps:
       catkin_pkg ^
       EmPy ^
       lark-parser ^
-      pyparsing pyyaml
+      pyparsing pyyaml ^
+      numpy
     pip install -U ^
       pytest ^
       coverage ^
@@ -66,12 +67,13 @@ steps:
       vcs branch
       colcon build ^
         --merge-install ^
+        --packages-ignore rmw_fastrtps_dynamic_cpp rcl_logging_log4cxx ^
         --cmake-args ^
           -G "${{ parameters.generator }}" ^
           -A "${{ parameters.arch }}" ^
           -DBUILD_TESTING=OFF ^
           -DCMAKE_SYSTEM_NAME=WindowsStore ^
-          -DCMAKE_SYSTEM_VERSION=10.0.14393 ^
+          -DCMAKE_SYSTEM_VERSION=10.0.17763 ^
           -DTHIRDPARTY=ON ^
           -DINSTALL_EXAMPLES=OFF
     displayName: 'Build ros2-dotnet for UWP'
@@ -92,6 +94,7 @@ steps:
       vcs branch
       colcon build ^
         --merge-install ^
+        --packages-ignore rmw_fastrtps_dynamic_cpp rcl_logging_log4cxx ^
         --cmake-args ^
           -G "${{ parameters.generator }}" ^
           -A "${{ parameters.arch }}" ^

@@ -29,9 +29,12 @@ What's missing?
 ---------------
 
 Lots of things!
+- Unicode types
+- String constants (specifically BoundedString)
 - Nested types
 - Component nodes
 - Clients and services
+- Actions
 - Tests
 - Documentation
 - More examples (e.g. IoT, VB, UWP, HoloLens, etc.)
@@ -97,7 +100,7 @@ vcs import src < ros2_dotnet_uwp.repos
 cd \dev\ament
 call install\local_setup.bat
 cd \dev\ros2
-colcon build --merge-install --cmake-args -A "%TARGET_ARCH%" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.14393 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DBUILD_TESTING=OFF
+colcon build --merge-install --packages-ignore rmw_fastrtps_dynamic_cpp rcl_logging_log4cxx --cmake-args -A "%TARGET_ARCH%" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.17763 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DBUILD_TESTING=OFF
 ```
 
 Now you can just run a bunch of examples.
