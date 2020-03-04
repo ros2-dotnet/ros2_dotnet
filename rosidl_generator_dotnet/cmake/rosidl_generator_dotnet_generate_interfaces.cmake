@@ -255,11 +255,11 @@ foreach(_generated_c_ts_file ${_generated_c_ts_files})
 
   add_dependencies(${_target_name}
     ${rosidl_generate_interfaces_TARGET}__${_typesupport_impl}
+    ${rosidl_generate_interfaces_TARGET}__rosidl_generator_c
   )
   ament_target_dependencies(${_target_name}
     "rosidl_generator_c"
     "rosidl_generator_dotnet"
-    "${PROJECT_NAME}__rosidl_generator_c"
   )
 
   if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
