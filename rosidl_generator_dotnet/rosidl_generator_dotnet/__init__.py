@@ -43,18 +43,10 @@ class Underscorer(string.Formatter):
 def generate_dotnet(generator_arguments_file, typesupport_impls):
     mapping = {
         'idl.cs.em': '%s.cs',
+        'idl.c.em': '%s.c',
         'idl.h.em': 'rcldotnet_%s.h'
     }
     generate_files(generator_arguments_file, mapping)
-
-    typesupport_impls = typesupport_impls.split(';')
-    for impl in typesupport_impls:
-        typesupport_mapping = {
-            'idl.c.em' : '%s.ep.{0}.c'.format(impl)
-        }
-        generate_files(generator_arguments_file, typesupport_mapping)
-
-
     return 0
 
 

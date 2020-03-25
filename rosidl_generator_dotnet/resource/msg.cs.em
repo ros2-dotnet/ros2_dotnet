@@ -14,6 +14,7 @@ from rosidl_parser.definition import BasicType
 from rosidl_parser.definition import NamespacedType
 
 type_name = message.structure.namespaced_type.name
+msg_typename = '%s__%s' % ('__'.join(message.structure.namespaced_type.namespaces), type_name)
 }
 using System;
 using System.Runtime.InteropServices;
@@ -34,19 +35,19 @@ public class @(type_name) : IMessage {
     static @(type_name)()
     {
         dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
-        IntPtr nativelibrary = dllLoadUtils.LoadLibrary("@(package_name)_@(type_name)__rosidl_typesupport_c");
+        IntPtr nativelibrary = dllLoadUtils.LoadLibrary("@(package_name)__dotnetext");
 
-        IntPtr native_get_typesupport_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_get_typesupport");
+        IntPtr native_get_typesupport_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__get_typesupport");
 
         @(type_name).native_get_typesupport = (NativeGetTypeSupportType)Marshal.GetDelegateForFunctionPointer(
             native_get_typesupport_ptr, typeof(NativeGetTypeSupportType));
 
-        IntPtr native_create_native_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_create_native_message");
+        IntPtr native_create_native_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__create_native_message");
 
         @(type_name).native_create_native_message = (NativeCreateNativeMessageType)Marshal.GetDelegateForFunctionPointer(
             native_create_native_message_ptr, typeof(NativeCreateNativeMessageType));
 
-        IntPtr native_destroy_native_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_destroy_native_message");
+        IntPtr native_destroy_native_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__destroy_native_message");
 
         @(type_name).native_destroy_native_message = (NativeDestroyNativeMessageType)Marshal.GetDelegateForFunctionPointer(
             native_destroy_native_message_ptr, typeof(NativeDestroyNativeMessageType));
@@ -60,13 +61,13 @@ public class @(type_name) : IMessage {
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
         IntPtr native_read_field_@(member.name)_ptr =
-            dllLoadUtils.GetProcAddress(nativelibrary, "native_read_field_@(member.name)");
+            dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__read_field_@(member.name)");
         @(type_name).native_read_field_@(member.name) =
             (NativeReadField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
             native_read_field_@(member.name)_ptr, typeof(NativeReadField@(get_field_name(type_name, member.name))Type));
 
         IntPtr native_write_field_@(member.name)_ptr =
-            dllLoadUtils.GetProcAddress(nativelibrary, "native_write_field_@(member.name)");
+            dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__write_field_@(member.name)");
         @(type_name).native_write_field_@(member.name) =
             (NativeWriteField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
             native_write_field_@(member.name)_ptr, typeof(NativeWriteField@(get_field_name(type_name, member.name))Type));

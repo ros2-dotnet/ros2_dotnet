@@ -13,9 +13,11 @@
 # limitations under the License.
 
 find_package(ament_cmake_export_assemblies REQUIRED)
-find_package(rosidl_generator_c REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 find_package(rmw REQUIRED)
+find_package(rosidl_generator_c REQUIRED)
+find_package(rosidl_typesupport_c REQUIRED)
+find_package(rosidl_typesupport_interface REQUIRED)
 
 find_package(dotnet_cmake_module REQUIRED)
 find_package(DotNETExtra REQUIRED)
@@ -34,14 +36,6 @@ set(_generated_cs_files "")
 set(_generated_c_ts_files "")
 set(_generated_h_files "")
 
-if(NOT WIN32)
-  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
-  elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-undefined,error")
-  endif()
-endif()
-
 foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
   get_filename_component(_parent_folder "${_abs_idl_file}" DIRECTORY)
   get_filename_component(_parent_folder "${_parent_folder}" NAME)
@@ -58,12 +52,9 @@ foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
       "${_output_path}/${_parent_folder}/rcldotnet_${_module_name}.h"
       )
 
-    foreach(_typesupport_impl ${_typesupport_impls})
-      list_append_unique(_generated_c_ts_files
-        "${_output_path}/${_parent_folder}/${_module_name}.ep.${_typesupport_impl}.c"
+    list(APPEND _generated_c_ts_files
+      "${_output_path}/${_parent_folder}/${_module_name}.c"
       )
-      list(APPEND _type_support_by_generated_c_files "${_typesupport_impl}")
-    endforeach()
   elseif(_parent_folder STREQUAL "srv")
   elseif(_parent_folder STREQUAL "action")
   else()
@@ -96,10 +87,7 @@ set(target_dependencies
   ${_dependency_files})
 foreach(dep ${target_dependencies})
   if(NOT EXISTS "${dep}")
-    get_property(is_generated SOURCE "${dep}" PROPERTY GENERATED)
-    if(NOT ${_is_generated})
-      message(FATAL_ERROR "Target dependency '${dep}' does not exist")
-    endif()
+    message(FATAL_ERROR "Target dependency '${dep}' does not exist")
   endif()
 endforeach()
 
@@ -114,10 +102,6 @@ rosidl_write_generator_arguments(
   TARGET_DEPENDENCIES ${target_dependencies}
 )
 
-file(MAKE_DIRECTORY "${_output_path}")
-
-set(_generated_extension_files "")
-set(_extension_dependencies "")
 set(_target_suffix "__dotnet")
 
 set_property(
@@ -150,75 +134,39 @@ if(_generated_cs_files)
   endif()
 endif()
 
-foreach(_generated_c_ts_file ${_generated_c_ts_files})
-  get_filename_component(_full_folder "${_generated_c_ts_file}" DIRECTORY)
-  get_filename_component(_package_folder "${_full_folder}" DIRECTORY)
-  get_filename_component(_package_name "${_package_folder}" NAME)
-  get_filename_component(_parent_folder "${_full_folder}" NAME)
-  get_filename_component(_base_msg_name "${_generated_c_ts_file}" NAME_WE)
-  get_filename_component(_full_extension_msg_name "${_generated_c_ts_file}" EXT)
+macro(set_properties _build_type)
+  set_target_properties(${_target_name} PROPERTIES
+    COMPILE_OPTIONS "${_extension_compile_flags}"
+    LIBRARY_OUTPUT_DIRECTORY${_build_type} ${_output_path}
+    RUNTIME_OUTPUT_DIRECTORY${_build_type} ${_output_path}
+    OUTPUT_NAME ${_target_name}_native)
+endmacro()
 
-  set(_msg_name "${_base_msg_name}${_full_extension_msg_name}")
-
-  list(FIND _generated_c_ts_files ${_generated_c_ts_file} _file_index)
-  list(GET _type_support_by_generated_c_files ${_file_index} _typesupport_impl)
-  find_package(${_typesupport_impl} REQUIRED)
-  set(_generated_msg_c_common_file "${_full_folder}/${_base_msg_name}.c")
-
+# This if is only needed because srvs/actions are currently skipped
+if(_generated_c_ts_files)
   set(_dotnetext_suffix "__dotnetext")
-  set(_target_name "${_package_name}_${_base_msg_name}__${_typesupport_impl}")
-
-  string_camel_case_to_lower_case_underscore("${_module_name}" _header_name)
-  set(_generated_h_file "${_full_folder}/rcldotnet_${_header_name}.h")
-
+  set(_target_name "${rosidl_generate_interfaces_TARGET}${_dotnetext_suffix}")
   add_library(${_target_name} SHARED
-    "${_generated_c_ts_file}"
+    "${_generated_c_ts_files}"
     "${_generated_h_files}"
   )
-
-  set(_destination_dir "${_output_path}/${_parent_folder}")
-
-  set_target_properties(${_target_name} PROPERTIES
-    COMPILE_FLAGS "${_extension_compile_flags}"
-    LIBRARY_OUTPUT_DIRECTORY "${_destination_dir}"
-    RUNTIME_OUTPUT_DIRECTORY "${_destination_dir}"
-    OUTPUT_NAME ${_target_name}_native
-  )
-
-  set_target_properties(${_target_name} PROPERTIES
-    COMPILE_FLAGS "${_extension_compile_flags}"
-    LIBRARY_OUTPUT_DIRECTORY_DEBUG "${_destination_dir}"
-    RUNTIME_OUTPUT_DIRECTORY_DEBUG "${_destination_dir}"
-    OUTPUT_NAME ${_target_name}_native
-  )
-
-  set_target_properties(${_target_name} PROPERTIES
-    COMPILE_FLAGS "${_extension_compile_flags}"
-    LIBRARY_OUTPUT_DIRECTORY_RELEASE "${_destination_dir}"
-    RUNTIME_OUTPUT_DIRECTORY_RELEASE "${_destination_dir}"
-    OUTPUT_NAME ${_target_name}_native
-  )
-
-  set_target_properties(${_target_name} PROPERTIES
-    COMPILE_FLAGS "${_extension_compile_flags}"
-    LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${_destination_dir}"
-    RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${_destination_dir}"
-    OUTPUT_NAME ${_target_name}_native
-  )
-
-  set_target_properties(${_target_name} PROPERTIES
-    COMPILE_FLAGS "${_extension_compile_flags}"
-    LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL "${_destination_dir}"
-    RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL "${_destination_dir}"
-    OUTPUT_NAME ${_target_name}_native
+  add_dependencies(
+    ${_target_name}
+    ${rosidl_generate_interfaces_TARGET}${_target_suffix}
+    ${rosidl_generate_interfaces_TARGET}__rosidl_typesupport_c
   )
 
   set(_extension_compile_flags "")
-  if(NOT WIN32)
-    set(_extension_compile_flags "-Wall -Wextra")
+  if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(_extension_compile_flags -Wall -Wextra)
   endif()
-
-  list(APPEND _extension_dependencies ${_target_name})
+  set_properties("")
+  if(WIN32)
+    set_properties("_DEBUG")
+    set_properties("_MINSIZEREL")
+    set_properties("_RELEASE")
+    set_properties("_RELWITHDEBINFO")
+  endif()
 
   set(_extension_link_flags "")
   if(NOT WIN32)
@@ -230,17 +178,17 @@ foreach(_generated_c_ts_file ${_generated_c_ts_files})
   endif()
   target_link_libraries(
     ${_target_name}
-    ${PROJECT_NAME}__${_typesupport_impl}
+    ${PROJECT_NAME}__rosidl_typesupport_c
     ${_extension_link_flags}
   )
-  rosidl_target_interfaces(${_target_name}
-    ${PROJECT_NAME} rosidl_typesupport_c)
-
   target_include_directories(${_target_name}
     PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_c
     ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_dotnet
   )
+
+  rosidl_target_interfaces(${_target_name}
+    ${rosidl_generate_interfaces_TARGET} rosidl_typesupport_c)
 
   ament_target_dependencies(${_target_name}
     "rosidl_generator_c"
@@ -253,13 +201,9 @@ foreach(_generated_c_ts_file ${_generated_c_ts_files})
     )
   endforeach()
 
-  add_dependencies(${_target_name}
-    ${rosidl_generate_interfaces_TARGET}__${_typesupport_impl}
-  )
   ament_target_dependencies(${_target_name}
     "rosidl_generator_c"
     "rosidl_generator_dotnet"
-    "${PROJECT_NAME}__rosidl_generator_c"
   )
 
   if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
@@ -268,10 +212,8 @@ foreach(_generated_c_ts_file ${_generated_c_ts_files})
       LIBRARY DESTINATION lib
       RUNTIME DESTINATION bin
     )
-
   endif()
-
-endforeach()
+endif()
 
 set(_assembly_deps_dll "")
 set(_assembly_deps_nuget "")
