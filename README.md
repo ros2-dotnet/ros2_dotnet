@@ -6,7 +6,7 @@ Build status
 
 | Target | Status |
 |----------|--------|
-| **Universal Windows Platform (x86/x64/ARM)** | ![Build (UWP)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(UWP)/badge.svg) |
+| **Universal Windows Platform (x86/x64)** | ![Build (UWP)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(UWP)/badge.svg) |
 | **Windows Desktop (x64)** | ![Build (Desktop)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(Desktop)/badge.svg) |
 | **Linux** | (TODO) |
 
@@ -89,7 +89,7 @@ call install\local_setup.bat
 UWP
 ---
 
-Replace `%TARGET_ARCH%` with Win32, x64 or ARM
+Replace `%TARGET_ARCH%` with Win32 or x64
 
 ```
 md \dev\ros2\src

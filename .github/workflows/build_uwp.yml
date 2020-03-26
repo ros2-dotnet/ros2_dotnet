@@ -9,7 +9,7 @@ jobs:
   build-uwp:
     strategy:
       matrix:
-        arch: [x64, Win32, ARM]
+        arch: [x64, Win32]
     runs-on: windows-latest
     env:
       VisualStudioVersion: '16.0'
