@@ -42,7 +42,7 @@ jobs:
         TARGET_ARCH: ${{ matrix.arch }}
       run: |
         cd \dev\ros2
-        colcon build --event-handlers console_cohesion+ console_package_list+ --packages-ignore rmw_fastrtps_dynamic_cpp rcl_logging_log4cxx --cmake-args -A %TARGET_ARCH% -DBUILD_TESTING=OFF -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF
+        colcon build --event-handlers console_cohesion+ console_package_list+ --packages-ignore rmw_fastrtps_dynamic_cpp rcl_logging_log4cxx rcl_logging_spdlog ros2trace tracetools_launch tracetools_read tracetools_test tracetools_trace --cmake-args -A %TARGET_ARCH% -DBUILD_TESTING=OFF -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DRCL_LOGGING_IMPLEMENTATION=rcl_logging_noop
       shell: cmd
 
     - name: Compress ROS2 install directory
