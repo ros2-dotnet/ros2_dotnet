@@ -79,6 +79,10 @@ repositories:
     type: git
     url: https://github.com/ros2/poco_vendor.git
     version: eloquent
+  ros2/python_cmake_module:
+    type: git
+    url: https://github.com/ros2/python_cmake_module.git
+    version: eloquent
   ros2/rcl:
     type: git
     url: https://github.com/ros2/rcl.git
