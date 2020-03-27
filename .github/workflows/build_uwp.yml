@@ -60,7 +60,7 @@ jobs:
       run: |
         cd \dev\ros2
         call ..\ament\install\local_setup.bat
-        colcon build --event-handlers console_cohesion+ console_package_list+ --merge-install --packages-ignore rmw_fastrtps_dynamic_cpp rcl_logging_log4cxx rcl_logging_spdlog ros2trace tracetools_launch tracetools_read tracetools_test tracetools_trace --cmake-args -A %TARGET_ARCH% -DBUILD_TESTING=OFF -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.17763 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DRCL_LOGGING_IMPLEMENTATION=rcl_logging_noop
+        colcon build --event-handlers console_cohesion+ console_package_list+ --merge-install --packages-ignore rmw_fastrtps_dynamic_cpp rcl_logging_log4cxx rcl_logging_spdlog ros2trace tracetools_launch tracetools_read tracetools_test tracetools_trace --cmake-args -A %TARGET_ARCH% -DBUILD_TESTING=OFF -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.18362 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DRCL_LOGGING_IMPLEMENTATION=rcl_logging_noop
       shell: cmd
 
     - name: Compress ROS2 install directory
