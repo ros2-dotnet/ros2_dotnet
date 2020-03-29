@@ -68,6 +68,8 @@ steps:
       colcon build ^
         --merge-install ^
         --packages-ignore rmw_fastrtps_dynamic_cpp rcl_logging_log4cxx ^
+          rcl_logging_spdlog ros2trace tracetools_launch tracetools_read ^
+          tracetools_test tracetools_trace ^
         --cmake-args ^
           -G "${{ parameters.generator }}" ^
           -A "${{ parameters.arch }}" ^
@@ -75,7 +77,8 @@ steps:
           -DCMAKE_SYSTEM_NAME=WindowsStore ^
           -DCMAKE_SYSTEM_VERSION=10.0.17763 ^
           -DTHIRDPARTY=ON ^
-          -DINSTALL_EXAMPLES=OFF
+          -DINSTALL_EXAMPLES=OFF ^
+          -DRCL_LOGGING_IMPLEMENTATION=rcl_logging_noop
     displayName: 'Build ros2-dotnet for UWP'
 
 - ${{ if eq(parameters.platform, 'desktop') }}:
@@ -95,12 +98,15 @@ steps:
       colcon build ^
         --merge-install ^
         --packages-ignore rmw_fastrtps_dynamic_cpp rcl_logging_log4cxx ^
+          rcl_logging_spdlog ros2trace tracetools_launch tracetools_read ^
+          tracetools_test tracetools_trace ^
         --cmake-args ^
           -G "${{ parameters.generator }}" ^
           -A "${{ parameters.arch }}" ^
           -DBUILD_TESTING=OFF ^
           -DTHIRDPARTY=ON ^
-          -DINSTALL_EXAMPLES=OFF
+          -DINSTALL_EXAMPLES=OFF ^
+          -DRCL_LOGGING_IMPLEMENTATION=rcl_logging_noop
     displayName: 'Build ros2-dotnet for Desktop'
 
   - script: |

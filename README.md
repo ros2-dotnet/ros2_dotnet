@@ -6,7 +6,7 @@ Build status
 
 | Target | Status |
 |----------|--------|
-| **Universal Windows Platform (x86/x64/ARM)** | ![Build (UWP)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(UWP)/badge.svg) |
+| **Universal Windows Platform (x86/x64)** | ![Build (UWP)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(UWP)/badge.svg) |
 | **Windows Desktop (x64)** | ![Build (Desktop)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(Desktop)/badge.svg) |
 | **Linux** | (TODO) |
 
@@ -89,7 +89,7 @@ call install\local_setup.bat
 UWP
 ---
 
-Replace `%TARGET_ARCH%` with Win32, x64 or ARM
+Replace `%TARGET_ARCH%` with Win32 or x64
 
 ```
 md \dev\ros2\src
@@ -99,7 +99,7 @@ vcs import src < ros2_dotnet_uwp.repos
 cd \dev\ament
 call install\local_setup.bat
 cd \dev\ros2
-colcon build --merge-install --packages-ignore rmw_fastrtps_dynamic_cpp rcl_logging_log4cxx --cmake-args -A "%TARGET_ARCH%" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.17763 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DBUILD_TESTING=OFF
+colcon build --merge-install --packages-ignore rmw_fastrtps_dynamic_cpp rcl_logging_log4cxx rcl_logging_spdlog ros2trace tracetools_launch tracetools_read tracetools_test tracetools_trace --cmake-args -A "%TARGET_ARCH%" -DCMAKE_SYSTEM_NAME=WindowsStore -DCMAKE_SYSTEM_VERSION=10.0.17763 -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF -DBUILD_TESTING=OFF -DRCL_LOGGING_IMPLEMENTATION=rcl_logging_noop
 ```
 
 Now you can just run a bunch of examples.
