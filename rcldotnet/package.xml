@@ -23,6 +23,10 @@
 
   <exec_depend>rcl</exec_depend>
 
+  <test_depend>std_msgs</test_depend>
+  <test_depend>test_msgs</test_depend>
+  <test_depend>builtin_interfaces</test_depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>

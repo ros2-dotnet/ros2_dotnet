@@ -19,43 +19,6 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 
-  set(message_files
-    "msg/Bool.msg"
-    "msg/Byte.msg"
-    "msg/Char.msg"
-    "msg/Constants.msg"
-    "msg/Empty.msg"
-    "msg/Float32.msg"
-    "msg/Float64.msg"
-    "msg/Int16.msg"
-    "msg/Int32.msg"
-    "msg/Int64.msg"
-    "msg/Int8.msg"
-    "msg/Nested.msg"
-    "msg/Primitives.msg"
-    "msg/Strings.msg"
-    "msg/Uint16.msg"
-    "msg/Uint32.msg"
-    "msg/Uint64.msg"
-    "msg/Uint8.msg"
-    "msg/Various.msg"
-  )
-
-  include(cmake/register_dotnet.cmake)
-  include(cmake/rosidl_generator_dotnet_get_typesupports.cmake)
-
-  set(rosidl_generator_dotnet_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-  rosidl_generator_dotnet_extras(
-    "${CMAKE_CURRENT_SOURCE_DIR}/bin/rosidl_generator_dotnet"
-    "${CMAKE_CURRENT_SOURCE_DIR}/rosidl_generator_dotnet/__init__.py"
-    "${CMAKE_CURRENT_SOURCE_DIR}/resource"
-  )
-
-  rosidl_generate_interfaces(${PROJECT_NAME} ${message_files}
-    SKIP_INSTALL
-  )
-
 endif()
 
 install(

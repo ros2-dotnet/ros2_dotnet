@@ -84,6 +84,33 @@ ament_export_dependencies(rosidl_typesupport_c)
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+
+  find_package(std_msgs REQUIRED)
+  find_package(test_msgs REQUIRED)
+
+  ament_lint_auto_find_test_dependencies()
+
+  set(_assemblies_dep_dlls
+      ${rcldotnet_common_ASSEMBLIES_DLL}
+      ${std_msgs_ASSEMBLIES_DLL}
+      ${test_msgs_ASSEMBLIES_DLL}
+      ${builtin_interfaces_ASSEMBLIES_DLL}
+  )
+
+  add_dotnet_test(test_messages
+    ${CS_SOURCES}
+    test/test_messages.cs
+    INCLUDE_DLLS
+    ${_assemblies_dep_dlls}
+    INCLUDE_REFERENCES
+    "Microsoft.NET.Test.Sdk=15.9.0"
+    "xunit=2.4.1"
+    "xunit.runner.visualstudio=2.4.1"
+  )
+  add_dependencies(test_messages ${PROJECT_NAME}_assemblies ${_target_name})
+
+  install_dotnet(test_messages DESTINATION lib/${PROJECT_NAME}/dotnet )
+
 endif()
 
 ament_package()
