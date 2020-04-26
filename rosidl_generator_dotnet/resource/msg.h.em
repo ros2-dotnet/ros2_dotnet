@@ -57,9 +57,9 @@ void @(msg_prefix)_CDECL @(msg_typename)__destroy_native_message(void *);
 
 @(msg_prefix)_EXPORT
 void @(msg_typename)__write_field_@(member.name)(void *, @(msg_type_to_c(member.type)));
-@[  else]@
+@[    else]@
 @(msg_prefix)_EXPORT
-void * @(msg_prefix)_CDECL @(msg_typename)__native_get_field_@(member.name)_HANDLE(void *);
+void * @(msg_prefix)_CDECL @(msg_typename)__get_field_@(member.name)_HANDLE(void *);
 @[    end if]@
 @[end for]@
 
