@@ -32,7 +32,7 @@ namespace RCLdotnetTests
           received=true;
           msg2 = rcv_msg;
         }
-        );
+      );
 
       while(!received)
       {
@@ -66,7 +66,7 @@ namespace RCLdotnetTests
           received=true;
           msg2 = rcv_msg;
         }
-        );
+      );
 
       while(!received)
       {
