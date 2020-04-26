@@ -137,6 +137,8 @@ def get_builtin_dotnet_type(type_, use_primitives=True):
 def get_dotnet_type(type_, use_primitives=True):
     if isinstance(type_, AbstractGenericString):
         return 'System.String'
+    if isinstance(type_, NamespacedType):
+        return '.'.join(type_.namespaced_name())
 
     return get_builtin_dotnet_type(type_.typename, use_primitives=use_primitives)
 
