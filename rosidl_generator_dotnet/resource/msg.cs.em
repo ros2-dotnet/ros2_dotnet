@@ -43,7 +43,7 @@ public class @(type_name) : IMessage {
 @[    elif isinstance(member.type, AbstractString)]@
         @(get_field_name(type_name, member.name)) = "";
 @[    else]@
-        @(get_field_name(type_name, member.name)) = new @(member.type.namespaces[0]).@(member.type.namespaces[1]).@(member.type.name)(); 
+        @(get_field_name(type_name, member.name)) = new @(get_dotnet_type(member.type))();
 @[    end if]@
 @[end for]@
     }
@@ -90,7 +90,7 @@ public class @(type_name) : IMessage {
 @[    else]@
         IntPtr native_get_field_@(member.name)_HANDLE_ptr =
             dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__native_get_field_@(member.name)_HANDLE");
-        
+
         @(type_name).native_get_field_@(member.name)_HANDLE =
             (NativeGetField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
             native_get_field_@(member.name)_HANDLE_ptr, typeof(NativeGetField@(get_field_name(type_name, member.name))Type));
@@ -209,10 +209,8 @@ public class @(type_name) : IMessage {
 // TODO: Sequence types are not supported
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
-@[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
-    public @(get_dotnet_type(member.type)) @(get_field_name(type_name, member.name)) { get; set; }
 @[    else]@
-    public @(member.type.namespaces[0]).@(member.type.namespaces[1]).@(member.type.name) @(get_field_name(type_name, member.name)) { get; set; }
+    public @(get_dotnet_type(member.type)) @(get_field_name(type_name, member.name)) { get; set; }
 @[    end if]@
 @[end for]@
 }
