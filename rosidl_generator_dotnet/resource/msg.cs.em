@@ -34,7 +34,7 @@ public class @(type_name) : IMessage {
     {
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
-// TODO: Array types are not supported
+//    @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>();
 @[    elif isinstance(member.type, AbstractSequence)]@
 // TODO: Sequence types are not supported
 @[    elif isinstance(member.type, AbstractWString)]@
@@ -204,7 +204,7 @@ public class @(type_name) : IMessage {
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
-// TODO: Array types are not supported
+    public List<@(get_dotnet_type(member.type.value_type))> @(get_field_name(type_name, member.name));
 @[    elif isinstance(member.type, AbstractSequence)]@
 // TODO: Sequence types are not supported
 @[    elif isinstance(member.type, AbstractWString)]@
