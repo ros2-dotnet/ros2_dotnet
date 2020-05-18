@@ -8,7 +8,7 @@ Build status
 |----------|--------|
 | **Universal Windows Platform (x86/x64)** | ![Build (UWP)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(UWP)/badge.svg) |
 | **Windows Desktop (x64)** | ![Build (Desktop)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(Desktop)/badge.svg) |
-| **Linux** | (TODO) |
+| **Linux** | ![Build (Desktop)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(Linux)/badge.svg) |
 
 Introduction
 ------------
@@ -41,38 +41,72 @@ Lots of things!
 Sounds great, how can I try this out?
 -------------------------------------
 
-First of all install the standard ROS2 dependencies for your operating system of choice https://github.com/ros2/ros2/wiki/Installation#building-from-source
+First of all install the standard ROS2 dependencies for your operating system
+of choice (**NOTE**: only do this if building Windows Desktop or Linux. For UWP,
+see the relevant section below): https://github.com/ros2/ros2/wiki/Installation#building-from-source
 
-Next make sure you've either installed .Net Core (preferred) https://www.microsoft.com/net/learn/get-started or Mono https://www.mono-project.com/
+Next make sure you've either installed .Net Core (preferred)
+https://www.microsoft.com/net/learn/get-started or Mono
+https://www.mono-project.com/. (**NOTE**: For building unit tests, .NET 2.1 is
+required).
 
-The following steps show how to build the examples on Windows and Linux:
+For running on Linux or Windows Desktop, one can build `ros2_dotnet` (along with
+all desired packages containing interface definitions) as an overlay on top
+of an existing ROS2 installation. The `ros2_dotnet.repos` contains all
+necessary repositories to build the core `ros2_dotnet` project along with all
+standard ROS2 interface packages. If you are using other packages which provide
+interface definitions, those must also be included in the `ros2_dotnet` workspace
+in order for .NET bindings to be generated. (NOTE: if you wish to build the
+core of ROS2 from source, everything through the `rcl` layer is required.)
+
+For running within UWP (Universal Windows Platform) applications, the entire
+core of ROS2 must be compiled for UWP compatibility.
 
 Windows (Desktop)
 -----------------
+Assuming you've installed ROS2 (pre-built binary packages) to the directory
+c:\dev\ros2_eloquent per the official [installation instructions](https://index.ros.org/doc/ros2/Installation/Eloquent/Windows-Install-Binary/),
+run the following from an Administrator Visual Studio 2019 Developer Command
+Prompt:
+
+(**NOTE**: Building as an overlay on top of *binary* distributions of ROS2 has
+presented some challenges. As of this writing, you may also need to include the
+`rosidl` package due to some unicode/locale compatibility problems.
+This is done for you below in the line preceding `colcon build`. This step
+can/should be omitted if building on top of a built-from-source ROS2 workspace)
 
 ```
+call \dev\ros2_eloquent\local_setup.bat
 md \dev\ros2_dotnet_ws\src
 cd \dev\ros2_dotnet_ws
-curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet.repos -o ros2_dotnet.repos
+curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet.repos -o ros2_dotnet.repos
 vcs import \dev\ros2_dotnet_ws\src < ros2_dotnet.repos
+git clone --branch eloquent https://github.com/ros2/rosidl src\ros2\rosidl
 colcon build --merge-install
 ```
+
 
 Linux
 -----
-
+Assuming ROS2 eloquent installed to the standard location, run the following commands:
 ```
+source /opt/ros/eloquent/setup.bash
 mkdir -p ~/ros2_dotnet_ws/src
 cd ~/ros2_dotnet_ws
-wget https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet.repos
+wget https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet.repos
 vcs import ~/ros2_dotnet_ws/src < ros2_dotnet.repos
-colcon build --merge-install
+colcon build
 ```
 
-Universal Windows Platform (ARM, Win32, Win64)
+Universal Windows Platform (Win32, Win64)
 ----------------------------------------------
+We'll build this in two steps, first `ament` (the build system) and related tools
+which will run natively on the host, followed by ROS2 itself, built for UWP and
+the target architecture.
 
-We'll build this in two steps, first `ament` (the build system) and then ROS2 itself. This is because `ament` will run on the host platform, whereas `ros2-dotnet` on the target.
+If you have previously installed ROS2 dependencies (OpenSSL, tinyxml, log4cxx,
+etc) it is strongly recommended to uninstall those dependencies before building
+to avoid any non-UWP binaries getting pulled into the build.
 
 ament
 -----
@@ -80,7 +114,7 @@ ament
 ```
 md \dev\ament\src
 cd \dev\ament
-curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ament_dotnet_uwp.repos -o ament_dotnet_uwp.repos
+curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ament_dotnet_uwp.repos -o ament_dotnet_uwp.repos
 vcs import src < ament_dotnet_uwp.repos
 colcon build --merge-install
 call install\local_setup.bat
@@ -94,7 +128,7 @@ Replace `%TARGET_ARCH%` with Win32 or x64
 ```
 md \dev\ros2\src
 cd \dev\ros2
-curl -sk https://raw.githubusercontent.com/esteve/ros2_dotnet/master/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
+curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
 vcs import src < ros2_dotnet_uwp.repos
 cd \dev\ament
 call install\local_setup.bat
