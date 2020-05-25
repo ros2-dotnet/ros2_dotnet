@@ -1,0 +1,111 @@
+name: Build (Linux / ADE)
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-ade-image:
+    runs-on: ubuntu-18.04
+    container:
+      image: docker:dind
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v2
+
+    - name: Print tree
+      run: |
+        pwd
+        echo 'PWD'
+        find
+        apk add --update-cache git
+
+    - name: Build ADE image
+      run: |
+        # export LAST_CHANGE=$(git log -1 --pretty=%H .)
+        set -x
+        export CI_COMMIT_SHA=$GITHUB_SHA
+        export CI_COMMIT_REF_SLUG=$(echo $GITHUB_HEAD_REF | cut -d/ -f2- | tr "[:upper:]" "[:lower:]" | sed "s/[^[:alnum:]-]/-/g")
+        export CI_REGISTRY=docker.pkg.github.com
+        export CI_REGISTRY_IMAGE="$CI_REGISTRY/${{ github.repository }}"
+        export CI_JOB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+        export CI_USERNAME=${{ github.repository_owner }}
+        echo "TOKEN $CI_JOB_TOKEN -- $CI_USERNAME .. $CI_REGISTRY =="
+        echo "GITHUB_REF == $GITHUB_REF ---"
+        echo "GITHUB_HEAD_REF == $GITHUB_HEAD_REF ---"
+        echo "GITHUB_BASE_REF == $GITHUB_BASE_REF ---"
+        apk add --update-cache git
+        cd tools/ade_image
+        docker login -u $CI_USERNAME -p $CI_JOB_TOKEN $CI_REGISTRY
+        if [[ -n "$FORCE" ]]; then
+            chmod og-w . -R;
+            docker build --label ade_image_commit_sha="$CI_COMMIT_SHA" -t image .;
+        else
+            (
+                docker pull $CI_REGISTRY_IMAGE$ARCH/ade:commit-$CI_COMMIT_SHA &&
+                docker tag $CI_REGISTRY_IMAGE$ARCH/ade:commit-$CI_COMMIT_SHA image
+            # ) || (
+            #     docker pull $CI_REGISTRY_IMAGE$ARCH/ade:commit-$LAST_CHANGE &&
+            #     docker tag $CI_REGISTRY_IMAGE$ARCH/ade:commit-$LAST_CHANGE image
+            ) || (
+                chmod og-w . -R;
+                docker build --label ade_image_commit_sha="$CI_COMMIT_SHA" -t image .;
+            );
+        fi
+
+        # docker tag image $CI_REGISTRY_IMAGE$ARCH/ade:commit-$LAST_CHANGE
+        docker tag image $CI_REGISTRY_IMAGE$ARCH/ade:commit-$CI_COMMIT_SHA
+        docker tag image $CI_REGISTRY_IMAGE$ARCH/ade:$CI_COMMIT_REF_SLUG
+        # docker push $CI_REGISTRY_IMAGE$ARCH/ade:commit-$LAST_CHANGE
+        docker push $CI_REGISTRY_IMAGE$ARCH/ade:commit-$CI_COMMIT_SHA
+        docker push $CI_REGISTRY_IMAGE$ARCH/ade:$CI_COMMIT_REF_SLUG
+
+  # build-linux-ade:
+  #   needs: build-ade
+  #   runs-on: ubuntu-18.04
+  #   container:
+  #     image: docker.pkg.github.com/ade:commit-$GITHUB_SHA
+
+  #   steps:
+  #   - name: Checkout source
+  #     uses: actions/checkout@v2
+
+  #   # https://docs.microsoft.com/en-us/dotnet/core/install/linux-package-manager-ubuntu-1804
+  #   - name: Install .NET SDK v2.1
+  #     run: |
+  #       wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+  #       sudo dpkg -i packages-microsoft-prod.deb
+  #       sudo add-apt-repository universe
+  #       sudo apt-get update
+  #       sudo apt-get install -y apt-transport-https
+  #       sudo apt-get update
+  #       sudo apt-get install -y dotnet-sdk-2.1
+
+  #   - name: Setup ROS2
+  #     uses: ros-tooling/setup-ros@0.0.20
+  #     with:
+  #       required-ros-distributions: eloquent
+
+  #   - name: Configure ros2_dotnet workspace
+  #     run: |
+  #       mkdir -p ~/ros2_dotnet_ws/src
+  #       cd ~/ros2_dotnet_ws
+  #       cp ${{github.workspace}}/ros2_dotnet.repos .
+  #       vcs import src < ros2_dotnet.repos
+  #       rm -rf src/ros2_dotnet/ros2_dotnet
+  #       cp -r ${{github.workspace}} src/ros2_dotnet/ros2_dotnet
+  #       vcs branch
+
+  #   - name: Build ros2_dotnet source
+  #     run: |
+  #       source /opt/ros/eloquent/setup.bash
+  #       cd ~/ros2_dotnet_ws
+  #       colcon build --event-handlers console_cohesion+ console_package_list+
+
+  #   - name: Run tests
+  #     run: |
+  #       source /opt/ros/eloquent/setup.bash
+  #       cd ~/ros2_dotnet_ws
+  #       colcon test --event-handlers console_cohesion+ --return-code-on-test-failure --packages-select rcldotnet

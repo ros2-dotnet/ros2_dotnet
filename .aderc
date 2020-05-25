@@ -1,0 +1,6 @@
+export ADE_DOCKER_RUN_ARGS="--cap-add=SYS_PTRACE"
+export ADE_GITHUB=github.com
+export ADE_REGISTRY=docker.pkg.github.com
+export ADE_IMAGES="
+  docker.pkg.github.com/ros2-dotnet/ros2_dotnet/ade:master
+"
