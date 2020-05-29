@@ -301,46 +301,46 @@ namespace RCLdotnetTests
       // Assert.Equal("three", msg2.String_values[2]);
       Assert.Equal(3, msg2.Basic_types_values.Count);
       Assert.True(msg2.Basic_types_values[0].Bool_value);
-      //Assert.Equal(36, msg2.Basic_types_values[0].Byte_value);
-      //Assert.Equal(37, msg2.Basic_types_values[0].Char_value);
-      //Assert.Equal(38.1f, msg2.Basic_types_values[0].Float32_value);
-      //Assert.Equal(39.1, msg2.Basic_types_values[0].Float64_value);
-      //Assert.Equal(40, msg2.Basic_types_values[0].Int8_value);
-      //Assert.Equal(41, msg2.Basic_types_values[0].Uint8_value);
-      //Assert.Equal(42, msg2.Basic_types_values[0].Int16_value);
-      //Assert.Equal(43, msg2.Basic_types_values[0].Uint16_value);
-      //Assert.Equal(44, msg2.Basic_types_values[0].Int32_value);
-      //Assert.Equal((uint)45, msg2.Basic_types_values[0].Uint32_value);
-      //Assert.Equal(46, msg2.Basic_types_values[0].Int64_value);
-      //Assert.Equal((ulong)47, msg2.Basic_types_values[0].Uint64_value);
-//
-      // Assert.False(msg2.Basic_types_values[1].Bool_value);
-      // Assert.Equal(48, msg2.Basic_types_values[1].Byte_value);
-      // Assert.Equal(49, msg2.Basic_types_values[1].Char_value);
-      // Assert.Equal(50.1f, msg2.Basic_types_values[1].Float32_value);
-      // Assert.Equal(51.1, msg2.Basic_types_values[1].Float64_value);
-      // Assert.Equal(52, msg2.Basic_types_values[1].Int8_value);
-      // Assert.Equal(53, msg2.Basic_types_values[1].Uint8_value);
-      // Assert.Equal(54, msg2.Basic_types_values[1].Int16_value);
-      // Assert.Equal(55, msg2.Basic_types_values[1].Uint16_value);
-      // Assert.Equal(56, msg2.Basic_types_values[1].Int32_value);
-      // Assert.Equal((uint)57, msg2.Basic_types_values[1].Uint32_value);
-      // Assert.Equal(58, msg2.Basic_types_values[1].Int64_value);
-      // Assert.Equal((ulong)59, msg2.Basic_types_values[1].Uint64_value);
-// 
-      // Assert.True(msg2.Basic_types_values[2].Bool_value);
-      // Assert.Equal(60, msg2.Basic_types_values[2].Byte_value);
-      // Assert.Equal(61, msg2.Basic_types_values[2].Char_value);
-      // Assert.Equal(62.1f, msg2.Basic_types_values[2].Float32_value);
-      // Assert.Equal(63.1, msg2.Basic_types_values[2].Float64_value);
-      // Assert.Equal(64, msg2.Basic_types_values[2].Int8_value);
-      // Assert.Equal(65, msg2.Basic_types_values[2].Uint8_value);
-      // Assert.Equal(66, msg2.Basic_types_values[2].Int16_value);
-      // Assert.Equal(67, msg2.Basic_types_values[2].Uint16_value);
-      // Assert.Equal(68, msg2.Basic_types_values[2].Int32_value);
-      // Assert.Equal((uint)69, msg2.Basic_types_values[2].Uint32_value);
-      // Assert.Equal(70, msg2.Basic_types_values[2].Int64_value);
-      // Assert.Equal((ulong)71, msg2.Basic_types_values[2].Uint64_value);
+      Assert.Equal(36, msg2.Basic_types_values[0].Byte_value);
+      Assert.Equal(37, msg2.Basic_types_values[0].Char_value);
+      Assert.Equal(38.1f, msg2.Basic_types_values[0].Float32_value);
+      Assert.Equal(39.1, msg2.Basic_types_values[0].Float64_value);
+      Assert.Equal(40, msg2.Basic_types_values[0].Int8_value);
+      Assert.Equal(41, msg2.Basic_types_values[0].Uint8_value);
+      Assert.Equal(42, msg2.Basic_types_values[0].Int16_value);
+      Assert.Equal(43, msg2.Basic_types_values[0].Uint16_value);
+      Assert.Equal(44, msg2.Basic_types_values[0].Int32_value);
+      Assert.Equal((uint)45, msg2.Basic_types_values[0].Uint32_value);
+      Assert.Equal(46, msg2.Basic_types_values[0].Int64_value);
+      Assert.Equal((ulong)47, msg2.Basic_types_values[0].Uint64_value);
+
+      Assert.False(msg2.Basic_types_values[1].Bool_value);
+      Assert.Equal(48, msg2.Basic_types_values[1].Byte_value);
+      Assert.Equal(49, msg2.Basic_types_values[1].Char_value);
+      Assert.Equal(50.1f, msg2.Basic_types_values[1].Float32_value);
+      Assert.Equal(51.1, msg2.Basic_types_values[1].Float64_value);
+      Assert.Equal(52, msg2.Basic_types_values[1].Int8_value);
+      Assert.Equal(53, msg2.Basic_types_values[1].Uint8_value);
+      Assert.Equal(54, msg2.Basic_types_values[1].Int16_value);
+      Assert.Equal(55, msg2.Basic_types_values[1].Uint16_value);
+      Assert.Equal(56, msg2.Basic_types_values[1].Int32_value);
+      Assert.Equal((uint)57, msg2.Basic_types_values[1].Uint32_value);
+      Assert.Equal(58, msg2.Basic_types_values[1].Int64_value);
+      Assert.Equal((ulong)59, msg2.Basic_types_values[1].Uint64_value);
+ 
+      Assert.True(msg2.Basic_types_values[2].Bool_value);
+      Assert.Equal(60, msg2.Basic_types_values[2].Byte_value);
+      Assert.Equal(61, msg2.Basic_types_values[2].Char_value);
+      Assert.Equal(62.1f, msg2.Basic_types_values[2].Float32_value);
+      Assert.Equal(63.1, msg2.Basic_types_values[2].Float64_value);
+      Assert.Equal(64, msg2.Basic_types_values[2].Int8_value);
+      Assert.Equal(65, msg2.Basic_types_values[2].Uint8_value);
+      Assert.Equal(66, msg2.Basic_types_values[2].Int16_value);
+      Assert.Equal(67, msg2.Basic_types_values[2].Uint16_value);
+      Assert.Equal(68, msg2.Basic_types_values[2].Int32_value);
+      Assert.Equal((uint)69, msg2.Basic_types_values[2].Uint32_value);
+      Assert.Equal(70, msg2.Basic_types_values[2].Int64_value);
+      Assert.Equal((ulong)71, msg2.Basic_types_values[2].Uint64_value);
     }
 
   }
