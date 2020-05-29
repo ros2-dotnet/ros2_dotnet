@@ -10,34 +10,30 @@ less
 man
 openssh-client
 python3-lxml
-ros-dashing-ament-cmake
-ros-dashing-ament-cmake-core
-ros-dashing-ament-cmake-gtest
-ros-dashing-ament-cmake-lint-cmake
-ros-dashing-ament-cmake-pclint
-ros-dashing-ament-cmake-pytest
-ros-dashing-ament-copyright
-ros-dashing-ament-flake8
-ros-dashing-ament-lint-auto
-ros-dashing-ament-lint-common
-ros-dashing-ament-pep257
-ros-dashing-angles
-ros-dashing-demo-nodes-cpp
-ros-dashing-diagnostic-updater
-ros-dashing-geographic-msgs
-ros-dashing-launch
-ros-dashing-launch-ros
-ros-dashing-launch-testing
-ros-dashing-launch-testing-ament-cmake
-ros-dashing-launch-testing-ros
-ros-dashing-nmea-msgs
-ros-dashing-osrf-testing-tools-cpp
-ros-dashing-rcutils
-ros-dashing-rmw
-ros-dashing-rmw-cyclonedds-cpp
-ros-dashing-rmw-implementation-cmake
-ros-dashing-ros-testing
-ros-dashing-std-msgs
+python3-rosdep
+# ros-eloquent-ament-cmake
+# ros-eloquent-ament-cmake-core
+# ros-eloquent-ament-cmake-gtest
+# ros-eloquent-ament-cmake-lint-cmake
+# ros-eloquent-ament-cmake-pclint
+# ros-eloquent-ament-cmake-pytest
+# ros-eloquent-ament-copyright
+# ros-eloquent-ament-flake8
+# ros-eloquent-ament-lint-auto
+# ros-eloquent-ament-lint-common
+# ros-eloquent-ament-pep257
+# ros-eloquent-launch
+# ros-eloquent-launch-ros
+# ros-eloquent-launch-testing
+# ros-eloquent-launch-testing-ament-cmake
+# ros-eloquent-launch-testing-ros
+# ros-eloquent-osrf-testing-tools-cpp
+# ros-eloquent-rcutils
+# ros-eloquent-rmw
+# ros-eloquent-rmw-cyclonedds-cpp
+# ros-eloquent-rmw-implementation-cmake
+# ros-eloquent-ros-testing
+# ros-eloquent-std-msgs
 shellcheck
 strace
 sudo
@@ -45,3 +41,7 @@ vim
 
 # Bloom
 python3-bloom
+
+# .NET Core
+apt-transport-https
+dotnet-sdk-2.1
