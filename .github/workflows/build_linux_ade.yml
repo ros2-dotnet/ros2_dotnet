@@ -57,7 +57,7 @@ jobs:
         docker push $CI_REGISTRY_IMAGE$ARCH/ade:$CI_COMMIT_REF_SLUG
 
   build-linux-ade:
-    needs: build-ade
+    needs: build-ade-image
     runs-on: ubuntu-18.04
     container:
       image: docker.pkg.github.com/ade:commit-$GITHUB_SHA
