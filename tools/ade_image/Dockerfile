@@ -33,6 +33,7 @@ ENV LC_ALL en_US.UTF-8
 
 RUN echo deb http://packages.ros.org/ros/ubuntu ${CODENAME} main | tee /etc/apt/sources.list.d/ros-latest.list
 RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key 5523BAEEB01FA116
+RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key F42ED6FBAB17C654
 
 RUN wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb \
     -O /tmp/packages-microsoft-prod.deb && \
