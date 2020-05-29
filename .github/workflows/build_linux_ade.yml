@@ -25,16 +25,16 @@ jobs:
     - name: Build ADE image
       run: |
         set -x
-        export CI_COMMIT_SHA=$GITHUB_SHA
-        export CI_COMMIT_REF_SLUG=$(echo $GITHUB_HEAD_REF | cut -d/ -f2- | tr "[:upper:]" "[:lower:]" | sed "s/[^[:alnum:]-]/-/g")
+        export CI_COMMIT_SHA=${{ github.sha }}
+        export CI_COMMIT_REF_SLUG=$(echo ${{ github.head_ref }} | cut -d/ -f2- | tr "[:upper:]" "[:lower:]" | sed "s/[^[:alnum:]-]/-/g")
         export CI_REGISTRY=docker.pkg.github.com
         export CI_REGISTRY_IMAGE="$CI_REGISTRY/${{ github.repository }}"
         export CI_JOB_TOKEN=${{ secrets.GITHUB_TOKEN }}
         export CI_USERNAME=${{ github.repository_owner }}
         echo "TOKEN $CI_JOB_TOKEN -- $CI_USERNAME .. $CI_REGISTRY =="
         echo "GITHUB_REF == $GITHUB_REF ---"
-        echo "GITHUB_HEAD_REF == $GITHUB_HEAD_REF ---"
-        echo "GITHUB_BASE_REF == $GITHUB_BASE_REF ---"
+        echo "GITHUB_HEAD_REF == ${{ github.head_ref }} ---"
+        echo "GITHUB_BASE_REF == ${{ github.base_ref }} ---"
         apk add --update-cache git
         cd tools/ade_image
         docker login -u $CI_USERNAME -p $CI_JOB_TOKEN $CI_REGISTRY
@@ -60,7 +60,7 @@ jobs:
     needs: build-ade-image
     runs-on: ubuntu-18.04
     container:
-      image: docker.pkg.github.com/${{ github.repository }}/ade:commit-$GITHUB_SHA
+      image: docker.pkg.github.com/${{ github.repository }}/ade:commit-${{ github.sha }}
 
     steps:
     # - name: Checkout source
