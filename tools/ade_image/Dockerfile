@@ -21,7 +21,7 @@ deb http://ports.ubuntu.com/ubuntu-ports/ ${CODENAME}-security main universe\n\
 
 
 RUN apt-get update && \
-    apt-get install -y \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
         gnupg2 \
         locales \
         wget \
