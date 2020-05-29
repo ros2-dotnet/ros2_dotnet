@@ -22,6 +22,7 @@ deb http://ports.ubuntu.com/ubuntu-ports/ ${CODENAME}-security main universe\n\
 
 RUN apt-get update && \
     apt-get install -y \
+        gnupg2 \
         locales \
     && rm -rf /var/lib/apt/lists/*
 RUN locale-gen en_US.UTF-8; dpkg-reconfigure -f noninteractive locales
