@@ -1,4 +1,4 @@
-FROM ros:eloquent
+FROM ubuntu:bionic
 ARG CODENAME=bionic
 
 
