@@ -24,6 +24,7 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         gnupg2 \
         locales \
+        tzdata \
         wget \
     && rm -rf /var/lib/apt/lists/*
 RUN locale-gen en_US.UTF-8; dpkg-reconfigure -f noninteractive locales
