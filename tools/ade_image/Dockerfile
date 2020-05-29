@@ -48,6 +48,9 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/* /tmp/apt-packages
 
 RUN echo 'ALL ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+ENV ROS_DISTRO=eloquent
+
 RUN echo 'Defaults env_keep += "DEBUG ROS_DISTRO"' >> /etc/sudoers
 
 COPY env.sh /etc/profile.d/ade_env.sh

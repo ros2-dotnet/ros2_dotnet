@@ -60,7 +60,7 @@ jobs:
     needs: build-ade-image
     runs-on: ubuntu-18.04
     container:
-      image: docker.pkg.github.com/ade:commit-$GITHUB_SHA
+      image: docker.pkg.github.com/${{ github.repository }}/ade:commit-$GITHUB_SHA
 
     steps:
     # - name: Checkout source
