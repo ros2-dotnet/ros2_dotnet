@@ -24,6 +24,7 @@ RUN apt-get update && \
     apt-get install -y \
         gnupg2 \
         locales \
+        wget \
     && rm -rf /var/lib/apt/lists/*
 RUN locale-gen en_US.UTF-8; dpkg-reconfigure -f noninteractive locales
 ENV LANG en_US.UTF-8
