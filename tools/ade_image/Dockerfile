@@ -1,4 +1,4 @@
-FROM ros:dashing
+FROM ros:eloquent
 ARG CODENAME=bionic
 
 
