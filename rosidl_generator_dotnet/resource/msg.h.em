@@ -47,11 +47,16 @@ void @(msg_prefix)_CDECL @(msg_typename)__destroy_native_message(void *);
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
 @(msg_prefix)_EXPORT
-void * @(msg_prefix)_CDECL @(msg_typename)_get_field_@(member.name)_message(void *, int);
+void * @(msg_prefix)_CDECL @(msg_typename)__get_field_@(member.name)_message(void *, int);
 @(msg_prefix)_EXPORT
-void * @(msg_prefix)_CDECL @(msg_typename)_native_init_field_@(member.name)_message(void *, int);
+int @(msg_prefix)_CDECL @(msg_typename)__getsize_array_field_@(member.name)_message();
+
+@[        if isinstance(member.type.value_type, BasicType)]@
 @(msg_prefix)_EXPORT
-int @(msg_prefix)_CDECL @(msg_typename)_native_getsize_array_field_@(member.name)_message(void *);
+void @(msg_typename)__write_field_@(member.name)(void *, @(msg_type_to_c(member.type.value_type)));
+@(msg_prefix)_EXPORT
+@(msg_type_to_c(member.type.value_type)) @(msg_prefix)_CDECL @(msg_typename)__read_field_@(member.name)(void *);
+@[        end if]@
 
 @[    elif isinstance(member.type, AbstractSequence)]@
 // TODO: Sequence types are not supported

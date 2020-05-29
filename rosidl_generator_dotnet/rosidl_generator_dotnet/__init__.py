@@ -134,7 +134,7 @@ def get_builtin_dotnet_type(type_, use_primitives=True):
     assert False, "unknown type '%s'" % type_
 
 def get_idl_type(type_):
-    if type_ == 'byte' or type_ == 'char':
+    if type_ == 'byte':
         return 'octet'
     
     return type_

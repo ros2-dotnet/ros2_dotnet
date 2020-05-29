@@ -48,40 +48,49 @@ const void * @(msg_typename)__get_typesupport() {
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
-void * @(msg_typename)_get_field_@(member.name)_message(void *message_handle, int index) {
+////////////////////////////////////////////////////////
+// DOING: Array types support
+
+void * @(msg_typename)__get_field_@(member.name)_message(void *message_handle, int index) {
   @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
   return &(ros_message->@(member.name)[index]);
 }
 
-void * @(msg_typename)_init_field_@(member.name)_message(void *message_handle, int size) {
-  @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
-@[        if isinstance(member.type.value_type, Array)]@
-//  TODO: Array array fields are not supported
-@[        elif isinstance(member.type.value_type, AbstractSequence)]@ 
-//  TODO: AbstractSequence array fields are not supported
-@[        elif isinstance(member.type.value_type, AbstractWString)]@ 
-//  TODO: AbstractWString array fields are not supported
-@[        elif isinstance(member.type.value_type, BasicType) or isinstance(member.type, AbstractString)]@
-  rosidl_generator_c__@(get_idl_type(member.type.value_type.typename))__Sequence__init(&(ros_message->@(member.name)), size);
-@[        elif isinstance(member.type.value_type, AbstractGenericString)]@
-// TODO: AbstractGenericString array fields are not supported
-@[        else]@
-  @(member.type.value_type.namespaces[0])__@(member.type.value_type.namespaces[1])__@(member.type.value_type.name)__Sequence__init(&(ros_message->@(member.name)), size);
-@[        end if]@ 
-}
-
-int @(msg_typename)_getsize_array_field_@(member.name)_message(void *message_handle)
+int @(msg_typename)__getsize_array_field_@(member.name)_message()
 {
-  @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
-  int size = 0;
-
-@[    if isinstance(member.type, Array)]@
-  size = @(member.type.size);
-@[    end if]@
-
-  return size;
+@[        if isinstance(member.type, Array)]@
+  return @(member.type.size);
+@[        else]@
+  return 0;
+@[        end if]@
 }
 
+@[        if isinstance(member.type.value_type, BasicType)]@
+void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_type_to_c(member.type.value_type)) value)
+{
+  @(msg_type_to_c(member.type.value_type)) * ros_message = (@(msg_type_to_c(member.type.value_type)) *)message_handle;
+  *ros_message = value;
+}
+
+@(msg_type_to_c(member.type.value_type)) @(msg_typename)__read_field_@(member.name)(void *message_handle)
+{
+  @(msg_type_to_c(member.type.value_type)) * ros_message = (@(msg_type_to_c(member.type.value_type)) *)message_handle;
+  return *ros_message;
+}
+@[        elif isinstance(member.type.value_type, AbstractString)]@
+void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_type_to_c(member.type.value_type)) value)
+{
+  
+}
+
+@(msg_type_to_c(member.type.value_type)) @(msg_typename)__read_field_@(member.name)(void *message_handle)
+{
+  @(msg_typename) * ros_message = (@(msg_typename)*)message_handle;
+  return ros_message->@(member.name)->data;
+}
+@[        end if]@
+
+////////////////////////////////////////////////////////
 @[    elif isinstance(member.type, AbstractSequence)]@
 // TODO: Sequence types are not supported
 @[    elif isinstance(member.type, AbstractWString)]@
