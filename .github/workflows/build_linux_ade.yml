@@ -58,6 +58,7 @@ jobs:
 
   login-to-server:
     needs: build-ade-image
+    runs-on: ubuntu-18.04
     steps:
     - name: Login
       uses: azure/docker-login@v1
