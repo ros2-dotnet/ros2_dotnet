@@ -45,8 +45,8 @@ const char *native_rcl_get_rmw_identifier() {
   return rmw_get_implementation_identifier();
 }
 
-const char *native_rcl_get_error_string() {
-  return rcl_get_error_string().str;
+void native_rcl_get_error_string(int length, char* buffer) {
+  strncpy(buffer, rcl_get_error_string().str, length);
 }
 
 void native_rcl_reset_error() { rcl_reset_error(); }

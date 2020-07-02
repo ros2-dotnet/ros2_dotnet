@@ -51,6 +51,11 @@ namespace ROS2 {
     internal static NativeRCLGetRMWIdentifierType native_rcl_get_rmw_identifier = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate IntPtr NativeRCLGetErrorStringType (int len, StringBuilder lpBuffer);
+
+    internal static NativeRCLGetErrorStringType native_rcl_get_error_string = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate IntPtr NativeRCLGetZeroInitializedWaitSetType ();
 
     internal static NativeRCLGetZeroInitializedWaitSetType native_rcl_get_zero_initialized_wait_set = null;
@@ -98,6 +103,12 @@ namespace ROS2 {
       RCLdotnetDelegates.native_rcl_init =
         (NativeRCLInitType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_init_ptr, typeof (NativeRCLInitType));
+
+      IntPtr native_rcl_get_error_string_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_get_error_string");
+      RCLdotnetDelegates.native_rcl_get_error_string =
+        (NativeRCLGetErrorStringType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_get_error_string_ptr, typeof (NativeRCLGetErrorStringType));
 
       IntPtr native_rcl_get_rmw_identifier_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_get_rmw_identifier");
@@ -279,13 +290,22 @@ namespace ROS2 {
       DestroyWaitSet (waitSetHandle);
     }
 
-    public static void Init () {
+    public static RCLRet Init () {
+      RCLRet ret = RCLRet.Ok;
       lock (syncLock) {
         if (!initialized) {
-          RCLdotnetDelegates.native_rcl_init ();
+          ret = (RCLRet)RCLdotnetDelegates.native_rcl_init ();
           initialized = true;
         }
       }
+
+      return ret;
+    }
+
+    public static string GetErrorString () {
+      StringBuilder buffer = new StringBuilder(1024);
+      RCLdotnetDelegates.native_rcl_get_error_string (buffer.Capacity, buffer);
+      return buffer.ToString();
     }
 
     public static string GetRMWIdentifier () {
