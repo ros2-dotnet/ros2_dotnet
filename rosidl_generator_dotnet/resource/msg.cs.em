@@ -39,9 +39,12 @@ public class @(type_name) : IMessage {
         // @(member.type.value_type) @(member.type.value_type.typename)
 @[        end if]@       
         @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>(@(member.type.size));
-
 @[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
+@[        if isinstance(member.type.value_type, BasicType)]@
+        @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>();
+@[        else]@
+        // TODO: Nested-type sequences not yet implemented
+@[        end if]@
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType)]@
@@ -82,10 +85,10 @@ public class @(type_name) : IMessage {
         IntPtr native_read_field_@(member.name)_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__read_field_@(member.name)");
 @[        end if]@
 
-        @(type_name).native_get_field_@(member.name)_message = (NativeGetField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
-            native_get_field_@(member.name)_message_ptr, typeof(NativeGetField@(get_field_name(type_name, member.name))Type));
-        @(type_name).native_getsize_array_field_@(member.name)_message = (NativeGetSizeArrayField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
-            native_getsize_array_field_@(member.name)_message_ptr, typeof(NativeGetSizeArrayField@(get_field_name(type_name, member.name))Type));
+        @(type_name).native_get_field_@(member.name)_message = (NativeGetField@(get_field_name(type_name, member.name))MessageType)Marshal.GetDelegateForFunctionPointer(
+            native_get_field_@(member.name)_message_ptr, typeof(NativeGetField@(get_field_name(type_name, member.name))MessageType));
+        @(type_name).native_getsize_array_field_@(member.name)_message = (NativeGetSizeArrayField@(get_field_name(type_name, member.name))MessageType)Marshal.GetDelegateForFunctionPointer(
+            native_getsize_array_field_@(member.name)_message_ptr, typeof(NativeGetSizeArrayField@(get_field_name(type_name, member.name))MessageType));
 
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
         @(type_name).native_write_field_@(member.name) = (NativeWriteField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
@@ -95,7 +98,32 @@ public class @(type_name) : IMessage {
 @[        end if]@
 
 @[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
+@[        if isinstance(member.type.value_type, BasicType)]@
+        IntPtr native_get_field_@(member.name)_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__get_field_@(member.name)_message");
+        IntPtr native_getsize_sequence_field_@(member.name)_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__getsize_sequence_field_@(member.name)_message");
+@[            if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
+        IntPtr native_write_field_@(member.name)_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__write_field_@(member.name)");
+        IntPtr native_read_field_@(member.name)_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__read_field_@(member.name)");
+@[            end if]@
+        IntPtr native_resize_sequence_field_@(member.name)_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__resize_sequence_field_@(member.name)_message");
+
+        @(type_name).native_get_field_@(member.name)_message = (NativeGetField@(get_field_name(type_name, member.name))MessageType)Marshal.GetDelegateForFunctionPointer(
+            native_get_field_@(member.name)_message_ptr, typeof(NativeGetField@(get_field_name(type_name, member.name))MessageType));
+        @(type_name).native_getsize_sequence_field_@(member.name)_message = (NativeGetSizeSequenceField@(get_field_name(type_name, member.name))MessageType)Marshal.GetDelegateForFunctionPointer(
+            native_getsize_sequence_field_@(member.name)_message_ptr, typeof(NativeGetSizeSequenceField@(get_field_name(type_name, member.name))MessageType));
+
+@[            if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
+        @(type_name).native_write_field_@(member.name) = (NativeWriteField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
+            native_write_field_@(member.name)_ptr, typeof(NativeWriteField@(get_field_name(type_name, member.name))Type));
+        @(type_name).native_read_field_@(member.name) = (NativeReadField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
+            native_read_field_@(member.name)_ptr, typeof(NativeReadField@(get_field_name(type_name, member.name))Type));
+@[            end if]@
+
+        @(type_name).native_resize_sequence_field_@(member.name)_message = (NativeResizeSequenceField@(get_field_name(type_name, member.name))MessageType)Marshal.GetDelegateForFunctionPointer(
+            native_resize_sequence_field_@(member.name)_message_ptr, typeof(NativeResizeSequenceField@(get_field_name(type_name, member.name))MessageType));
+@[        else]@
+        // TODO: Nested-typed sequences not yet supported
+@[        end if]@
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
@@ -138,17 +166,17 @@ public class @(type_name) : IMessage {
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
-    private static NativeGetField@(get_field_name(type_name, member.name))Type native_get_field_@(member.name)_message = null;
-    private static NativeGetSizeArrayField@(get_field_name(type_name, member.name))Type native_getsize_array_field_@(member.name)_message = null;
+    private static NativeGetField@(get_field_name(type_name, member.name))MessageType native_get_field_@(member.name)_message = null;
+    private static NativeGetSizeArrayField@(get_field_name(type_name, member.name))MessageType native_getsize_array_field_@(member.name)_message = null;
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
     private static NativeWriteField@(get_field_name(type_name, member.name))Type native_write_field_@(member.name) = null;
     private static NativeReadField@(get_field_name(type_name, member.name))Type native_read_field_@(member.name) = null;
 @[        end if]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr NativeGetField@(get_field_name(type_name, member.name))Type(
+    private delegate IntPtr NativeGetField@(get_field_name(type_name, member.name))MessageType(
         IntPtr messageHandle, int index);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int NativeGetSizeArrayField@(get_field_name(type_name, member.name))Type(IntPtr messageHandle);
+    private delegate int NativeGetSizeArrayField@(get_field_name(type_name, member.name))MessageType(IntPtr messageHandle);
 @[            if isinstance(member.type.value_type, AbstractString)]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
@@ -164,10 +192,41 @@ public class @(type_name) : IMessage {
         IntPtr messageHandle, @(get_dotnet_type(member.type.value_type)) value);
 @[            end if]@
 @[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
+@[        if isinstance(member.type.value_type, BasicType)]@
+    private static NativeGetField@(get_field_name(type_name, member.name))MessageType native_get_field_@(member.name)_message = null;
+    private static NativeGetSizeSequenceField@(get_field_name(type_name, member.name))MessageType native_getsize_sequence_field_@(member.name)_message = null;
+@[            if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
+    private static NativeWriteField@(get_field_name(type_name, member.name))Type native_write_field_@(member.name) = null;
+    private static NativeReadField@(get_field_name(type_name, member.name))Type native_read_field_@(member.name) = null;
+@[            end if]@
+    private static NativeResizeSequenceField@(get_field_name(type_name, member.name))MessageType native_resize_sequence_field_@(member.name)_message = null;
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate IntPtr NativeGetField@(get_field_name(type_name, member.name))MessageType(
+        IntPtr messageHandle, int index);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int NativeGetSizeSequenceField@(get_field_name(type_name, member.name))MessageType(IntPtr messageHandle);
+@[                if isinstance(member.type.value_type, AbstractString)]@
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
+        IntPtr messageHandle, [MarshalAs (UnmanagedType.LPStr)] string value);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate IntPtr NativeReadField@(get_field_name(type_name, member.name))Type(IntPtr messageHandle);
+@[                else]@
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate @(get_dotnet_type(member.type.value_type)) NativeReadField@(get_field_name(type_name, member.name))Type(
+        IntPtr messageHandle);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
+        IntPtr messageHandle, @(get_dotnet_type(member.type.value_type)) value);
+@[                end if]@
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    private delegate int NativeResizeSequenceField@(get_field_name(type_name, member.name))MessageType(IntPtr messageHandle, int size);
+@[        else]@
+    // TODO: Nested-typed sequences not yet supported
+@[        end if]@
 @[   elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
-@[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
+@[   elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
 @[        if isinstance(member.type, AbstractString)]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate IntPtr NativeReadField@(get_field_name(type_name, member.name))Type(IntPtr messageHandle);
@@ -207,26 +266,48 @@ public class @(type_name) : IMessage {
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
 
-      {
-          int size = native_getsize_array_field_@(member.name)_message(messageHandle);
-          @(get_field_name(type_name, member.name)).Clear();
-          for (int i=0; i<size; i++)
-          {
-          @[        if isinstance(member.type.value_type, BasicType)]@
-              @(get_field_name(type_name, member.name)).Add(native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i)));
-          @[        elif isinstance(member.type.value_type, AbstractString)]@
-              // TODO: String types are not supported  
-          @[        elif isinstance(member.type.value_type, AbstractWString)]
-              // TODO: Unicode types are not supported  
-          @[        else]
-              @(get_field_name(type_name, member.name)).Add(new @(get_dotnet_type(member.type.value_type))());
-              @(get_field_name(type_name, member.name))[@(get_field_name(type_name, member.name)).Count-1]._READ_HANDLE(native_get_field_@(member.name)_message(messageHandle, i));
-          @[        end if]@
+        {
+            int size = native_getsize_array_field_@(member.name)_message(messageHandle);
+            @(get_field_name(type_name, member.name)).Clear();
+            for (int i=0; i<size; i++)
+            {
+            @[        if isinstance(member.type.value_type, BasicType)]@
+                @(get_field_name(type_name, member.name)).Add(native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i)));
+            @[        elif isinstance(member.type.value_type, AbstractString)]@
+            // TODO: String types are not supported  
+            @[        elif isinstance(member.type.value_type, AbstractWString)]
+            // TODO: Unicode types are not supported  
+            @[        else]
+                @(get_field_name(type_name, member.name)).Add(new @(get_dotnet_type(member.type.value_type))());
+                @(get_field_name(type_name, member.name))[@(get_field_name(type_name, member.name)).Count-1]._READ_HANDLE(native_get_field_@(member.name)_message(messageHandle, i));
+            @[        end if]@
+            }
         }
-      }
+
+
 
 @[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
+@[        if isinstance(member.type.value_type, BasicType)]@
+        {
+            int size = native_getsize_sequence_field_@(member.name)_message(messageHandle);
+            @(get_field_name(type_name, member.name)).Clear();
+            for (int i=0; i<size; i++)
+            {
+@[            if isinstance(member.type.value_type, BasicType)]@
+                @(get_field_name(type_name, member.name)).Add(native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i)));
+@[            elif isinstance(member.type.value_type, AbstractString)]@
+            // TODO: String types are not supported  
+@[            elif isinstance(member.type.value_type, AbstractWString)]
+            // TODO: Unicode types are not supported  
+@[            else]
+                @(get_field_name(type_name, member.name)).Add(new @(get_dotnet_type(member.type.value_type))());
+                @(get_field_name(type_name, member.name))[@(get_field_name(type_name, member.name)).Count-1]._READ_HANDLE(native_get_field_@(member.name)_message(messageHandle, i));
+@[            end if]@
+            }
+        }
+@[        else]@
+        // TODO: Nested-typed sequences not yet supported
+@[        end if]@      
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
@@ -262,7 +343,26 @@ public class @(type_name) : IMessage {
         }
 
 @[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
+@[        if isinstance(member.type.value_type, BasicType)]@
+        {
+            int count = 0;
+            int foo = native_resize_sequence_field_@(member.name)_message(messageHandle, @(get_field_name(type_name, member.name)).Count);
+            foreach(@(get_dotnet_type(member.type.value_type)) value in @(get_field_name(type_name, member.name)))
+            {
+@[            if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
+                native_write_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, count++), value);
+@[            elif isinstance(member.type.value_type, AbstractString)]
+// TODO: String types are not supported  
+@[            elif isinstance(member.type.value_type, AbstractWString)]
+// TODO: Unicode types are not supported  
+@[            else]@
+                value._WRITE_HANDLE(native_get_field_@(member.name)_message(messageHandle, count++));
+@[            end if]@
+            }
+        }
+@[        else]@
+        // TODO: Nested-typed sequences not yet supported
+@[        end if]@
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
@@ -286,7 +386,12 @@ public class @(type_name) : IMessage {
 @[    if isinstance(member.type, Array)]@
     public List<@(get_dotnet_type(member.type.value_type))> @(get_field_name(type_name, member.name));
 @[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
+@[        if isinstance(member.type.value_type, BasicType)]@
+        
+        public List<@(get_dotnet_type(member.type.value_type))> @(get_field_name(type_name, member.name));
+@[        else]@
+        // TODO: Nested-typed sequences not yet supported
+@[        end if]
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    else]@

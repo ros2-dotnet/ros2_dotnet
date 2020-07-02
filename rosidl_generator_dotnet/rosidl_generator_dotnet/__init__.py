@@ -133,6 +133,12 @@ def get_builtin_dotnet_type(type_, use_primitives=True):
 
     assert False, "unknown type '%s'" % type_
 
+def get_idl_type(type_):
+    if type_ == 'byte':
+        return 'octet'
+    
+    return type_
+
 def get_dotnet_type(type_, use_primitives=True):
     if isinstance(type_, AbstractGenericString):
         return 'System.String'
@@ -158,3 +164,22 @@ def get_field_name(type_name, field_name):
         return "{0}_".format(type_name)
     else:
         return upperfirst(field_name)
+
+
+BASIC_DOTNET_TYPES_TO_BASIC_IDL_TYPES = {
+    'float': 'float',
+    'double': 'double',
+    'long double': 'long double',
+    'char': 'signed char',
+    'wchar': 'uint16_t',
+    'boolean': 'bool',
+    'octet': 'uint8_t',
+    'uint8': 'uint8_t',
+    'int8': 'int8_t',
+    'uint16': 'uint16_t',
+    'int16': 'int16_t',
+    'uint32': 'uint32_t',
+    'int32': 'int32_t',
+    'uint64': 'uint64_t',
+    'int64': 'int64_t',
+}
