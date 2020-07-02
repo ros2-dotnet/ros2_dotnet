@@ -15,7 +15,7 @@
 
 namespace ROS2 {
   namespace Common {
-    public enum RCLRet {
+    public enum RCLRet : int {
       Ok = 0,
       Error = 1,
       Timeout = 2,
