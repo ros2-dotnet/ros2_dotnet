@@ -32,13 +32,13 @@ namespace ROS2 {
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate int NativeRCLCreatePublisherHandleType (
-      ref IntPtr publisherHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle);
+      ref IntPtr publisherHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle, QosProfile.Profile profile_id);
 
     internal static NativeRCLCreatePublisherHandleType native_rcl_create_publisher_handle = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate int NativeRCLCreateSubscriptionHandleType (
-      ref IntPtr subscriptionHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle);
+      ref IntPtr subscriptionHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle, QosProfile.Profile profile_id);
 
     internal static NativeRCLCreateSubscriptionHandleType native_rcl_create_subscription_handle = null;
 
@@ -75,22 +75,22 @@ namespace ROS2 {
 
     public IntPtr Handle { get; }
 
-    public IPublisher<T> CreatePublisher<T> (string topic) where T : IMessage {
+    public IPublisher<T> CreatePublisher<T> (string topic, QosProfile.Profile profile_id) where T : IMessage {
       MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("_GET_TYPE_SUPPORT");
 
       IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
       IntPtr publisherHandle = IntPtr.Zero;
-      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_publisher_handle (ref publisherHandle, Handle, topic, typesupport);
+      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_publisher_handle (ref publisherHandle, Handle, topic, typesupport, profile_id);
       Publisher<T> publisher = new Publisher<T> (publisherHandle);
       return publisher;
     }
 
-    public ISubscription<T> CreateSubscription<T> (string topic, Action<T> callback) where T : IMessage, new () {
+    public ISubscription<T> CreateSubscription<T> (string topic, Action<T> callback, QosProfile.Profile profile_id) where T : IMessage, new () {
       MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("_GET_TYPE_SUPPORT");
 
       IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
       IntPtr subscriptionHandle = IntPtr.Zero;
-      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_subscription_handle (ref subscriptionHandle, Handle, topic, typesupport);
+      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_subscription_handle (ref subscriptionHandle, Handle, topic, typesupport, profile_id);
       Subscription<T> subscription = new Subscription<T> (subscriptionHandle, callback);
       this.subscriptions_.Add (subscription);
       return subscription;

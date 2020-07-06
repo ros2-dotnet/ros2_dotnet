@@ -34,6 +34,7 @@ set(CS_SOURCES
   Publisher.cs
   RCLdotnet.cs
   Subscription.cs
+  QosProfile.cs
 )
 
 find_package(rcldotnet_common REQUIRED)

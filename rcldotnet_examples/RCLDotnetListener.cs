@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 using ROS2;
+using ROS2.Utils;
 
 namespace ConsoleApplication {
   public class RCLDotnetListener {
@@ -14,7 +15,7 @@ namespace ConsoleApplication {
       INode node = RCLdotnet.CreateNode ("listener");
 
       ISubscription<std_msgs.msg.String> chatter_sub = node.CreateSubscription<std_msgs.msg.String> (
-        "chatter", msg => Console.WriteLine ("I heard: [" + msg.Data + "]"));
+        "chatter", msg => Console.WriteLine ("I heard: [" + msg.Data + "]"), QosProfile.Profile.Default);
 
       RCLdotnet.Spin (node);
     }

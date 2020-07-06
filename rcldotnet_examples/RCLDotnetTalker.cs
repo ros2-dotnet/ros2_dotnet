@@ -14,7 +14,7 @@ namespace ConsoleApplication {
 
       INode node = RCLdotnet.CreateNode ("talker");
 
-      IPublisher<std_msgs.msg.String> chatter_pub = node.CreatePublisher<std_msgs.msg.String> ("chatter");
+      IPublisher<std_msgs.msg.String> chatter_pub = node.CreatePublisher<std_msgs.msg.String> ("chatter", QosProfile.Profile.Default);
 
       std_msgs.msg.String msg = new std_msgs.msg.String ();
 
