@@ -40,10 +40,10 @@ public class @(type_name) : IMessage {
 @[        end if]@       
         @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>(@(member.type.size));
 @[    elif isinstance(member.type, AbstractSequence)]@
-@[        if isinstance(member.type.value_type, BasicType)]@
+@[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, NamespacedType)]@
         @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>();
 @[        else]@
-        // TODO: Nested-type sequences not yet implemented
+        // TODO: sequence of this type not yet implemented
 @[        end if]@
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
@@ -98,7 +98,7 @@ public class @(type_name) : IMessage {
 @[        end if]@
 
 @[    elif isinstance(member.type, AbstractSequence)]@
-@[        if isinstance(member.type.value_type, BasicType)]@
+@[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, NamespacedType)]@
         IntPtr native_get_field_@(member.name)_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__get_field_@(member.name)_message");
         IntPtr native_getsize_sequence_field_@(member.name)_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__getsize_sequence_field_@(member.name)_message");
 @[            if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
@@ -122,7 +122,7 @@ public class @(type_name) : IMessage {
         @(type_name).native_resize_sequence_field_@(member.name)_message = (NativeResizeSequenceField@(get_field_name(type_name, member.name))MessageType)Marshal.GetDelegateForFunctionPointer(
             native_resize_sequence_field_@(member.name)_message_ptr, typeof(NativeResizeSequenceField@(get_field_name(type_name, member.name))MessageType));
 @[        else]@
-        // TODO: Nested-typed sequences not yet supported
+        // TODO: sequences of this type not yet supported
 @[        end if]@
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
@@ -192,7 +192,7 @@ public class @(type_name) : IMessage {
         IntPtr messageHandle, @(get_dotnet_type(member.type.value_type)) value);
 @[            end if]@
 @[    elif isinstance(member.type, AbstractSequence)]@
-@[        if isinstance(member.type.value_type, BasicType)]@
+@[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, NamespacedType)]@
     private static NativeGetField@(get_field_name(type_name, member.name))MessageType native_get_field_@(member.name)_message = null;
     private static NativeGetSizeSequenceField@(get_field_name(type_name, member.name))MessageType native_getsize_sequence_field_@(member.name)_message = null;
 @[            if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
@@ -222,7 +222,7 @@ public class @(type_name) : IMessage {
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate int NativeResizeSequenceField@(get_field_name(type_name, member.name))MessageType(IntPtr messageHandle, int size);
 @[        else]@
-    // TODO: Nested-typed sequences not yet supported
+    // TODO: sequences of this type not yet supported
 @[        end if]@
 @[   elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
@@ -287,7 +287,7 @@ public class @(type_name) : IMessage {
 
 
 @[    elif isinstance(member.type, AbstractSequence)]@
-@[        if isinstance(member.type.value_type, BasicType)]@
+@[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, NamespacedType)]@
         {
             int size = native_getsize_sequence_field_@(member.name)_message(messageHandle);
             @(get_field_name(type_name, member.name)).Clear();
@@ -306,7 +306,7 @@ public class @(type_name) : IMessage {
             }
         }
 @[        else]@
-        // TODO: Nested-typed sequences not yet supported
+        // TODO: sequences of this type not yet supported
 @[        end if]@      
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
@@ -343,7 +343,7 @@ public class @(type_name) : IMessage {
         }
 
 @[    elif isinstance(member.type, AbstractSequence)]@
-@[        if isinstance(member.type.value_type, BasicType)]@
+@[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, NamespacedType)]@
         {
             int count = 0;
             int foo = native_resize_sequence_field_@(member.name)_message(messageHandle, @(get_field_name(type_name, member.name)).Count);
@@ -361,7 +361,7 @@ public class @(type_name) : IMessage {
             }
         }
 @[        else]@
-        // TODO: Nested-typed sequences not yet supported
+        // TODO: sequences of this type not yet supported
 @[        end if]@
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
@@ -386,11 +386,11 @@ public class @(type_name) : IMessage {
 @[    if isinstance(member.type, Array)]@
     public List<@(get_dotnet_type(member.type.value_type))> @(get_field_name(type_name, member.name));
 @[    elif isinstance(member.type, AbstractSequence)]@
-@[        if isinstance(member.type.value_type, BasicType)]@
+@[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, NamespacedType)]@
         
         public List<@(get_dotnet_type(member.type.value_type))> @(get_field_name(type_name, member.name));
 @[        else]@
-        // TODO: Nested-typed sequences not yet supported
+        // TODO: sequences of this type not yet supported
 @[        end if]
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported

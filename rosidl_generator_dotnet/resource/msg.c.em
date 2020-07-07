@@ -38,6 +38,15 @@ header_filename = "{0}/rcldotnet_{1}.h".format('/'.join(message.structure.namesp
 
 #include "@(header_filename)"
 
+
+@[for member in message.structure.members]@
+@[    if isinstance(member.type, AbstractSequence)]@
+@[        if isinstance(member.type.value_type, NamespacedType)]@
+#include "@('/'.join(member.type.value_type.namespaces))/@(convert_camel_case_to_lower_case_underscore(member.type.value_type.name))__functions.h"
+@[        end if]@
+@[    end if]@
+@[end for]@
+
 void * @(msg_typename)__create_native_message() {
    @(msg_typename) * ros_message = @(msg_typename)__create();
    return ros_message;
@@ -126,6 +135,11 @@ int @(msg_typename)__resize_sequence_field_@(member.name)_message(void *message_
       rosidl_generator_c__@(sub("_t$", "", msg_type_to_c(member.type.value_type)))__Sequence__fini(&ros_message->@(member.name));
     }
     return rosidl_generator_c__@(sub("_t$", "", msg_type_to_c(member.type.value_type)))__Sequence__init(&ros_message->@(member.name), size) ? 0 : -1;
+@[        elif isinstance(member.type.value_type, NamespacedType)]@
+    if (ros_message->@(member.name).data) {
+      @('%s__%s' % ('__'.join(member.type.value_type.namespaces), member.type.value_type.name))__Sequence__fini(&ros_message->@(member.name));
+    }
+    return @('%s__%s' % ('__'.join(member.type.value_type.namespaces), member.type.value_type.name))__Sequence__init(&ros_message->@(member.name), size) ? 0 : -1;
 @[        else]@
     //TODO: non-primitive sequences not yet supported!
     return -1;
