@@ -59,7 +59,7 @@ void @(msg_typename)__write_field_@(member.name)(void *, @(msg_type_to_c(member.
 @[        end if]@
 
 @[    elif isinstance(member.type, AbstractSequence)]@
-@[        if isinstance(member.type.value_type, BasicType)]@
+@[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, NamespacedType)]@
 @(msg_prefix)_EXPORT
 void * @(msg_prefix)_CDECL @(msg_typename)__get_field_@(member.name)_message(void *, int);
 @(msg_prefix)_EXPORT
@@ -73,7 +73,7 @@ void @(msg_typename)__write_field_@(member.name)(void *, @(msg_type_to_c(member.
 @(msg_type_to_c(member.type.value_type)) @(msg_prefix)_CDECL @(msg_typename)__read_field_@(member.name)(void *);
 @[            end if]@
 @[        else]@
-// TODO: Nested-typed sequences not yet supported
+// TODO: sequences of this type not yet supported
 @[        end if]@
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
