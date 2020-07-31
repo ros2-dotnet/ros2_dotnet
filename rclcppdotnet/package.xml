@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>rclcppdotnet</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="cam.thebaird@gmail.com">Cameron</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>dotnet_cmake_module</buildtool_depend>
+  <buildtool_depend>ament_cmake_export_assemblies</buildtool_depend>
+  <buildtool_depend>rcldotnet_common</buildtool_depend>
+  <buildtool_export_depend>rosidl_cmake</buildtool_export_depend>
+  
+  <depend>tf2_ros</depend>
+  <depend>geometry_msgs</depend>
+  <depend>rclcpp</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
