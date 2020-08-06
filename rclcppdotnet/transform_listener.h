@@ -23,7 +23,13 @@ extern "C" {
 	void* __cdecl native_construct_buffer();
 
 	__declspec(dllexport)
+	void __cdecl native_delete_buffer(void* buf);
+
+	__declspec(dllexport)
 	void* __cdecl native_construct_listener(void* buf);
+
+	__declspec(dllexport)
+	void __cdecl native_delete_listener(void* listener);
 
 	__declspec(dllexport)
 	void* __cdecl native_construct_time(int sec, int nano);

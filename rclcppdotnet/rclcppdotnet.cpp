@@ -5,3 +5,10 @@
 void native_rclcpp_init() {
 	rclcpp::init(0, nullptr);  // no args
 }
+
+void native_rclcpp_shutdown() {
+	if (rclcpp::ok()) {
+		rclcpp::shutdown();
+	}
+}
+
