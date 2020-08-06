@@ -15,16 +15,20 @@ namespace ROS2 {
         internal static readonly DllLoadUtils dllLoadUtils;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void NativeRclcppInitType();
-        internal static NativeRclcppInitType native_rclcpp_init = null;
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate IntPtr NativeConstructBufferType();
         internal static NativeConstructBufferType native_construct_buffer = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate IntPtr NativeDeleteBufferType(IntPtr buf);
+        internal static NativeDeleteBufferType native_delete_buffer = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate IntPtr NativeConstructListenerType(IntPtr buf);
         internal static NativeConstructListenerType native_construct_listener = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate IntPtr NativeDeleteListenerType(IntPtr listener);
+        internal static NativeDeleteListenerType native_delete_listener = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate IntPtr NativeConstructTimeType(int sec, int nano);
@@ -51,9 +55,17 @@ namespace ROS2 {
             TransformListenerDelegates.native_construct_buffer = (NativeConstructBufferType)Marshal.GetDelegateForFunctionPointer(
                 native_construct_buffer_ptr, typeof(NativeConstructBufferType));
 
+            IntPtr native_delete_buffer_ptr = dllLoadUtils.GetProcAddress(nativeLibTFL, "native_delete_buffer");
+            TransformListenerDelegates.native_delete_buffer = (NativeDeleteBufferType)Marshal.GetDelegateForFunctionPointer(
+                native_delete_buffer_ptr, typeof(NativeDeleteBufferType));
+
             IntPtr native_construct_listener_ptr = dllLoadUtils.GetProcAddress(nativeLibTFL, "native_construct_listener");
             TransformListenerDelegates.native_construct_listener = (NativeConstructListenerType)Marshal.GetDelegateForFunctionPointer(
                 native_construct_listener_ptr, typeof(NativeConstructListenerType));
+
+            IntPtr native_delete_listener_ptr = dllLoadUtils.GetProcAddress(nativeLibTFL, "native_delete_listener");
+            TransformListenerDelegates.native_delete_listener = (NativeDeleteListenerType)Marshal.GetDelegateForFunctionPointer(
+                native_delete_listener_ptr, typeof(NativeDeleteListenerType));
 
             IntPtr native_construct_time_ptr = dllLoadUtils.GetProcAddress(nativeLibTFL, "native_construct_time");
             TransformListenerDelegates.native_construct_time = (NativeConstructTimeType)Marshal.GetDelegateForFunctionPointer(
@@ -113,6 +125,21 @@ namespace ROS2 {
             }
         }
 
+        ~TransformListener()
+        {
+            if (buf != IntPtr.Zero)
+            {
+                TransformListenerDelegates.native_delete_buffer(buf);
+                buf = IntPtr.Zero;
+            }
+
+            if (listener != IntPtr.Zero)
+            {
+                TransformListenerDelegates.native_delete_listener(listener);
+                listener = IntPtr.Zero;
+            }
+        }
+
         /// <summary>
         /// Returns the ROS2 translation between frames 'from' and 'to', or null
         /// if one or more of the frames do not exist.
@@ -123,13 +150,12 @@ namespace ROS2 {
         public TfVector3? LookupTranslation(string from, string to) 
         {
             IntPtr transformHandle = IntPtr.Zero;
-            try
+
+            transformHandle = TransformListenerDelegates.native_lookup_transform(buf,
+                from, to, TransformListenerDelegates.native_construct_time(0, 0));
+
+            if (transformHandle == IntPtr.Zero)
             {
-                transformHandle = TransformListenerDelegates.native_lookup_transform(buf,
-                    from, to, TransformListenerDelegates.native_construct_time(0, 0));
-            } catch (Exception e)  // unfortunately cannot differentiate between what native exception happened
-            {
-                // drop exceptions due to frame not existing (assumes tf2::LookupException)
                 return null;
             }
 
@@ -148,13 +174,12 @@ namespace ROS2 {
         public TfQuaternion? LookupRotation(string from, string to)
         {
             IntPtr transformHandle = IntPtr.Zero;
-            try
+
+            transformHandle = TransformListenerDelegates.native_lookup_transform(buf,
+                from, to, TransformListenerDelegates.native_construct_time(0, 0));
+
+            if (transformHandle == IntPtr.Zero)
             {
-                transformHandle = TransformListenerDelegates.native_lookup_transform(buf,
-                    from, to, TransformListenerDelegates.native_construct_time(0, 0));
-            } catch (Exception e)  // unfortunately cannot differentiate between what native exception happened
-            {
-                // drop exceptions due to frame not existing (assumes tf2::LookupException)
                 return null;
             }
 

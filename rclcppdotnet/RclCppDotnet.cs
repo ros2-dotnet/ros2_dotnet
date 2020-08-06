@@ -17,6 +17,10 @@ namespace ROS2 {
         internal delegate void NativeRclcppInitType();
         internal static NativeRclcppInitType native_rclcpp_init = null;
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate void NativeRclcppShutdownType();
+        internal static NativeRclcppShutdownType native_rclcpp_shutdown = null;
+
         static RclCppDotnetDelegates() {
             dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
             IntPtr pDll = dllLoadUtils.LoadLibrary("rclcppdotnet");
@@ -24,6 +28,10 @@ namespace ROS2 {
             IntPtr native_rclcpp_init_ptr = dllLoadUtils.GetProcAddress(pDll, "native_rclcpp_init");
             RclCppDotnetDelegates.native_rclcpp_init = (NativeRclcppInitType)Marshal.GetDelegateForFunctionPointer(
                 native_rclcpp_init_ptr, typeof(NativeRclcppInitType));
+
+            IntPtr native_rclcpp_shutdown_ptr = dllLoadUtils.GetProcAddress(pDll, "native_rclcpp_shutdown");
+            RclCppDotnetDelegates.native_rclcpp_shutdown = (NativeRclcppShutdownType)Marshal.GetDelegateForFunctionPointer(
+                native_rclcpp_shutdown_ptr, typeof(NativeRclcppShutdownType));
         }
     }
 
@@ -39,6 +47,18 @@ namespace ROS2 {
                 {
                     RclCppDotnetDelegates.native_rclcpp_init();
                     initialized = true;
+                }
+            }
+        }
+
+        public static void Shutdown()
+        {
+            lock (syncLock)
+            {
+                if (initialized)
+                {
+                    RclCppDotnetDelegates.native_rclcpp_shutdown();
+                    initialized = false;
                 }
             }
         }

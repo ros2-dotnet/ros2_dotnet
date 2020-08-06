@@ -14,8 +14,18 @@ void* native_construct_buffer() {
 	return new tf2_ros::Buffer(clock);
 }
 
+void native_delete_buffer(void* buf) {
+	auto casted = (tf2_ros::Buffer*)buf;
+	delete casted;
+}
+
 void* native_construct_listener(void* buf) {
 	return new tf2_ros::TransformListener(*((tf2_ros::Buffer*)buf));
+}
+
+void native_delete_listener(void* listener) {
+	auto casted = (tf2_ros::TransformListener*)listener;
+	delete listener;
 }
 
 void* native_construct_time(int sec, int nano) {
@@ -24,10 +34,15 @@ void* native_construct_time(int sec, int nano) {
 
 void* native_lookup_transform(void* buf,
 	char* from, char* to, void* t) {
-	auto outputVar = new geometry_msgs::msg::TransformStamped(
-		((tf2_ros::Buffer*)buf)->lookupTransform((char*)from, (char*)to, *((rclcpp::Time*)t))
-	);
-	return outputVar;
+	try {
+		auto outputVar = new geometry_msgs::msg::TransformStamped(
+			((tf2_ros::Buffer*)buf)->lookupTransform((char*)from, (char*)to, *((rclcpp::Time*)t))
+		);
+		return outputVar;
+	}
+	catch (tf2::TransformException &ex) {
+		return nullptr;
+	}
 }
 
 bool native_retrieve_translation(void* tf, TfVector3Ptr vec) {

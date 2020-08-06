@@ -8,6 +8,9 @@ extern "C" {
 	__declspec(dllexport)
 	void __cdecl native_rclcpp_init();
 
+    __declspec(dllexport)
+	void __cdecl native_rclcpp_shutdown();
+
 #ifdef __cplusplus
 }
 #endif
