@@ -56,19 +56,8 @@ jobs:
         docker push $CI_REGISTRY_IMAGE$ARCH/ade:commit-$CI_COMMIT_SHA
         docker push $CI_REGISTRY_IMAGE$ARCH/ade:$CI_COMMIT_REF_SLUG
 
-  login-to-server:
-    needs: build-ade-image
-    runs-on: ubuntu-18.04
-    steps:
-    - name: Login
-      uses: azure/docker-login@v1
-      with:
-        login-server: 'docker.pkg.github.com' # default: index.docker.io
-        username: '${{ github.repository_owner }}'
-        password: '${{ secrets.GITHUB_TOKEN }}'
-
   build-linux-ade:
-    needs: login-to-server
+    needs: build-ade-image
     runs-on: ubuntu-18.04
     container:
       image: ghcr.io/${{ github.repository }}/ade:commit-${{ github.sha }}
