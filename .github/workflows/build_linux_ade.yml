@@ -27,7 +27,7 @@ jobs:
         set -x
         export CI_COMMIT_SHA=${{ github.sha }}
         export CI_COMMIT_REF_SLUG=$(echo ${{ github.head_ref }} | cut -d/ -f2- | tr "[:upper:]" "[:lower:]" | sed "s/[^[:alnum:]-]/-/g")
-        export CI_REGISTRY=docker.pkg.github.com
+        export CI_REGISTRY=ghcr.io
         export CI_REGISTRY_IMAGE="$CI_REGISTRY/${{ github.repository }}"
         export CI_JOB_TOKEN=${{ secrets.GITHUB_TOKEN }}
         export CI_USERNAME=${{ github.repository_owner }}
@@ -71,7 +71,7 @@ jobs:
     needs: login-to-server
     runs-on: ubuntu-18.04
     container:
-      image: docker.pkg.github.com/${{ github.repository }}/ade:commit-${{ github.sha }}
+      image: ghcr.io/${{ github.repository }}/ade:commit-${{ github.sha }}
 
     steps:
     # - name: Checkout source
