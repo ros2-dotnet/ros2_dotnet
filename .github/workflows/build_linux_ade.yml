@@ -34,6 +34,8 @@ jobs:
         apk add --update-cache git
         cd tools/ade_image
         docker login -u $CI_USERNAME -p $CI_JOB_TOKEN $CI_REGISTRY
+        echo "=== DOCKER PUSH: docker push $CI_REGISTRY_IMAGE$ARCH/ade:commit-$CI_COMMIT_SHA"
+        echo "=== DOCKER PUSH: docker push $CI_REGISTRY_IMAGE$ARCH/ade:$CI_COMMIT_REF_SLUG"
         if [[ -n "$FORCE" ]]; then
             chmod og-w . -R;
             docker build --label ade_image_commit_sha="$CI_COMMIT_SHA" -t image .;
