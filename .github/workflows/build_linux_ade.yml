@@ -28,7 +28,7 @@ jobs:
         export CI_COMMIT_SHA=${{ github.sha }}
         export CI_COMMIT_REF_SLUG=$(echo ${{ github.head_ref }} | cut -d/ -f2- | tr "[:upper:]" "[:lower:]" | sed "s/[^[:alnum:]-]/-/g")
         export CI_REGISTRY=ghcr.io
-        export CI_REGISTRY_IMAGE="$CI_REGISTRY/${{ github.repository }}"
+        export CI_REGISTRY_IMAGE="$CI_REGISTRY/${{ github.repository_owner }}"
         export CI_JOB_TOKEN=${{ secrets.CR_PAT }}
         export CI_USERNAME=${{ github.repository_owner }}
         apk add --update-cache git
