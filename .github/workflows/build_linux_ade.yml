@@ -58,7 +58,7 @@ jobs:
     needs: build-ade-image
     runs-on: ubuntu-18.04
     container:
-      image: ghcr.io/${{ github.repository }}/ade:commit-${{ github.sha }}
+      image: ghcr.io/${{ github.repository_owner }}/ade:commit-${{ github.sha }}
 
     steps:
     - name: Configure ros2_dotnet workspace
