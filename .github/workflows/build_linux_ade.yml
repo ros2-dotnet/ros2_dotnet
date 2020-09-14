@@ -57,28 +57,37 @@ jobs:
   build-linux-ade:
     needs: build-ade-image
     runs-on: ubuntu-18.04
-    container:
-      image: ghcr.io/${{ github.repository_owner }}/ade:commit-${{ github.sha }}
+    # container:
+    #   image: ghcr.io/${{ github.repository_owner }}/ade:commit-${{ github.sha }}
 
     steps:
-    - name: Configure ros2_dotnet workspace
+    - name: Test docker pull
       run: |
-        mkdir -p ~/ros2_dotnet_ws/src
-        cd ~/ros2_dotnet_ws
-        cp ${{github.workspace}}/ros2_dotnet.repos .
-        vcs import src < ros2_dotnet.repos
-        rm -rf src/ros2_dotnet/ros2_dotnet
-        cp -r ${{github.workspace}} src/ros2_dotnet/ros2_dotnet
-        vcs branch
+        docker pull ghcr.io/${{ github.repository_owner }}/ade:commit-${{ github.sha }}
+        # mkdir -p ~/ros2_dotnet_ws/src
+        # cd ~/ros2_dotnet_ws
+        # cp ${{github.workspace}}/ros2_dotnet.repos .
+        # vcs import src < ros2_dotnet.repos
 
-    - name: Build ros2_dotnet source
-      run: |
-        source /opt/ros/eloquent/setup.bash
-        cd ~/ros2_dotnet_ws
-        colcon build --event-handlers console_cohesion+ console_package_list+
+    # steps:
+    # - name: Configure ros2_dotnet workspace
+    #   run: |
+    #     mkdir -p ~/ros2_dotnet_ws/src
+    #     cd ~/ros2_dotnet_ws
+    #     cp ${{github.workspace}}/ros2_dotnet.repos .
+    #     vcs import src < ros2_dotnet.repos
+    #     rm -rf src/ros2_dotnet/ros2_dotnet
+    #     cp -r ${{github.workspace}} src/ros2_dotnet/ros2_dotnet
+    #     vcs branch
 
-    - name: Run tests
-      run: |
-        source /opt/ros/eloquent/setup.bash
-        cd ~/ros2_dotnet_ws
-        colcon test --event-handlers console_cohesion+ --return-code-on-test-failure --packages-select rcldotnet
+    # - name: Build ros2_dotnet source
+    #   run: |
+    #     source /opt/ros/eloquent/setup.bash
+    #     cd ~/ros2_dotnet_ws
+    #     colcon build --event-handlers console_cohesion+ console_package_list+
+
+    # - name: Run tests
+    #   run: |
+    #     source /opt/ros/eloquent/setup.bash
+    #     cd ~/ros2_dotnet_ws
+    #     colcon test --event-handlers console_cohesion+ --return-code-on-test-failure --packages-select rcldotnet
