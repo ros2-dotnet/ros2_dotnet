@@ -12,7 +12,7 @@ find_package(rcldotnet REQUIRED)
 
 find_package(dotnet_cmake_module REQUIRED)
 
-set(CSHARP_TARGET_FRAMEWORK "netcoreapp2.0")
+set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
 find_package(DotNETExtra REQUIRED)
 
 set(_assemblies_dep_dlls
