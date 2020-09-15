@@ -38,6 +38,8 @@ int32_t native_rcl_init() {
   }
   const char ** arg_values = NULL;
   ret = rcl_init(num_args, arg_values, &init_options, &context);
+
+  rmw_set_log_severity(RMW_LOG_SEVERITY_DEBUG);
   return ret;
 }
 

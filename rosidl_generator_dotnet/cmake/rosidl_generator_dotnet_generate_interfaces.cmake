@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
 
 find_package(ament_cmake_export_assemblies REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)

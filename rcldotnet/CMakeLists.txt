@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.5)
 
 project(rcldotnet C)
 
+if(MSVC)
+  add_compile_options(/W3 /wd4005 /wd4996 /wd4018 -D_CRT_SECURE_NO_WARNINGS)
+endif()
+
+set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
+
 find_package(ament_cmake_export_assemblies REQUIRED)
 
 find_package(ament_cmake REQUIRED)
