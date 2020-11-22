@@ -65,13 +65,13 @@ public class @(type_name) : IMessage {
 
         IntPtr native_create_native_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__create_native_message");
 
-        @(type_name).native_create_native_message = (NativeCreateNativeMessageType)Marshal.GetDelegateForFunctionPointer(
-            native_create_native_message_ptr, typeof(NativeCreateNativeMessageType));
+        @(type_name).native_create_native_message = (NativeCreateNativeType)Marshal.GetDelegateForFunctionPointer(
+            native_create_native_message_ptr, typeof(NativeCreateNativeType));
 
         IntPtr native_destroy_native_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__destroy_native_message");
 
-        @(type_name).native_destroy_native_message = (NativeDestroyNativeMessageType)Marshal.GetDelegateForFunctionPointer(
-            native_destroy_native_message_ptr, typeof(NativeDestroyNativeMessageType));
+        @(type_name).native_destroy_native_message = (NativeDestroyNativeType)Marshal.GetDelegateForFunctionPointer(
+            native_destroy_native_message_ptr, typeof(NativeDestroyNativeType));
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
@@ -82,10 +82,10 @@ public class @(type_name) : IMessage {
         IntPtr native_read_field_@(member.name)_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__read_field_@(member.name)");
 @[        end if]@
 
-        @(type_name).native_get_field_@(member.name)_message = (NativeGetField@(get_field_name(type_name, member.name))MessageType)Marshal.GetDelegateForFunctionPointer(
-            native_get_field_@(member.name)_message_ptr, typeof(NativeGetField@(get_field_name(type_name, member.name))MessageType));
-        @(type_name).native_getsize_array_field_@(member.name)_message = (NativeGetSizeArrayField@(get_field_name(type_name, member.name))MessageType)Marshal.GetDelegateForFunctionPointer(
-            native_getsize_array_field_@(member.name)_message_ptr, typeof(NativeGetSizeArrayField@(get_field_name(type_name, member.name))MessageType));
+        @(type_name).native_get_field_@(member.name)_message = (NativeGetField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
+            native_get_field_@(member.name)_message_ptr, typeof(NativeGetField@(get_field_name(type_name, member.name))Type));
+        @(type_name).native_getsize_array_field_@(member.name)_message = (NativeGetSizeArrayField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
+            native_getsize_array_field_@(member.name)_message_ptr, typeof(NativeGetSizeArrayField@(get_field_name(type_name, member.name))Type));
 
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
         @(type_name).native_write_field_@(member.name) = (NativeWriteField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
@@ -127,28 +127,28 @@ public class @(type_name) : IMessage {
     private static NativeGetTypeSupportType native_get_typesupport = null;
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr NativeCreateNativeMessageType();
+    private delegate IntPtr NativeCreateNativeType();
 
-    private static NativeCreateNativeMessageType native_create_native_message = null;
+    private static NativeCreateNativeType native_create_native_message = null;
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void NativeDestroyNativeMessageType(IntPtr messageHandle);
+    private delegate void NativeDestroyNativeType(IntPtr messageHandle);
 
-    private static NativeDestroyNativeMessageType native_destroy_native_message = null;
+    private static NativeDestroyNativeType native_destroy_native_message = null;
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
-    private static NativeGetField@(get_field_name(type_name, member.name))MessageType native_get_field_@(member.name)_message = null;
-    private static NativeGetSizeArrayField@(get_field_name(type_name, member.name))MessageType native_getsize_array_field_@(member.name)_message = null;
+    private static NativeGetField@(get_field_name(type_name, member.name))Type native_get_field_@(member.name)_message = null;
+    private static NativeGetSizeArrayField@(get_field_name(type_name, member.name))Type native_getsize_array_field_@(member.name)_message = null;
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
     private static NativeWriteField@(get_field_name(type_name, member.name))Type native_write_field_@(member.name) = null;
     private static NativeReadField@(get_field_name(type_name, member.name))Type native_read_field_@(member.name) = null;
 @[        end if]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr NativeGetField@(get_field_name(type_name, member.name))MessageType(
+    private delegate IntPtr NativeGetField@(get_field_name(type_name, member.name))Type(
         IntPtr messageHandle, int index);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int NativeGetSizeArrayField@(get_field_name(type_name, member.name))MessageType(IntPtr messageHandle);
+    private delegate int NativeGetSizeArrayField@(get_field_name(type_name, member.name))Type(IntPtr messageHandle);
 @[            if isinstance(member.type.value_type, AbstractString)]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     private delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
@@ -224,8 +224,6 @@ public class @(type_name) : IMessage {
           @[        end if]@
         }
       }
-
-
 
 @[    elif isinstance(member.type, AbstractSequence)]@
 // TODO: Sequence types are not supported

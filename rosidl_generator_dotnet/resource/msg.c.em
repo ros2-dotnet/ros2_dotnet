@@ -1,7 +1,5 @@
 @{
 from rosidl_generator_dotnet import msg_type_to_c
-from rosidl_generator_dotnet import get_builtin_dotnet_type
-from rosidl_generator_dotnet import get_idl_type
 
 from rosidl_parser.definition import AbstractNestedType
 from rosidl_parser.definition import AbstractGenericString
@@ -48,16 +46,12 @@ const void * @(msg_typename)__get_typesupport() {
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
-////////////////////////////////////////////////////////
-// DOING: Array types support
-
 void * @(msg_typename)__get_field_@(member.name)_message(void *message_handle, int index) {
   @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
   return &(ros_message->@(member.name)[index]);
 }
 
-int @(msg_typename)__getsize_array_field_@(member.name)_message()
-{
+int @(msg_typename)__getsize_array_field_@(member.name)_message() {
 @[        if isinstance(member.type, Array)]@
   return @(member.type.size);
 @[        else]@
