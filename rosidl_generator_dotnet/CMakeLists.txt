@@ -10,6 +10,7 @@ find_package(rosidl_generator_c REQUIRED)
 find_package(rcldotnet_common REQUIRED)
 
 ament_export_dependencies(rosidl_cmake)
+ament_export_dependencies(rosidl_generator_c)
 
 ament_python_install_package(${PROJECT_NAME})
 
