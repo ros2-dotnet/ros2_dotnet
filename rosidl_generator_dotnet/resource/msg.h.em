@@ -17,7 +17,7 @@ header_guard = "{0}_H".format(msg_prefix)
 #ifndef @(header_guard)
 #define @(header_guard)
 
-#if defined(_MSC_VER)
+#if defined(WIN32)
     //  Microsoft
     #define @(msg_prefix)_EXPORT __declspec(dllexport)
     #define @(msg_prefix)_IMPORT __declspec(dllimport)
@@ -34,6 +34,9 @@ header_guard = "{0}_H".format(msg_prefix)
     #define @(msg_prefix)_CDECL
     #pragma warning Unknown dynamic link import/export semantics.
 #endif
+
+@(msg_prefix)_EXPORT
+void * @(msg_prefix)_CDECL @(msg_typename)__create_native_message();
 
 @(msg_prefix)_EXPORT
 const void * @(msg_prefix)_CDECL @(msg_typename)__get_typesupport();
@@ -88,5 +91,8 @@ void @(msg_typename)__write_field_@(member.name)(void *, @(msg_type_to_c(member.
 void * @(msg_prefix)_CDECL @(msg_typename)__get_field_@(member.name)_HANDLE(void *);
 @[    end if]@
 @[end for]@
+
+@(msg_prefix)_EXPORT
+void @(msg_prefix)_CDECL @(msg_typename)__destroy_native_message(void * raw_ros_message);
 
 #endif // @(header_guard)

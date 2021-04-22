@@ -15,10 +15,8 @@
 
 macro(accumulate_typesupports)
   set(_typesupport_impl "")
-  if(${rmw_implementation}_FOUND)
-    get_rmw_typesupport(_typesupport_impl ${rmw_implementation} LANGUAGE "C")
-    list_append_unique(_typesupport_impls ${_typesupport_impl})
-  endif()
+  get_rmw_typesupport(_typesupport_impl ${rmw_implementation})
+  list_append_unique(_typesupport_impls ${_typesupport_impl})
 endmacro()
 
 macro(rosidl_generator_dotnet_get_typesupports TYPESUPPORT_IMPLS)
