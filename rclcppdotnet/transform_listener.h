@@ -1,5 +1,6 @@
-#ifndef RCL_DOTNET_TFL
-#define RCL_DOTNET_TFL
+#ifndef TRANSFORM_LISTENER_H
+#define TRANSFORM_LISTENER_H
+#include "rclcppdotnet_macros.h"
 
 typedef struct TfVector3 {
     double x;
@@ -19,34 +20,34 @@ typedef struct TfQuaternion {
 extern "C" {
 #endif
 
-	__declspec(dllexport)
-	void* __cdecl native_construct_buffer();
+	RCLCPPDOTNET_EXPORT
+	void* RCLCPPDOTNET_CDECL native_construct_buffer();
 
-	__declspec(dllexport)
-	void __cdecl native_delete_buffer(void* buf);
+	RCLCPPDOTNET_EXPORT
+	void RCLCPPDOTNET_CDECL native_delete_buffer(void* buf);
 
-	__declspec(dllexport)
-	void* __cdecl native_construct_listener(void* buf);
+	RCLCPPDOTNET_EXPORT
+	void* RCLCPPDOTNET_CDECL native_construct_listener(void* buf);
 
-	__declspec(dllexport)
-	void __cdecl native_delete_listener(void* listener);
+	RCLCPPDOTNET_EXPORT
+	void RCLCPPDOTNET_CDECL native_delete_listener(void* listener);
 
-	__declspec(dllexport)
-	void* __cdecl native_construct_time(int sec, int nano);
+	RCLCPPDOTNET_EXPORT
+	void* RCLCPPDOTNET_CDECL native_construct_time(int sec, int nano);
 
-	__declspec(dllexport)
-	void* __cdecl native_lookup_transform(void* buf,
+	RCLCPPDOTNET_EXPORT
+	void* RCLCPPDOTNET_CDECL native_lookup_transform(void* buf,
 		char* from, char* to, void* t);
 
-	__declspec(dllexport)
-	bool __cdecl native_retrieve_translation(void* tf, TfVector3Ptr vec);
+	RCLCPPDOTNET_EXPORT
+	bool RCLCPPDOTNET_CDECL native_retrieve_translation(void* tf, TfVector3Ptr vec);
 
-    __declspec(dllexport)
-	bool __cdecl native_retrieve_rotation(void* tf, TfQuaternionPtr quat);
+    RCLCPPDOTNET_EXPORT
+	bool RCLCPPDOTNET_CDECL native_retrieve_rotation(void* tf, TfQuaternionPtr quat);
 
 #ifdef __cplusplus
 }
 #endif
 
 
-#endif // RCL_DOTNET_TFL
+#endif // TRANSFORM_LISTENER_H

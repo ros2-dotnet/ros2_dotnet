@@ -3,9 +3,9 @@
 <package format="3">
   <name>rclcppdotnet</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="cam.thebaird@gmail.com">Cameron</maintainer>
-  <license>TODO: License declaration</license>
+  <description>Package containing RCLCPP C# interpo </description>
+  <maintainer email="riotsquad@microsoft.com">Azure Edge Robotics</maintainer>
+  <license>MIT and Apache</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>dotnet_cmake_module</buildtool_depend>

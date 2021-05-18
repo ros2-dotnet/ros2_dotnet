@@ -1,18 +1,20 @@
-#ifndef RCL_DOTNET_H
-#define RCL_DOTNET_H
+#ifndef RCLCPP_DOTNET_H
+#define RCLCPP_DOTNET_H
+
+#include "rclcppdotnet_macros.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-	__declspec(dllexport)
-	void __cdecl native_rclcpp_init();
+	RCLCPPDOTNET_EXPORT
+	void RCLCPPDOTNET_CDECL native_rclcpp_init();
 
-    __declspec(dllexport)
-	void __cdecl native_rclcpp_shutdown();
+    RCLCPPDOTNET_EXPORT
+	void RCLCPPDOTNET_CDECL native_rclcpp_shutdown();
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif  // RCL_DOTNET_H
+#endif  // RCLCPP_DOTNET_H
