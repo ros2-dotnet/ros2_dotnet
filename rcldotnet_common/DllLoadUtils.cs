@@ -16,6 +16,8 @@
 // Based on http://dimitry-i.blogspot.com.es/2013/01/mononet-how-to-dynamically-load-native.html
 
 using System;
+using System.IO;
+using System.Text;
 using System.Runtime;
 using System.Runtime.InteropServices;
 
@@ -37,14 +39,10 @@ namespace ROS2 {
       Unix,
       MacOSX,
       WindowsDesktop,
-      UWP,
       Unknown
     }
 
     public class DllLoadUtilsFactory {
-      [DllImport ("api-ms-win-core-libraryloader-l2-1-0.dll", EntryPoint = "LoadPackagedLibrary", SetLastError = true, ExactSpelling = true)]
-      private static extern IntPtr LoadPackagedLibrary ([MarshalAs (UnmanagedType.LPWStr)] string fileName, int reserved = 0);
-
       [DllImport ("api-ms-win-core-libraryloader-l1-2-0.dll", EntryPoint = "FreeLibrary", SetLastError = true, ExactSpelling = true)]
       private static extern int FreeLibraryUWP (IntPtr handle);
 
@@ -76,21 +74,9 @@ namespace ROS2 {
             return new DllLoadUtilsMacOSX ();
           case Platform.WindowsDesktop:
             return new DllLoadUtilsWindowsDesktop ();
-          case Platform.UWP:
-            return new DllLoadUtilsUWP ();
           case Platform.Unknown:
           default:
             throw new UnknownPlatformError ();
-        }
-      }
-
-      private static bool IsUWP () {
-        try {
-          IntPtr ptr = LoadPackagedLibrary ("api-ms-win-core-libraryloader-l2-1-0.dll");
-          FreeLibraryUWP (ptr);
-          return true;
-        } catch (TypeLoadException) {
-          return false;
         }
       }
 
@@ -125,14 +111,12 @@ namespace ROS2 {
       }
 
       private static Platform CheckPlatform () {
-        if (IsUnix ()) {
+        if (IsWindowsDesktop ()) {
+          return Platform.WindowsDesktop;
+        } else if (IsUnix ()) {
           return Platform.Unix;
         } else if (IsMacOSX ()) {
           return Platform.MacOSX;
-        } else if (IsWindowsDesktop ()) {
-          return Platform.WindowsDesktop;
-        } else if (IsUWP ()) {
-          return Platform.UWP;
         } else {
           return Platform.Unknown;
         }
@@ -145,36 +129,13 @@ namespace ROS2 {
       IntPtr GetProcAddress (IntPtr dllHandle, string name);
     }
 
-    public class DllLoadUtilsUWP : DllLoadUtils {
-
-      [DllImport ("api-ms-win-core-libraryloader-l2-1-0.dll", SetLastError = true, ExactSpelling = true)]
-      private static extern IntPtr LoadPackagedLibrary ([MarshalAs (UnmanagedType.LPWStr)] string fileName, int reserved = 0);
-
-      [DllImport ("api-ms-win-core-libraryloader-l1-2-0.dll", SetLastError = true, ExactSpelling = true)]
-      private static extern int FreeLibrary (IntPtr handle);
-
-      [DllImport ("api-ms-win-core-libraryloader-l1-2-0.dll", SetLastError = true, ExactSpelling = true)]
-      private static extern IntPtr GetProcAddress (IntPtr handle, string procedureName);
-
-      void DllLoadUtils.FreeLibrary (IntPtr handle) {
-        FreeLibrary (handle);
-      }
-
-      IntPtr DllLoadUtils.GetProcAddress (IntPtr dllHandle, string name) {
-        return GetProcAddress (dllHandle, name);
-      }
-
-      IntPtr DllLoadUtils.LoadLibrary (string fileName) {
-        string libraryName = fileName + "_native.dll";
-        IntPtr ptr = LoadPackagedLibrary (libraryName);
-        if (ptr == IntPtr.Zero) {
-          throw new UnsatisfiedLinkError (libraryName);
-        }
-        return ptr;
-      }
-    }
-
     public class DllLoadUtilsWindowsDesktop : DllLoadUtils {
+
+      [DllImport ("kernel32.dll", EntryPoint = "SetDllDirectoryA", SetLastError = true, ExactSpelling = true)]
+      private static extern bool SetDllDirectoryA (string path);
+
+      [DllImport ("kernel32.dll", EntryPoint = "GetCurrentDirectoryA", SetLastError = true, ExactSpelling = true)]
+      private static extern bool GetCurrentDirectoryA(uint nBufferLength, StringBuilder lpBuffer);
 
       [DllImport ("kernel32.dll", EntryPoint = "LoadLibraryA", SetLastError = true, ExactSpelling = true)]
       private static extern IntPtr LoadLibraryA (string fileName, int reserved = 0);
@@ -194,11 +155,18 @@ namespace ROS2 {
       }
 
       IntPtr DllLoadUtils.LoadLibrary (string fileName) {
+        var t = typeof(DllLoadUtilsWindowsDesktop).Assembly.Location;
+        var p = Path.GetDirectoryName(t);
+        SetDllDirectoryA(p);
+
         string libraryName = fileName + "_native.dll";
         IntPtr ptr = LoadLibraryA (libraryName);
+
+
         if (ptr == IntPtr.Zero) {
           throw new UnsatisfiedLinkError (libraryName);
         }
+
         return ptr;
       }
     }
