@@ -51,7 +51,7 @@ void * @(msg_prefix)_CDECL @(msg_typename)__get_field_@(member.name)_message(voi
 @(msg_prefix)_EXPORT
 int @(msg_prefix)_CDECL @(msg_typename)__getsize_array_field_@(member.name)_message();
 
-@[        if isinstance(member.type.value_type, BasicType)]@
+@[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
 @(msg_prefix)_EXPORT
 void @(msg_typename)__write_field_@(member.name)(void *, @(msg_type_to_c(member.type.value_type)));
 @(msg_prefix)_EXPORT

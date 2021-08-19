@@ -70,13 +70,14 @@ void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_typ
 @[        elif isinstance(member.type.value_type, AbstractString)]@
 void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_type_to_c(member.type.value_type)) value)
 {
-  
+  rosidl_runtime_c__String * ros_message = (rosidl_runtime_c__String *)message_handle;
+  rosidl_runtime_c__String__assign(ros_message, value); 
 }
 
 @(msg_type_to_c(member.type.value_type)) @(msg_typename)__read_field_@(member.name)(void *message_handle)
 {
-  @(msg_typename) * ros_message = (@(msg_typename)*)message_handle;
-  return ros_message->@(member.name)->data;
+  rosidl_runtime_c__String * ros_message = (rosidl_runtime_c__String *)message_handle;
+  return ros_message->data;
 }
 @[        end if]@
 

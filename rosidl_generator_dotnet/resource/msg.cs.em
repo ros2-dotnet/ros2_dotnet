@@ -215,14 +215,15 @@ public class @(type_name) : IMessage {
 @[        if isinstance(member.type.value_type, BasicType)]
               @(get_field_name(type_name, member.name)).Add(native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i)));
 @[        elif isinstance(member.type.value_type, AbstractString)]
-              // TODO: String types are not supported  
+              IntPtr pStr_@(get_field_name(type_name, member.name)) = native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i));
+              @(get_field_name(type_name, member.name)).Add(Marshal.PtrToStringAnsi(pStr_@(get_field_name(type_name, member.name))));
           @[        elif isinstance(member.type.value_type, AbstractWString)]
               // TODO: Unicode types are not supported  
           @[        else]
               @(get_field_name(type_name, member.name)).Add(new @(get_dotnet_type(member.type.value_type))());
               @(get_field_name(type_name, member.name))[@(get_field_name(type_name, member.name)).Count-1]._READ_HANDLE(native_get_field_@(member.name)_message(messageHandle, i));
 @[        end if]
-        }
+          }
       }
 
 @[    elif isinstance(member.type, AbstractSequence)]@
@@ -251,8 +252,6 @@ public class @(type_name) : IMessage {
             {
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
                 native_write_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, count++), value);
-@[        elif isinstance(member.type.value_type, AbstractString)]
-// TODO: String types are not supported  
 @[        elif isinstance(member.type.value_type, AbstractWString)]
 // TODO: Unicode types are not supported  
 @[        else]@
