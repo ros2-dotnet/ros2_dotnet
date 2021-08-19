@@ -159,9 +159,9 @@ namespace RCLdotnetTests
       msg.Uint64_values.Add(35);
 
       // string_values
-      // msg.String_values.Add("one");
-      // msg.String_values.Add("two");
-      // msg.String_values.Add("three");
+      msg.String_values.Add("one");
+      msg.String_values.Add("two");
+      msg.String_values.Add("three");
 
       test_msgs.msg.BasicTypes basic_type_1 = new test_msgs.msg.BasicTypes();
       basic_type_1.Bool_value = true;
@@ -295,10 +295,10 @@ namespace RCLdotnetTests
       Assert.Equal((ulong)35, msg2.Uint64_values[2]);
 
       // string_values
-      // Not supported yet
-      // Assert.Equal("one", msg2.String_values[0]);
-      // Assert.Equal("two", msg2.String_values[1]);
-      // Assert.Equal("three", msg2.String_values[2]);
+      Assert.Equal("one", msg2.String_values[0]);
+      Assert.Equal("two", msg2.String_values[1]);
+      Assert.Equal("three", msg2.String_values[2]);
+      
       Assert.Equal(3, msg2.Basic_types_values.Count);
       Assert.True(msg2.Basic_types_values[0].Bool_value);
       Assert.Equal(36, msg2.Basic_types_values[0].Byte_value);
