@@ -52,11 +52,7 @@ void * @(msg_typename)__get_field_@(member.name)_message(void *message_handle, i
 }
 
 int @(msg_typename)__getsize_array_field_@(member.name)_message() {
-@[        if isinstance(member.type, Array)]@
   return @(member.type.size);
-@[        else]@
-  return 0;
-@[        end if]@
 }
 
 @[        if isinstance(member.type.value_type, BasicType)]@
