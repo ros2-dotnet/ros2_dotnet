@@ -51,10 +51,6 @@ void * @(msg_typename)__get_field_@(member.name)_message(void *message_handle, i
   return &(ros_message->@(member.name)[index]);
 }
 
-int @(msg_typename)__getsize_array_field_@(member.name)_message() {
-  return @(member.type.size);
-}
-
 @[        if isinstance(member.type.value_type, BasicType)]@
 void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_type_to_c(member.type.value_type)) value)
 {

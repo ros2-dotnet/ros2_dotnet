@@ -31,6 +31,12 @@ namespace @(ns)
 public class @(type_name) : IMessage {
     private static readonly DllLoadUtils dllLoadUtils;
 
+@[for member in message.structure.members]@
+@[    if isinstance(member.type, Array)]@
+    public const int @(get_field_name(type_name, member.name))_Count = @(member.type.size);
+@[    end if]@
+@[end for]@
+
     public @(type_name)()
     {
 @[for member in message.structure.members]@
@@ -76,7 +82,6 @@ public class @(type_name) : IMessage {
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
         IntPtr native_get_field_@(member.name)_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__get_field_@(member.name)_message");
-        IntPtr native_getsize_array_field_@(member.name)_message_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__getsize_array_field_@(member.name)_message");
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
         IntPtr native_write_field_@(member.name)_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__write_field_@(member.name)");
         IntPtr native_read_field_@(member.name)_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "@(msg_typename)__read_field_@(member.name)");
@@ -84,8 +89,6 @@ public class @(type_name) : IMessage {
 
         @(type_name).native_get_field_@(member.name)_message = (NativeGetField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
             native_get_field_@(member.name)_message_ptr, typeof(NativeGetField@(get_field_name(type_name, member.name))Type));
-        @(type_name).native_getsize_array_field_@(member.name)_message = (NativeGetSizeArrayField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
-            native_getsize_array_field_@(member.name)_message_ptr, typeof(NativeGetSizeArrayField@(get_field_name(type_name, member.name))Type));
 
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
         @(type_name).native_write_field_@(member.name) = (NativeWriteField@(get_field_name(type_name, member.name))Type)Marshal.GetDelegateForFunctionPointer(
@@ -139,7 +142,6 @@ public class @(type_name) : IMessage {
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
     private static NativeGetField@(get_field_name(type_name, member.name))Type native_get_field_@(member.name)_message = null;
-    private static NativeGetSizeArrayField@(get_field_name(type_name, member.name))Type native_getsize_array_field_@(member.name)_message = null;
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
     private static NativeWriteField@(get_field_name(type_name, member.name))Type native_write_field_@(member.name) = null;
     private static NativeReadField@(get_field_name(type_name, member.name))Type native_read_field_@(member.name) = null;
@@ -208,9 +210,8 @@ public class @(type_name) : IMessage {
 @[    if isinstance(member.type, Array)]@
 
       {
-          int size = native_getsize_array_field_@(member.name)_message(messageHandle);
           @(get_field_name(type_name, member.name)).Clear();
-          for (int i=0; i<size; i++)
+          for (int i = 0; i < @(member.type.size); i++)
           {
 @[        if isinstance(member.type.value_type, BasicType)]
               @(get_field_name(type_name, member.name)).Add(native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i)));

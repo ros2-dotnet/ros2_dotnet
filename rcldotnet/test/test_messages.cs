@@ -230,75 +230,104 @@ namespace RCLdotnetTests
       }
 
       // bool_values
+      Assert.Equal(3, test_msgs.msg.Arrays.Bool_values_Count);
+      Assert.Equal(3, msg2.Bool_values.Count);
       Assert.True(msg2.Bool_values[0]);
       Assert.False(msg2.Bool_values[1]);
       Assert.True(msg2.Bool_values[2]);
 
       // byte_values
+      Assert.Equal(3, test_msgs.msg.Arrays.Byte_values_Count);
+      Assert.Equal(3, msg2.Byte_values.Count);
       Assert.Equal(0, msg2.Byte_values[0]);
       Assert.Equal(1, msg2.Byte_values[1]);
       Assert.Equal(2, msg2.Byte_values[2]);
 
       // char_values
+      Assert.Equal(3, test_msgs.msg.Arrays.Char_values_Count);
+      Assert.Equal(3, msg2.Char_values.Count);
       Assert.Equal(3, msg2.Char_values[0]);
       Assert.Equal(4, msg2.Char_values[1]);
       Assert.Equal(5, msg2.Char_values[2]);
 
       // float32_values
+      Assert.Equal(3, test_msgs.msg.Arrays.Float32_values_Count);
+      Assert.Equal(3, msg2.Float32_values.Count);
       Assert.Equal(6.1f, msg2.Float32_values[0]);
       Assert.Equal(7.1f, msg2.Float32_values[1]);
       Assert.Equal(8.1f, msg2.Float32_values[2]);
 
       // float64_values
+      Assert.Equal(3, test_msgs.msg.Arrays.Float64_values_Count);
+      Assert.Equal(3, msg2.Float64_values.Count);
       Assert.Equal(9.1, msg2.Float64_values[0]);
       Assert.Equal(10.1, msg2.Float64_values[1]);
       Assert.Equal(11.1, msg2.Float64_values[2]);
 
       // int8_values
+      Assert.Equal(3, test_msgs.msg.Arrays.Int8_values_Count);
+      Assert.Equal(3, msg2.Int8_values.Count);
       Assert.Equal(12, msg2.Int8_values[0]);
       Assert.Equal(13, msg2.Int8_values[1]);
       Assert.Equal(14, msg2.Int8_values[2]);
 
       // uint8_values
+      Assert.Equal(3, test_msgs.msg.Arrays.Uint8_values_Count);
+      Assert.Equal(3, msg2.Uint8_values.Count);
       Assert.Equal(15, msg2.Uint8_values[0]);
       Assert.Equal(16, msg2.Uint8_values[1]);
       Assert.Equal(17, msg2.Uint8_values[2]);
 
       // int16_values
+      Assert.Equal(3, test_msgs.msg.Arrays.Int16_values_Count);
+      Assert.Equal(3, msg2.Int16_values.Count);
       Assert.Equal(18, msg2.Int16_values[0]);
       Assert.Equal(19, msg2.Int16_values[1]);
       Assert.Equal(20, msg2.Int16_values[2]);
 
       // uint16_values
+      Assert.Equal(3, test_msgs.msg.Arrays.Uint16_values_Count);
+      Assert.Equal(3, msg2.Uint16_values.Count);
       Assert.Equal(21, msg2.Uint16_values[0]);
       Assert.Equal(22, msg2.Uint16_values[1]);
       Assert.Equal(23, msg2.Uint16_values[2]);
 
       // int32_values
+      Assert.Equal(3, test_msgs.msg.Arrays.Int32_values_Count);
+      Assert.Equal(3, msg2.Int32_values.Count);
       Assert.Equal(24, msg2.Int32_values[0]);
       Assert.Equal(25, msg2.Int32_values[1]);
       Assert.Equal(26, msg2.Int32_values[2]);
       
       // uint32_values
+      Assert.Equal(3, test_msgs.msg.Arrays.Uint32_values_Count);
+      Assert.Equal(3, msg2.Uint32_values.Count);
       Assert.Equal((uint)27, msg2.Uint32_values[0]);
       Assert.Equal((uint)28, msg2.Uint32_values[1]);
       Assert.Equal((uint)29, msg2.Uint32_values[2]);
 
       // int64_values
+      Assert.Equal(3, test_msgs.msg.Arrays.Int64_values_Count);
+      Assert.Equal(3, msg2.Int64_values.Count);
       Assert.Equal(30, msg2.Int64_values[0]);
       Assert.Equal(31, msg2.Int64_values[1]);
       Assert.Equal(32, msg2.Int64_values[2]);
       
       // uint64_values
+      Assert.Equal(3, test_msgs.msg.Arrays.Uint64_values_Count);
+      Assert.Equal(3, msg2.Uint64_values.Count);
       Assert.Equal((ulong)33, msg2.Uint64_values[0]);
       Assert.Equal((ulong)34, msg2.Uint64_values[1]);
       Assert.Equal((ulong)35, msg2.Uint64_values[2]);
 
       // string_values
+      Assert.Equal(3, test_msgs.msg.Arrays.String_values_Count);
+      Assert.Equal(3, msg2.String_values.Count);
       Assert.Equal("one", msg2.String_values[0]);
       Assert.Equal("two", msg2.String_values[1]);
       Assert.Equal("three", msg2.String_values[2]);
       
+      Assert.Equal(3, test_msgs.msg.Arrays.Basic_types_values_Count);
       Assert.Equal(3, msg2.Basic_types_values.Count);
       Assert.True(msg2.Basic_types_values[0].Bool_value);
       Assert.Equal(36, msg2.Basic_types_values[0].Byte_value);
