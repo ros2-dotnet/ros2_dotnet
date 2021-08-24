@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
@@ -217,17 +218,17 @@ namespace RCLdotnetTests
       ISubscription<test_msgs.msg.Arrays> chatter_sub = node_array_2.CreateSubscription<test_msgs.msg.Arrays> (
         "topic_array", rcv_msg =>
         {
-          received=true;
-          msg2 = rcv_msg;
+            received = true;
+            msg2 = rcv_msg;
         }
       );
 
-      while(!received)
+      while (!received)
       {
-        chatter_pub.Publish (msg);
+          chatter_pub.Publish(msg);
 
-        RCLdotnet.SpinOnce(node_array_1, 500);
-        RCLdotnet.SpinOnce(node_array_2, 500);
+          RCLdotnet.SpinOnce(node_array_1, 500);
+          RCLdotnet.SpinOnce(node_array_2, 500);
       }
 
       // bool_values
@@ -299,7 +300,7 @@ namespace RCLdotnetTests
       Assert.Equal(24, msg2.Int32_values[0]);
       Assert.Equal(25, msg2.Int32_values[1]);
       Assert.Equal(26, msg2.Int32_values[2]);
-      
+
       // uint32_values
       Assert.Equal(3, test_msgs.msg.Arrays.Uint32_values_Length);
       Assert.Equal(3, msg2.Uint32_values.Length);
@@ -313,7 +314,7 @@ namespace RCLdotnetTests
       Assert.Equal(30, msg2.Int64_values[0]);
       Assert.Equal(31, msg2.Int64_values[1]);
       Assert.Equal(32, msg2.Int64_values[2]);
-      
+
       // uint64_values
       Assert.Equal(3, test_msgs.msg.Arrays.Uint64_values_Length);
       Assert.Equal(3, msg2.Uint64_values.Length);
@@ -359,7 +360,7 @@ namespace RCLdotnetTests
       Assert.Equal((uint)57, msg2.Basic_types_values[1].Uint32_value);
       Assert.Equal(58, msg2.Basic_types_values[1].Int64_value);
       Assert.Equal((ulong)59, msg2.Basic_types_values[1].Uint64_value);
- 
+
       Assert.True(msg2.Basic_types_values[2].Bool_value);
       Assert.Equal(60, msg2.Basic_types_values[2].Byte_value);
       Assert.Equal(61, msg2.Basic_types_values[2].Char_value);
@@ -373,6 +374,44 @@ namespace RCLdotnetTests
       Assert.Equal((uint)69, msg2.Basic_types_values[2].Uint32_value);
       Assert.Equal(70, msg2.Basic_types_values[2].Int64_value);
       Assert.Equal((ulong)71, msg2.Basic_types_values[2].Uint64_value);
+    }
+
+    [Fact]
+    public void TestPublishArraysSizeCheckToLittle()
+    {
+      RCLdotnet.Init();
+      var nodeArraysSizeCheck = RCLdotnet.CreateNode("test_arrays_size_check_to_little");
+      var chatterPub = nodeArraysSizeCheck.CreatePublisher<test_msgs.msg.Arrays>("topic_array_size_check_to_little");
+      
+      var msg = new test_msgs.msg.Arrays();
+      msg.Bool_values = new bool[]
+      {
+        false,
+        true,
+      };
+      
+      var exception = Assert.Throws<Exception>(() => chatterPub.Publish(msg));
+      Assert.Equal("Invalid size of array 'Bool_values'.", exception.Message);
+    }
+
+    [Fact]
+    public void TestPublishArraysSizeCheckToMuch()
+    {
+      RCLdotnet.Init();
+      var nodeArraysSizeCheck = RCLdotnet.CreateNode("test_arrays_size_check_to_much");
+      var chatterPub = nodeArraysSizeCheck.CreatePublisher<test_msgs.msg.Arrays>("topic_array_size_check_to_much");
+
+      var msg = new test_msgs.msg.Arrays();
+      msg.String_values = new string[]
+      {
+        "0",
+        "1",
+        "2",
+        "3",
+      };
+      
+      var exception = Assert.Throws<Exception>(() => chatterPub.Publish(msg));
+      Assert.Equal("Invalid size of array 'String_values'.", exception.Message);
     }
 
     [Fact]
@@ -938,6 +977,26 @@ namespace RCLdotnetTests
       Assert.Equal((uint)69, msg2.Basic_types_values[2].Uint32_value);
       Assert.Equal(70, msg2.Basic_types_values[2].Int64_value);
       Assert.Equal((ulong)71, msg2.Basic_types_values[2].Uint64_value);
+    }
+
+    [Fact]
+    public void TestPublishBoundedSequencesSizeCheck()
+    {
+      RCLdotnet.Init();
+      var nodeBoundedSequencesSizeCheck = RCLdotnet.CreateNode("test_bounded_sequences_size_check");
+      var chatterPub = nodeBoundedSequencesSizeCheck.CreatePublisher<test_msgs.msg.BoundedSequences>("topic_bounded_sequences_size_check");
+
+      var msg = new test_msgs.msg.BoundedSequences();
+      msg.String_values = new List<string>
+      {
+        "0",
+        "1",
+        "2",
+        "3",
+      };
+      
+      var exception = Assert.Throws<Exception>(() => chatterPub.Publish(msg));
+      Assert.Equal("Invalid size of bounded sequence 'String_values'.", exception.Message);
     }
   }
 }

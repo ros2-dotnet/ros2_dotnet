@@ -292,21 +292,34 @@ public class @(type_name) : IMessage {
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array) or isinstance(member.type, AbstractSequence)]@
         {
-            int count__local_variable = 0;
-@[        if isinstance(member.type, AbstractSequence)]@
-            if (!native_init_seqence_field_@(member.name)_message(messageHandle, @(get_field_name(type_name, member.name)).Count))
+@[        if isinstance(member.type, Array)]@
+            var count__local_variable = @(get_field_name(type_name, member.name)).Length;
+            if (count__local_variable != @(member.type.size))
+            {
+                throw new Exception("Invalid size of array '@(get_field_name(type_name, member.name))'.");
+            }
+@[        elif isinstance(member.type, AbstractSequence)]@
+            var count__local_variable = @(get_field_name(type_name, member.name)).Count;
+@[            if member.type.has_maximum_size()]@
+            if (count__local_variable > @(member.type.maximum_size))
+            {
+                throw new Exception("Invalid size of bounded sequence '@(get_field_name(type_name, member.name))'.");
+            }
+@[            end if]@
+            if (!native_init_seqence_field_@(member.name)_message(messageHandle, count__local_variable))
             {
                 throw new Exception("The method 'native_init_seqence_field_@(member.name)_message()' failed.");
             }
 @[        end if]@
-            foreach(@(get_dotnet_type(member.type.value_type)) value in @(get_field_name(type_name, member.name)))
+            for (var i__local_variable = 0; i__local_variable < count__local_variable; i__local_variable++)
             {
+                var value__local_variable = @(get_field_name(type_name, member.name))[i__local_variable];
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
-                native_write_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, count__local_variable++), value);
+                native_write_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i__local_variable), value__local_variable);
 @[        elif isinstance(member.type.value_type, AbstractWString)]
 // TODO: Unicode types are not supported  
 @[        else]@
-                value._WRITE_HANDLE(native_get_field_@(member.name)_message(messageHandle, count__local_variable++));
+                value__local_variable._WRITE_HANDLE(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
 @[        end if]@
             }
         }
