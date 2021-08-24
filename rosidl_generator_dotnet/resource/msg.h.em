@@ -47,14 +47,14 @@ void @(msg_prefix)_CDECL @(msg_typename)__destroy_native_message(void *);
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array) or isinstance(member.type, AbstractSequence)]@
 @(msg_prefix)_EXPORT
-void * @(msg_prefix)_CDECL @(msg_typename)__get_field_@(member.name)_message(void *, int);
+void * @(msg_prefix)_CDECL @(msg_typename)__get_field_@(member.name)_message(void *, int32_t);
 
 @[        if isinstance(member.type, AbstractSequence)]@
 @(msg_prefix)_EXPORT
-int @(msg_prefix)_CDECL @(msg_typename)__getsize_field_@(member.name)_message(void *);
+int32_t @(msg_prefix)_CDECL @(msg_typename)__getsize_field_@(member.name)_message(void *);
 
 @(msg_prefix)_EXPORT
-bool @(msg_prefix)_CDECL @(msg_typename)__init_sequence_field_@(member.name)_message(void *, int);
+bool @(msg_prefix)_CDECL @(msg_typename)__init_sequence_field_@(member.name)_message(void *, int32_t);
 
 @[        end if]@
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@

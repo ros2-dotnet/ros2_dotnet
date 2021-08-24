@@ -50,7 +50,7 @@ const void * @(msg_typename)__get_typesupport() {
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array) or isinstance(member.type, AbstractSequence)]@
-void * @(msg_typename)__get_field_@(member.name)_message(void *message_handle, int index) {
+void * @(msg_typename)__get_field_@(member.name)_message(void *message_handle, int32_t index) {
   @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
 @[        if isinstance(member.type, Array)]@
   return &(ros_message->@(member.name)[index]);
@@ -60,12 +60,12 @@ void * @(msg_typename)__get_field_@(member.name)_message(void *message_handle, i
 }
 
 @[        if isinstance(member.type, AbstractSequence)]@
-int @(msg_typename)__getsize_field_@(member.name)_message(void *message_handle) {
+int32_t @(msg_typename)__getsize_field_@(member.name)_message(void *message_handle) {
   @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
   return ros_message->@(member.name).size;
 }
 
-bool @(msg_typename)__init_sequence_field_@(member.name)_message(void *message_handle, int size) {
+bool @(msg_typename)__init_sequence_field_@(member.name)_message(void *message_handle, int32_t size) {
   @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
 
   rcutils_allocator_t allocator = rcutils_get_default_allocator();
