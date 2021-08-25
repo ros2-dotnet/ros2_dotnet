@@ -16,35 +16,14 @@ from rosidl_cmake import convert_camel_case_to_lower_case_underscore
 
 type_name = message.structure.namespaced_type.name
 msg_typename = '%s__%s' % ('__'.join(message.structure.namespaced_type.namespaces), type_name)
-header_filename = "{0}/rcldotnet_{1}.h".format('/'.join(message.structure.namespaced_type.namespaces), convert_camel_case_to_lower_case_underscore(type_name))
 }@
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
-#include <stdint.h>
-
-#include <rcutils/allocator.h>
-
-#include <@('/'.join(message.structure.namespaced_type.namespaces))/@(convert_camel_case_to_lower_case_underscore(type_name)).h>
-#include "rosidl_runtime_c/message_type_support_struct.h"
-
-#include <rosidl_runtime_c/string.h>
-#include <rosidl_runtime_c/string_functions.h>
-
-#include <rosidl_runtime_c/primitives_sequence.h>
-#include <rosidl_runtime_c/primitives_sequence_functions.h>
-
-
-#include "@(header_filename)"
-
 void * @(msg_typename)__create_native_message() {
    @(msg_typename) * ros_message = @(msg_typename)__create();
    return ros_message;
 }
 
 const void * @(msg_typename)__get_typesupport() {
-  const void * ptr = ROSIDL_GET_MSG_TYPE_SUPPORT(@(package_name), msg, @(type_name));
+  const void * ptr = ROSIDL_GET_MSG_TYPE_SUPPORT(@(', '.join(message.structure.namespaced_type.namespaced_name())));
   return ptr;
 }
 

@@ -56,6 +56,17 @@ foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
       "${_output_path}/${_parent_folder}/${_module_name}.c"
       )
   elseif(_parent_folder STREQUAL "srv")
+    list(APPEND _generated_cs_files
+      "${_output_path}/${_parent_folder}/${_module_name}.cs"
+      )
+
+    list(APPEND _generated_h_files
+      "${_output_path}/${_parent_folder}/rcldotnet_${_module_name}.h"
+      )
+
+    list(APPEND _generated_c_ts_files
+      "${_output_path}/${_parent_folder}/${_module_name}.c"
+      )
   elseif(_parent_folder STREQUAL "action")
   else()
     message(FATAL_ERROR "Interface file with unknown parent folder: ${_idl_file}")
