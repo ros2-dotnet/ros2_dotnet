@@ -10,8 +10,13 @@
 @#  - interface_path (Path relative to the directory named after the package)
 @#  - content (IdlContent, list of elements, e.g. Messages or Services)
 @#######################################################################
-@
-@
+using System;
+using System.Runtime.InteropServices;
+using System.Collections.Generic;
+
+using ROS2.Interfaces;
+using ROS2.Utils;
+
 @#######################################################################
 @# Handle messages
 @#######################################################################
@@ -30,7 +35,22 @@ TEMPLATE(
 @# Handle services
 @#######################################################################
 @
-@#TODO - services not implemented
+@{
+from rosidl_parser.definition import Service
+}@
+@[for service in content.get_elements_of_type(Service)]@
+@{
+TEMPLATE(
+    'msg.cs.em',
+    package_name=package_name, interface_path=interface_path, message=service.request_message)
+}@
+
+@{
+TEMPLATE(
+    'msg.cs.em',
+    package_name=package_name, interface_path=interface_path, message=service.response_message)
+}@
+@[end for]@
 @
 @
 @#######################################################################

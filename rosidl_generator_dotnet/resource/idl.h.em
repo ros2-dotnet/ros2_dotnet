@@ -30,7 +30,22 @@ TEMPLATE(
 @# Handle services
 @#######################################################################
 @
-@# TODO - services not implemented
+@{
+from rosidl_parser.definition import Service
+}@
+@[for service in content.get_elements_of_type(Service)]@
+@{
+TEMPLATE(
+    'msg.h.em',
+    package_name=package_name, interface_path=interface_path, message=service.request_message)
+}@
+
+@{
+TEMPLATE(
+    'msg.h.em',
+    package_name=package_name, interface_path=interface_path, message=service.response_message)
+}@
+@[end for]@
 @
 @
 @#######################################################################

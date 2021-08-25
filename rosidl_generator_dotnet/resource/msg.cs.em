@@ -16,17 +16,8 @@ from rosidl_parser.definition import NamespacedType
 type_name = message.structure.namespaced_type.name
 msg_typename = '%s__%s' % ('__'.join(message.structure.namespaced_type.namespaces), type_name)
 }
-using System;
-using System.Runtime.InteropServices;
-using System.Collections.Generic;
-
-using ROS2.Interfaces;
-using ROS2.Utils;
-
-@[for ns in message.structure.namespaced_type.namespaces]@
-namespace @(ns)
+namespace @('.'.join(message.structure.namespaced_type.namespaces))
 {
-@[end for]@
 
 public class @(type_name) : IMessage {
     private static readonly DllLoadUtils dllLoadUtils;
@@ -356,6 +347,4 @@ public class @(type_name) : IMessage {
 @[end for]@
 }
 
-@[for ns in reversed(message.structure.namespaced_type.namespaces)]@
-}  // namespace @(ns)
-@[end for]@
+}
