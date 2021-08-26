@@ -102,6 +102,14 @@ int32_t native_rcl_wait_set_add_subscription(void *wait_set_handle, void *subscr
   return ret;
 }
 
+int32_t native_rcl_wait_set_add_service(void *wait_set_handle, void *service_handle) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+  rcl_service_t *service = (rcl_service_t *)service_handle;
+  rcl_ret_t ret = rcl_wait_set_add_service(wait_set, service, NULL);
+
+  return ret;
+}
+
 void native_rcl_destroy_wait_set(void *wait_set_handle) {
   free((rcl_wait_set_t *)wait_set_handle);
 }
@@ -117,6 +125,32 @@ int32_t native_rcl_take(void *subscription_handle, void *message_handle) {
   rcl_subscription_t * subscription = (rcl_subscription_t *)subscription_handle;
 
   rcl_ret_t ret = rcl_take(subscription, message_handle, NULL, NULL);
+  return ret;
+}
+
+void * native_rcl_create_request_header_handle(void) {
+  rmw_request_id_t *request_header = (rmw_request_id_t *)malloc(sizeof(rmw_request_id_t));
+  memset(request_header, 0, sizeof(rmw_request_id_t));
+  return (void *)request_header;
+}
+
+void native_rcl_destroy_request_header_handle(void *request_header_handle) {
+  free((rmw_request_id_t *)request_header_handle);
+}
+
+int32_t native_rcl_take_request(void *service_handle, void *request_header_handle, void *request_handle) {
+  rcl_service_t * service = (rcl_service_t *)service_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_take_request(service, request_header, request_handle);
+  return ret;
+}
+
+int32_t native_rcl_send_response(void *service_handle, void *request_header_handle, void *resopnse_handle) {
+  rcl_service_t * service = (rcl_service_t *)service_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_send_response(service, request_header, resopnse_handle);
   return ret;
 }
 

@@ -28,11 +28,14 @@ endif()
 set(CS_SOURCES
   INode.cs
   IPublisher.cs
+  IService.cs
+  IServiceBase.cs
   ISubscription.cs
   ISubscriptionBase.cs
   Node.cs
   Publisher.cs
   RCLdotnet.cs
+  Service.cs
   Subscription.cs
 )
 
