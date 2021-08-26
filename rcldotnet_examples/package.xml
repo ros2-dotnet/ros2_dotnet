@@ -16,12 +16,14 @@
   <build_depend>example_interfaces</build_depend>
   <build_depend>rcldotnet</build_depend>
   <build_depend>std_msgs</build_depend>
+  <build_depend>std_srvs</build_depend>
   <build_depend>sensor_msgs</build_depend>
 
   <exec_depend>rcldotnet_common</exec_depend>
   <exec_depend>example_interfaces</exec_depend>
   <exec_depend>rcldotnet</exec_depend>
   <exec_depend>std_msgs</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
 
   <export>
