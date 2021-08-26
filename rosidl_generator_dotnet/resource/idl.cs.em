@@ -50,6 +50,12 @@ TEMPLATE(
     'msg.cs.em',
     package_name=package_name, interface_path=interface_path, message=service.response_message)
 }@
+
+@{
+TEMPLATE(
+    'srv.cs.em',
+    package_name=package_name, interface_path=interface_path, service=service)
+}@
 @[end for]@
 @
 @

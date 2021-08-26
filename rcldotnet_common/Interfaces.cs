@@ -20,12 +20,26 @@ namespace ROS2 {
     public interface IMessageStruct { }
 
     public interface IMessage {
+      // must be implemented on deriving types, gets called via reflection
+      // (static abstract interface members are not supported yet.)
+      // public static abstract IntPtr _GET_TYPE_SUPPORT();
+      
       IntPtr _CREATE_NATIVE_MESSAGE ();
       void _READ_HANDLE (IntPtr messageHandle);
       void _DESTROY_NATIVE_MESSAGE (IntPtr messageHandle);
       void _WRITE_HANDLE (IntPtr messageHandle);
     }
 
+    public interface IRosServiceDefinition<TRequest, TResponse>
+        where TRequest : IMessage, new()
+        where TResponse : IMessage, new()
+    {
+      // must be implemented on deriving types, gets called via reflection
+      // (static abstract interface members are not supported yet.)
+      // public static abstract IntPtr _GET_TYPE_SUPPORT();
+    }
+
+    // TODO: (sh) Rename missleading IDisposable interface
     public interface IDisposable {
       IntPtr Handle {
         get;

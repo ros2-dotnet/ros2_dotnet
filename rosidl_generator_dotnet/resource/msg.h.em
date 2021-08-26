@@ -12,10 +12,7 @@ from rosidl_generator_dotnet import msg_type_to_c
 type_name = message.structure.namespaced_type.name
 msg_typename = '%s__%s' % ('__'.join(message.structure.namespaced_type.namespaces), type_name)
 msg_prefix = "RCLDOTNET_{0}_{1}_{2}".format(package_name, '_'.join(message.structure.namespaced_type.namespaces), type_name).upper()
-header_guard = "{0}_H".format(msg_prefix)
 }@
-#ifndef @(header_guard)
-#define @(header_guard)
 
 #if defined(_MSC_VER)
     //  Microsoft
@@ -77,5 +74,3 @@ void @(msg_typename)__write_field_@(member.name)(void *, @(msg_type_to_c(member.
 void * @(msg_prefix)_CDECL @(msg_typename)__get_field_@(member.name)_HANDLE(void *);
 @[    end if]@
 @[end for]@
-
-#endif // @(header_guard)
