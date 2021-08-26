@@ -42,6 +42,12 @@ namespace ROS2 {
 
     internal static NativeRCLCreateSubscriptionHandleType native_rcl_create_subscription_handle = null;
 
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate int NativeRCLCreateServiceHandleType (
+      ref IntPtr serviceHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string serviceName, IntPtr typesupportHandle);
+
+    internal static NativeRCLCreateServiceHandleType native_rcl_create_service_handle = null;
+
     static NodeDelegates () {
       dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils ();
       IntPtr nativelibrary = dllLoadUtils.LoadLibrary ("rcldotnet_node");
@@ -59,6 +65,13 @@ namespace ROS2 {
       NodeDelegates.native_rcl_create_subscription_handle =
         (NativeRCLCreateSubscriptionHandleType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_create_subscription_handle_ptr, typeof (NativeRCLCreateSubscriptionHandleType));
+
+      IntPtr native_rcl_create_service_handle_ptr = dllLoadUtils.GetProcAddress (
+        nativelibrary, "native_rcl_create_service_handle");
+
+      NodeDelegates.native_rcl_create_service_handle =
+        (NativeRCLCreateServiceHandleType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_create_service_handle_ptr, typeof (NativeRCLCreateServiceHandleType));
     }
   }
 
@@ -66,12 +79,18 @@ namespace ROS2 {
 
     private IList<ISubscriptionBase> subscriptions_;
 
+    private IList<IServiceBase> services_;
+
     public Node (IntPtr handle) {
       Handle = handle;
       subscriptions_ = new List<ISubscriptionBase> ();
+      services_ = new List<IServiceBase>();
     }
 
     public IList<ISubscriptionBase> Subscriptions { get { return subscriptions_; } }
+
+    // TODO: (sh) wrap in readonly collection
+    public IList<IServiceBase> Services => services_;
 
     public IntPtr Handle { get; }
 
@@ -94,6 +113,24 @@ namespace ROS2 {
       Subscription<T> subscription = new Subscription<T> (subscriptionHandle, callback);
       this.subscriptions_.Add (subscription);
       return subscription;
+    }
+
+    public Service<TService, TRequest, TResponse> CreateService<TService, TRequest, TResponse>(string serviceName, Action<TRequest, TResponse> callback)
+        where TService : IRosServiceDefinition<TRequest, TResponse>
+        where TRequest : IMessage, new()
+        where TResponse : IMessage, new()
+    {
+      MethodInfo m = typeof(TService).GetTypeInfo().GetDeclaredMethod("_GET_TYPE_SUPPORT");
+      IntPtr typesupport = (IntPtr)m.Invoke (null, new object[] { });
+
+      // TODO: (sh) check return value
+      // TODO: (sh) natvie memory managment
+      IntPtr serviceHandle = IntPtr.Zero;
+      RCLRet ret = (RCLRet)NodeDelegates.native_rcl_create_service_handle(ref serviceHandle, Handle, serviceName, typesupport);
+      
+      var service = new Service<TService, TRequest, TResponse>(serviceHandle, callback);
+      this.services_.Add(service);
+      return service;
     }
   }
 }

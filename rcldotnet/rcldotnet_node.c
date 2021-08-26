@@ -68,3 +68,26 @@ int32_t native_rcl_create_subscription_handle(void **subscription_handle,
 
   return ret;
 }
+
+int32_t native_rcl_create_service_handle(void **service_handle,
+                                         void *node_handle,
+                                         const char *service_name,
+                                         void *typesupport) {
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+
+  rosidl_service_type_support_t *ts =
+      (rosidl_service_type_support_t *)typesupport;
+
+  rcl_service_t *service =
+      (rcl_service_t *)malloc(sizeof(rcl_service_t));
+  service->impl = NULL;
+  rcl_service_options_t service_ops =
+      rcl_service_get_default_options();
+
+  rcl_ret_t ret =
+      rcl_service_init(service, node, ts, service_name, &service_ops);
+
+  *service_handle = (void *)service;
+
+  return ret;
+}

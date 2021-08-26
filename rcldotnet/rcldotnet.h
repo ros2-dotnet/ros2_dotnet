@@ -49,6 +49,9 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_subscription(void *, void *);
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_service(void *wait_set_handle, void *service_handle);
+
+RCLDOTNET_EXPORT
 void RCLDOTNET_CDECL native_rcl_destroy_wait_set(void *);
 
 RCLDOTNET_EXPORT
@@ -59,5 +62,17 @@ int32_t RCLDOTNET_CDECL native_rcl_take(void *, void *);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait(void *, int64_t);
+
+RCLDOTNET_EXPORT
+void * RCLDOTNET_CDECL native_rcl_create_request_header_handle(void);
+
+RCLDOTNET_EXPORT
+void RCLDOTNET_CDECL native_rcl_destroy_request_header_handle(void *request_header_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_take_request(void *service_handle, void *request_header_handle, void *request_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_send_response(void *service_handle, void *request_header_handle, void *resopnse_handle);
 
 #endif // RCLDOTNET_H
