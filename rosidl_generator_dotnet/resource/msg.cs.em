@@ -33,7 +33,7 @@ public class @(type_name) : IMessage {
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
-    public const int @(get_field_name(type_name, member.name))_Count = @(member.type.size);
+    public const int @(get_field_name(type_name, member.name))_Length = @(member.type.size);
 @[    elif isinstance(member.type, AbstractSequence) and member.type.has_maximum_size()]@
     public const int @(get_field_name(type_name, member.name))_MaxCount = @(member.type.maximum_size);
 @[    end if]@
@@ -43,7 +43,22 @@ public class @(type_name) : IMessage {
     {
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
-        @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>(@(member.type.size));
+        @(get_field_name(type_name, member.name)) = new @(get_dotnet_type(member.type.value_type))[@(member.type.size)];
+@[          if isinstance(member.type.value_type, AbstractString)]@
+        for (var i__local_variable = 0; i__local_variable < @(member.type.size); i__local_variable++)
+        {
+            @(get_field_name(type_name, member.name))[i__local_variable] = "";
+        }
+@[          elif isinstance(member.type.value_type, BasicType)]@
+@# Basic types get initialized by the array constructor.
+@[          elif isinstance(member.type.value_type, AbstractWString)]@
+// TODO: Unicode types are not supported
+@[          else]@
+        for (var i__local_variable = 0; i__local_variable < @(member.type.size); i__local_variable++)
+        {
+            @(get_field_name(type_name, member.name))[i__local_variable] = new @(get_dotnet_type(member.type.value_type))();
+        }
+@[          end if]@
 @[    elif isinstance(member.type, AbstractSequence)]@
         @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>();
 @[    elif isinstance(member.type, AbstractWString)]@
@@ -221,31 +236,43 @@ public class @(type_name) : IMessage {
 
     public void _READ_HANDLE(IntPtr messageHandle) {
 @[for member in message.structure.members]@
-@[    if isinstance(member.type, Array) or isinstance(member.type, AbstractSequence)]@
-
+@[    if isinstance(member.type, Array)]@
       {
-          @(get_field_name(type_name, member.name)).Clear();
-@[        if isinstance(member.type, AbstractSequence)]@
-          int size__local_variable = native_getsize_field_@(member.name)_message(messageHandle);
-          for (int i = 0; i < size__local_variable; i++)
-@[        else]@
-          for (int i = 0; i < @(member.type.size); i++)
-@[        end if]@
+          @(get_field_name(type_name, member.name)) = new @(get_dotnet_type(member.type.value_type))[@(member.type.size)];
+          for (int i__local_variable = 0; i__local_variable < @(member.type.size); i__local_variable++)
           {
-@[        if isinstance(member.type.value_type, BasicType)]
-              @(get_field_name(type_name, member.name)).Add(native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i)));
-@[        elif isinstance(member.type.value_type, AbstractString)]
-              IntPtr pStr_@(get_field_name(type_name, member.name)) = native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i));
-              @(get_field_name(type_name, member.name)).Add(Marshal.PtrToStringAnsi(pStr_@(get_field_name(type_name, member.name))));
-          @[        elif isinstance(member.type.value_type, AbstractWString)]
+@[        if isinstance(member.type.value_type, BasicType)]@
+              @(get_field_name(type_name, member.name))[i__local_variable] = native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
+@[        elif isinstance(member.type.value_type, AbstractString)]@
+              IntPtr pStr_@(get_field_name(type_name, member.name)) = native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
+              @(get_field_name(type_name, member.name))[i__local_variable] = Marshal.PtrToStringAnsi(pStr_@(get_field_name(type_name, member.name)));
+@[        elif isinstance(member.type.value_type, AbstractWString)]@
               // TODO: Unicode types are not supported  
-          @[        else]
-              @(get_field_name(type_name, member.name)).Add(new @(get_dotnet_type(member.type.value_type))());
-              @(get_field_name(type_name, member.name))[@(get_field_name(type_name, member.name)).Count-1]._READ_HANDLE(native_get_field_@(member.name)_message(messageHandle, i));
+@[        else]@
+              @(get_field_name(type_name, member.name))[i__local_variable] = new @(get_dotnet_type(member.type.value_type))();
+              @(get_field_name(type_name, member.name))[i__local_variable]._READ_HANDLE(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
 @[        end if]
           }
       }
-
+@[    elif isinstance(member.type, AbstractSequence)]@
+      {
+          int size__local_variable = native_getsize_field_@(member.name)_message(messageHandle);
+          @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>(size__local_variable);
+          for (int i__local_variable = 0; i__local_variable < size__local_variable; i__local_variable++)
+          {
+@[        if isinstance(member.type.value_type, BasicType)]@
+              @(get_field_name(type_name, member.name)).Add(native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i__local_variable)));
+@[        elif isinstance(member.type.value_type, AbstractString)]@
+              IntPtr pStr_@(get_field_name(type_name, member.name)) = native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
+              @(get_field_name(type_name, member.name)).Add(Marshal.PtrToStringAnsi(pStr_@(get_field_name(type_name, member.name))));
+@[        elif isinstance(member.type.value_type, AbstractWString)]@
+              // TODO: Unicode types are not supported  
+@[        else]@
+              @(get_field_name(type_name, member.name)).Add(new @(get_dotnet_type(member.type.value_type))());
+              @(get_field_name(type_name, member.name))[i__local_variable]._READ_HANDLE(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
+@[        end if]
+          }
+      }
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
@@ -304,7 +331,9 @@ public class @(type_name) : IMessage {
 @[end for]@
 
 @[for member in message.structure.members]@
-@[    if isinstance(member.type, Array) or isinstance(member.type, AbstractSequence)]@
+@[    if isinstance(member.type, Array)]@
+    public @(get_dotnet_type(member.type.value_type))[] @(get_field_name(type_name, member.name)) { get; set; }
+@[    elif isinstance(member.type, AbstractSequence)]@
     public List<@(get_dotnet_type(member.type.value_type))> @(get_field_name(type_name, member.name)) { get; set; }
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
