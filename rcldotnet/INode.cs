@@ -23,11 +23,18 @@ namespace ROS2 {
 
         IList<IServiceBase> Services { get; }
 
+        IList<Client> Clients { get; }
+
         IPublisher<T> CreatePublisher<T> (string topic) where T : IMessage;
 
         ISubscription<T> CreateSubscription<T> (string topic, Action<T> callback) where T : IMessage, new ();
 
         Service<TService, TRequest, TResponse> CreateService<TService, TRequest, TResponse>(string topic, Action<TRequest, TResponse> callback)
+            where TService : IRosServiceDefinition<TRequest, TResponse>
+            where TRequest : IMessage, new()
+            where TResponse : IMessage, new();
+
+        Client<TService, TRequest, TResponse> CreateClient<TService, TRequest, TResponse>(string serviceName)
             where TService : IRosServiceDefinition<TRequest, TResponse>
             where TRequest : IMessage, new()
             where TResponse : IMessage, new();

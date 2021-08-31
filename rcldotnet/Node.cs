@@ -48,6 +48,12 @@ namespace ROS2 {
 
     internal static NativeRCLCreateServiceHandleType native_rcl_create_service_handle = null;
 
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate int NativeRCLCreateClientHandleType (
+      ref IntPtr clientHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string serviceName, IntPtr typesupportHandle);
+
+    internal static NativeRCLCreateClientHandleType native_rcl_create_client_handle = null;
+
     static NodeDelegates () {
       dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils ();
       IntPtr nativelibrary = dllLoadUtils.LoadLibrary ("rcldotnet_node");
@@ -72,6 +78,13 @@ namespace ROS2 {
       NodeDelegates.native_rcl_create_service_handle =
         (NativeRCLCreateServiceHandleType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_create_service_handle_ptr, typeof (NativeRCLCreateServiceHandleType));
+
+      IntPtr native_rcl_create_client_handle_ptr = dllLoadUtils.GetProcAddress (
+        nativelibrary, "native_rcl_create_client_handle");
+
+      NodeDelegates.native_rcl_create_client_handle =
+        (NativeRCLCreateClientHandleType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_create_client_handle_ptr, typeof (NativeRCLCreateClientHandleType));
     }
   }
 
@@ -81,16 +94,21 @@ namespace ROS2 {
 
     private IList<IServiceBase> services_;
 
+    private IList<Client> clients_;
+
     public Node (IntPtr handle) {
       Handle = handle;
       subscriptions_ = new List<ISubscriptionBase> ();
       services_ = new List<IServiceBase>();
+      clients_ = new List<Client>();
     }
 
     public IList<ISubscriptionBase> Subscriptions { get { return subscriptions_; } }
 
     // TODO: (sh) wrap in readonly collection
     public IList<IServiceBase> Services => services_;
+
+    public IList<Client> Clients => clients_;
 
     public IntPtr Handle { get; }
 
@@ -131,6 +149,24 @@ namespace ROS2 {
       var service = new Service<TService, TRequest, TResponse>(serviceHandle, callback);
       this.services_.Add(service);
       return service;
+    }
+
+    public Client<TService, TRequest, TResponse> CreateClient<TService, TRequest, TResponse>(string serviceName)
+        where TService : IRosServiceDefinition<TRequest, TResponse>
+        where TRequest : IMessage, new()
+        where TResponse : IMessage, new()
+    {
+      MethodInfo m = typeof(TService).GetTypeInfo().GetDeclaredMethod("_GET_TYPE_SUPPORT");
+      IntPtr typesupport = (IntPtr)m.Invoke (null, new object[] { });
+
+      // TODO: (sh) check return value
+      // TODO: (sh) natvie memory managment
+      IntPtr clientHandle = IntPtr.Zero;
+      RCLRet ret = (RCLRet)NodeDelegates.native_rcl_create_client_handle(ref clientHandle, Handle, serviceName, typesupport);
+      
+      var client = new Client<TService, TRequest, TResponse>(clientHandle);
+      this.clients_.Add(client);
+      return client;
     }
   }
 }

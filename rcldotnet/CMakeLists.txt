@@ -26,6 +26,7 @@ if(NOT WIN32)
 endif()
 
 set(CS_SOURCES
+  Client.cs
   INode.cs
   IPublisher.cs
   IService.cs
@@ -54,7 +55,7 @@ add_dotnet_library(${PROJECT_NAME}_assemblies
 install_dotnet(${PROJECT_NAME}_assemblies DESTINATION lib/${PROJECT_NAME}/dotnet)
 ament_export_assemblies_dll("lib/${PROJECT_NAME}/dotnet/${PROJECT_NAME}_assemblies.dll")
 
-set(_native_sources "rcldotnet;rcldotnet_node;rcldotnet_publisher")
+set(_native_sources "rcldotnet;rcldotnet_node;rcldotnet_publisher;rcldotnet_client")
 
 foreach(_target_name ${_native_sources})
   add_library(${_target_name} SHARED

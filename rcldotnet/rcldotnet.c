@@ -110,6 +110,14 @@ int32_t native_rcl_wait_set_add_service(void *wait_set_handle, void *service_han
   return ret;
 }
 
+int32_t native_rcl_wait_set_add_client(void *wait_set_handle, void *client_handle) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+  rcl_client_t *service = (rcl_client_t *)client_handle;
+  rcl_ret_t ret = rcl_wait_set_add_client(wait_set, service, NULL);
+
+  return ret;
+}
+
 void native_rcl_destroy_wait_set(void *wait_set_handle) {
   free((rcl_wait_set_t *)wait_set_handle);
 }
@@ -138,6 +146,11 @@ void native_rcl_destroy_request_header_handle(void *request_header_handle) {
   free((rmw_request_id_t *)request_header_handle);
 }
 
+int64_t native_rcl_request_header_get_sequence_number(void *request_header_handle) {
+  rmw_request_id_t *request_header = (rmw_request_id_t *)request_header_handle;
+  return request_header->sequence_number;
+}
+
 int32_t native_rcl_take_request(void *service_handle, void *request_header_handle, void *request_handle) {
   rcl_service_t * service = (rcl_service_t *)service_handle;
   rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
@@ -151,6 +164,14 @@ int32_t native_rcl_send_response(void *service_handle, void *request_header_hand
   rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
 
   rcl_ret_t ret = rcl_send_response(service, request_header, resopnse_handle);
+  return ret;
+}
+
+int32_t native_rcl_take_response(void *client_handle, void *request_header_handle, void *response_handle) {
+  rcl_client_t * client = (rcl_client_t *)client_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_take_response(client, request_header, response_handle);
   return ret;
 }
 
