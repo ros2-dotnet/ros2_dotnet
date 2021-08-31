@@ -114,6 +114,7 @@ if(BUILD_TESTING)
     SOURCES
     ${CS_SOURCES}
     test/test_messages.cs
+    test/test_services.cs
     INCLUDE_DLLS
     ${_assemblies_dep_dlls}
     INCLUDE_REFERENCES
