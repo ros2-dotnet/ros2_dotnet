@@ -91,3 +91,26 @@ int32_t native_rcl_create_service_handle(void **service_handle,
 
   return ret;
 }
+
+int32_t native_rcl_create_client_handle(void **client_handle,
+                                        void *node_handle,
+                                        const char *service_name,
+                                        void *typesupport) {
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+
+  rosidl_service_type_support_t *ts =
+      (rosidl_service_type_support_t *)typesupport;
+
+  rcl_client_t *client =
+      (rcl_client_t *)malloc(sizeof(rcl_client_t));
+  client->impl = NULL;
+  rcl_client_options_t client_ops =
+      rcl_client_get_default_options();
+
+  rcl_ret_t ret = 
+      rcl_client_init(client, node, ts, service_name, &client_ops);
+
+  *client_handle = (void *)client;
+
+  return ret;
+}

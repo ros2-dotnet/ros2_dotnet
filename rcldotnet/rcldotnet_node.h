@@ -33,4 +33,10 @@ int32_t RCLDOTNET_CDECL native_rcl_create_service_handle(void **service_handle,
                                                          const char *service_name,
                                                          void *typesupport);
 
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_create_client_handle(void **client_handle,
+                                                        void *node_handle,
+                                                        const char *service_name,
+                                                        void *typesupport);
+
 #endif // RCLDOTNET_NODE_H
