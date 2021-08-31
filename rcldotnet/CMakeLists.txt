@@ -104,6 +104,7 @@ if(BUILD_TESTING)
   add_dotnet_test(test_messages
     ${CS_SOURCES}
     test/test_messages.cs
+    test/test_services.cs
     INCLUDE_DLLS
     ${_assemblies_dep_dlls}
     INCLUDE_REFERENCES
