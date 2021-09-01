@@ -17,8 +17,12 @@ namespace ConsoleApplication
 
             var client = node.CreateClient<std_srvs.srv.SetBool, std_srvs.srv.SetBool_Request, std_srvs.srv.SetBool_Response>("test_dotnet_service_name");
             
-            // TODO: (sh) WaitForService(timeout)
-            Thread.Sleep(2000);
+            // TODO: (sh) Add WaitForService(timeout) method that observes the node graph.
+            Console.WriteLine("Waiting for service...");
+            while (RCLdotnet.Ok() && !client.ServiceIsReady())
+            {
+                Thread.Sleep(500);
+            }
             
             var request = new std_srvs.srv.SetBool_Request();
             request.Data = true;

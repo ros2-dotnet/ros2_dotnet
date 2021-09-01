@@ -20,6 +20,8 @@
 #include <rcl/error_handling.h>
 #include <rcl/rcl.h>
 #include <rcl/node.h>
+#include <rcl/client.h>
+#include <rcl/graph.h>
 
 #include "rosidl_runtime_c/message_type_support_struct.h"
 
@@ -29,5 +31,13 @@ int32_t native_rcl_send_request(void *client_handle, void *request_handle, int64
   rcl_client_t * client = (rcl_client_t *)client_handle;
 
   rcl_ret_t ret = rcl_send_request(client, request_handle, sequence_number);
+  return ret;
+}
+
+int32_t native_rcl_service_server_is_available(void *node_handle, void *client_handle, bool *is_available) {
+  rcl_node_t * node = (rcl_node_t *)node_handle;
+  rcl_client_t * client = (rcl_client_t *)client_handle;
+
+  rcl_ret_t ret = rcl_service_server_is_available(node, client, is_available);
   return ret;
 }

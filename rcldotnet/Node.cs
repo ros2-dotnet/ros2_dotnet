@@ -164,7 +164,7 @@ namespace ROS2 {
       IntPtr clientHandle = IntPtr.Zero;
       RCLRet ret = (RCLRet)NodeDelegates.native_rcl_create_client_handle(ref clientHandle, Handle, serviceName, typesupport);
       
-      var client = new Client<TService, TRequest, TResponse>(clientHandle);
+      var client = new Client<TService, TRequest, TResponse>(clientHandle, this);
       this.clients_.Add(client);
       return client;
     }
