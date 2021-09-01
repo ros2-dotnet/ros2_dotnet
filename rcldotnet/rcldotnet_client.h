@@ -20,4 +20,7 @@
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_send_request(void *client_handle, void *request_handle, int64_t *sequence_number);
 
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_service_server_is_available(void *node_handle, void *client_handle, bool *is_available);
+
 #endif // RCLDOTNET_CLIENT_H

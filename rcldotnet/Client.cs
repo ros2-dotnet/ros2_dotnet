@@ -21,6 +21,12 @@ namespace ROS2
 
         internal static NativeRCLSendRequestType native_rcl_send_request = null;
 
+        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        internal delegate int NativeRCLServiceServerIsAvailableType(
+            IntPtr nodeHandle, IntPtr clientHandle, out bool isAvailable);
+
+        internal static NativeRCLServiceServerIsAvailableType native_rcl_service_server_is_available = null;
+
         static ClientDelegates()
         {
             dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
@@ -29,6 +35,10 @@ namespace ROS2
             IntPtr native_rcl_send_request_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_rcl_send_request");
             ClientDelegates.native_rcl_send_request = (NativeRCLSendRequestType)Marshal.GetDelegateForFunctionPointer(
                 native_rcl_send_request_ptr, typeof(NativeRCLSendRequestType));
+
+            IntPtr native_rcl_service_server_is_available_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_rcl_service_server_is_available");
+            ClientDelegates.native_rcl_service_server_is_available = (NativeRCLServiceServerIsAvailableType)Marshal.GetDelegateForFunctionPointer(
+                native_rcl_service_server_is_available_ptr, typeof(NativeRCLServiceServerIsAvailableType));
         }
     }
 
@@ -36,7 +46,7 @@ namespace ROS2
     {
         public abstract IntPtr Handle { get; }
 
-        public abstract IMessage CreateResponse();
+        internal abstract IMessage CreateResponse();
 
         internal abstract void HandleResponse(long sequenceNumber, IMessage response);
     }
@@ -46,15 +56,28 @@ namespace ROS2
         where TRequest : IMessage, new()
         where TResponse : IMessage, new()
     {
-        private ConcurrentDictionary<long, PendingRequest> _pendingRequests = new ConcurrentDictionary<long, PendingRequest>();
-        public Client(IntPtr handle)
+        // ros2_java uses a WeakReference here. Not sure if its needed or not.
+        private readonly Node _node;
+        private readonly ConcurrentDictionary<long, PendingRequest> _pendingRequests = new ConcurrentDictionary<long, PendingRequest>();
+        
+        internal Client(IntPtr handle, Node node)
         {
             Handle = handle;
+            _node = node;
         }
 
         public override IntPtr Handle { get; }
 
-        public override IMessage CreateResponse() => (IMessage)new TResponse();
+        public bool ServiceIsReady()
+        {
+            var ret = (RCLRet)ClientDelegates.native_rcl_service_server_is_available(_node.Handle, Handle, out var serviceIsReady);
+            if (ret != RCLRet.Ok)
+            {
+                throw new Exception($"rcl_service_server_is_available() failed: {ret}");
+            }
+
+            return serviceIsReady;
+        }
 
         public Task<TResponse> SendRequestAsync(TRequest request)
         {
@@ -79,6 +102,8 @@ namespace ROS2
 
             return taskCompletionSource.Task;
         }
+
+        internal override IMessage CreateResponse() => (IMessage)new TResponse();
 
         internal override void HandleResponse(long sequenceNumber, IMessage response)
         {
