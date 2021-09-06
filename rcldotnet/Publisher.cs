@@ -14,18 +14,12 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using ROS2.Interfaces;
 using ROS2.Utils;
 
 namespace ROS2 {
-  internal class PublisherDelegates {
+  internal static class PublisherDelegates {
     internal static readonly DllLoadUtils dllLoadUtils;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
@@ -43,14 +37,25 @@ namespace ROS2 {
     }
   }
 
-  public class Publisher<T> : IPublisher<T>
+  /// <summary>
+  /// Base class of a Publisher without generic type arguments for use in collections or so.
+  /// </summary>
+  public abstract class Publisher
+  {
+    // Only allow internal subclasses.
+    internal Publisher()
+    {
+    }
+  }
+
+  public sealed class Publisher<T> : Publisher
     where T : IMessage {
 
-      public Publisher (IntPtr handle) {
+      internal Publisher (IntPtr handle) {
         Handle = handle;
       }
 
-      public IntPtr Handle { get; }
+      internal IntPtr Handle { get; }
 
       public void Publish (T msg) {
         IntPtr messageHandle = msg._CREATE_NATIVE_MESSAGE ();

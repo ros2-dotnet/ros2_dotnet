@@ -14,32 +14,44 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using ROS2.Interfaces;
-using ROS2.Utils;
 
 namespace ROS2 {
-  public class Subscription<T> : ISubscription<T>
+
+  /// <summary>
+  /// Base class of a Subscription without generic type arguments for use in collections or so.
+  /// </summary>
+  public abstract class Subscription
+  {
+    // Only allow internal subclasses.
+    internal Subscription()
+    {
+    }
+
+    internal abstract IntPtr Handle { get; }
+
+    internal abstract IMessage CreateMessage();
+
+    internal abstract void TriggerCallback(IMessage message);
+  }
+
+  public class Subscription<T> : Subscription
     where T : IMessage, new () {
       private Action<T> callback_;
 
-      public Subscription (IntPtr handle, Action<T> callback) {
+      internal Subscription(IntPtr handle, Action<T> callback) {
         Handle = handle;
         callback_ = callback;
       }
 
-      public IntPtr Handle { get; }
+      internal override IntPtr Handle { get; }
 
-      public IMessage CreateMessage () {
+      internal override IMessage CreateMessage() {
         IMessage msg = (IMessage) new T ();
         return msg;
       }
 
-      public void TriggerCallback (IMessage message) {
+      internal override void TriggerCallback(IMessage message) {
         callback_ ((T) message);
       }
     }

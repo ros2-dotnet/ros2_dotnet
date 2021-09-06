@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using ROS2.Common;
 using ROS2.Interfaces;
@@ -11,7 +8,7 @@ using ROS2.Utils;
 
 namespace ROS2
 {
-    internal class ClientDelegates
+    internal static class ClientDelegates
     {
         internal static readonly DllLoadUtils dllLoadUtils;
 
@@ -42,9 +39,17 @@ namespace ROS2
         }
     }
 
-    public abstract class Client : ROS2.Interfaces.IDisposable
+    /// <summary>
+    /// Base class of a Client without generic type arguments for use in collections or so.
+    /// </summary>
+    public abstract class Client
     {
-        public abstract IntPtr Handle { get; }
+        // Only allow internal subclasses.
+        internal Client()
+        {
+        }
+
+        internal abstract IntPtr Handle { get; }
 
         internal abstract IMessage CreateResponse();
 
@@ -66,7 +71,7 @@ namespace ROS2
             _node = node;
         }
 
-        public override IntPtr Handle { get; }
+        internal override IntPtr Handle { get; }
 
         public bool ServiceIsReady()
         {

@@ -1,34 +1,47 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using ROS2.Interfaces;
-using ROS2.Utils;
 
 namespace ROS2
 {
-    public sealed class Service<TService, TRequest, TResponse> : IService<TService, TRequest, TResponse>
+    /// <summary>
+    /// Base class of a Service without generic type arguments for use in collections or so.
+    /// </summary>
+    public abstract class Service
+    {
+        // Only allow internal subclasses.
+        internal Service()
+        {
+        }
+
+        abstract internal IntPtr Handle { get; }
+
+        abstract internal IMessage CreateRequest();
+
+        abstract internal IMessage CreateResponse();
+
+        abstract internal void TriggerCallback(IMessage request, IMessage response);
+    }
+
+    public sealed class Service<TService, TRequest, TResponse> : Service
         where TService : IRosServiceDefinition<TRequest, TResponse>
         where TRequest : IMessage, new()
         where TResponse : IMessage, new()
     {
         private Action<TRequest, TResponse> _callback;
 
-        public Service(IntPtr handle, Action<TRequest, TResponse> callback)
+        internal Service(IntPtr handle, Action<TRequest, TResponse> callback)
         {
             Handle = handle;
             _callback = callback;
         }
 
-        public IntPtr Handle { get; }
+        internal override IntPtr Handle { get; }
 
-        public IMessage CreateRequest() => (IMessage)new TRequest();
+        internal override IMessage CreateRequest() => (IMessage)new TRequest();
 
-        public IMessage CreateResponse() => (IMessage)new TResponse();
+        internal override IMessage CreateResponse() => (IMessage)new TResponse();
 
-        public void TriggerCallback(IMessage request, IMessage response)
+        internal override void TriggerCallback(IMessage request, IMessage response)
         {
             _callback((TRequest)request, (TResponse)response);
         }

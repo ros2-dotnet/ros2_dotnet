@@ -17,8 +17,6 @@ using System;
 
 namespace ROS2 {
   namespace Interfaces {
-    public interface IMessageStruct { }
-
     public interface IMessage {
       // must be implemented on deriving types, gets called via reflection
       // (static abstract interface members are not supported yet.)
@@ -37,13 +35,6 @@ namespace ROS2 {
       // must be implemented on deriving types, gets called via reflection
       // (static abstract interface members are not supported yet.)
       // public static abstract IntPtr _GET_TYPE_SUPPORT();
-    }
-
-    // TODO: (sh) Rename missleading IDisposable interface
-    public interface IDisposable {
-      IntPtr Handle {
-        get;
-      }
     }
   }
 }
