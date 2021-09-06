@@ -14,19 +14,13 @@
  */
 
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-
 using ROS2.Common;
 using ROS2.Interfaces;
 using ROS2.Utils;
 
 namespace ROS2 {
-  internal class RCLdotnetDelegates {
+  internal static class RCLdotnetDelegates {
     internal static readonly DllLoadUtils dllLoadUtils;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
@@ -251,7 +245,7 @@ namespace ROS2 {
     }
   }
 
-  public class RCLdotnet {
+  public static class RCLdotnet {
     private static bool initialized = false;
     private static readonly object syncLock = new object ();
 
@@ -270,7 +264,7 @@ namespace ROS2 {
       return node;
     }
 
-    public static void Spin (INode node) {
+    public static void Spin (Node node) {
       while (Ok ()) {
         SpinOnce (node, 500);
       }
@@ -382,7 +376,7 @@ namespace ROS2 {
       return status;
     }
 
-    public static void SendResponse(IntPtr serviceHandle, IntPtr requestHeaderHandle, IMessage response)
+    private static void SendResponse(IntPtr serviceHandle, IntPtr requestHeaderHandle, IMessage response)
     {
       IntPtr responseHandle = response._CREATE_NATIVE_MESSAGE();
       response._WRITE_HANDLE (responseHandle);
@@ -394,7 +388,7 @@ namespace ROS2 {
       response._DESTROY_NATIVE_MESSAGE (responseHandle);
     }
 
-    public static void SpinOnce (INode node, long timeout) {
+    public static void SpinOnce (Node node, long timeout) {
       IntPtr waitSetHandle = GetZeroInitializedWaitSet ();
 
       long numberOfSubscriptions = node.Subscriptions.Count;
@@ -416,7 +410,7 @@ namespace ROS2 {
 
       WaitSetClear (waitSetHandle);
 
-      foreach (ISubscriptionBase subscription in node.Subscriptions) {
+      foreach (Subscription subscription in node.Subscriptions) {
         WaitSetAddSubscription (waitSetHandle, subscription.Handle);
       }
 
@@ -432,7 +426,7 @@ namespace ROS2 {
 
       Wait (waitSetHandle, timeout);
 
-      foreach (ISubscriptionBase subscription in node.Subscriptions) {
+      foreach (Subscription subscription in node.Subscriptions) {
         IMessage message = subscription.CreateMessage ();
         bool result = Take (subscription.Handle, message);
         if (result) {
