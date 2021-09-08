@@ -72,26 +72,32 @@ int32_t native_rcl_destroy_node_handle(void *node_handle) {
   return ret;
 }
 
-void *native_rcl_get_zero_initialized_wait_set() {
+int32_t native_rcl_create_wait_set_handle(
+    void **wait_set_handle,
+    int32_t number_of_subscriptions,
+    int32_t number_of_guard_conditions,
+    int32_t number_of_timers,
+    int32_t number_of_clients,
+    int32_t number_of_services,
+    int32_t number_of_events) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)malloc(sizeof(rcl_wait_set_t));
   *wait_set = rcl_get_zero_initialized_wait_set();
-  return (void *)wait_set;
-}
-
-int32_t native_rcl_wait_set_init(
-    void *wait_set_handle,
-    long number_of_subscriptions,
-    long number_of_guard_conditions,
-    long number_of_timers,
-    long number_of_clients,
-    long number_of_services,
-    long number_of_events) {
-  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
 
   rcl_ret_t ret = rcl_wait_set_init(
       wait_set, number_of_subscriptions, number_of_guard_conditions,
       number_of_timers, number_of_clients, number_of_services,
       number_of_events, &context, rcl_get_default_allocator());
+
+  *wait_set_handle = (void *)wait_set;
+
+  return ret;
+}
+
+int32_t native_rcl_destroy_wait_set_handle(void *wait_set_handle) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+
+  rcl_ret_t ret = rcl_wait_set_fini(wait_set);
+  free(wait_set);
 
   return ret;
 }
@@ -127,12 +133,7 @@ int32_t native_rcl_wait_set_add_client(void *wait_set_handle, void *client_handl
   return ret;
 }
 
-void native_rcl_destroy_wait_set(void *wait_set_handle) {
-  // TODO: (sh) MemoryLeak: call rcl_wait_set_fini to free all pointers in the rcl_wait_set_t type.
-  free((rcl_wait_set_t *)wait_set_handle);
-}
-
-int32_t native_rcl_wait_set(void *wait_set_handle, long timeout) {
+int32_t native_rcl_wait(void *wait_set_handle, int64_t timeout) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
   rcl_ret_t ret = rcl_wait(wait_set, timeout);
 
@@ -146,19 +147,22 @@ int32_t native_rcl_take(void *subscription_handle, void *message_handle) {
   return ret;
 }
 
-void * native_rcl_create_request_header_handle(void) {
-  rmw_request_id_t *request_header = (rmw_request_id_t *)malloc(sizeof(rmw_request_id_t));
-  memset(request_header, 0, sizeof(rmw_request_id_t));
-  return (void *)request_header;
+int32_t native_rcl_create_request_id_handle(void **request_id_handle) {
+  rmw_request_id_t *request_id = (rmw_request_id_t *)malloc(sizeof(rmw_request_id_t));
+  memset(request_id, 0, sizeof(rmw_request_id_t));
+
+  *request_id_handle = (void *)request_id;
+  return RCL_RET_OK;
 }
 
-void native_rcl_destroy_request_header_handle(void *request_header_handle) {
-  free((rmw_request_id_t *)request_header_handle);
+int32_t native_rcl_destroy_request_id_handle(void *request_id_handle) {
+  free((rmw_request_id_t *)request_id_handle);
+  return RCL_RET_OK;
 }
 
-int64_t native_rcl_request_header_get_sequence_number(void *request_header_handle) {
-  rmw_request_id_t *request_header = (rmw_request_id_t *)request_header_handle;
-  return request_header->sequence_number;
+int64_t native_rcl_request_id_get_sequence_number(void *request_id_handle) {
+  rmw_request_id_t *request_id = (rmw_request_id_t *)request_id_handle;
+  return request_id->sequence_number;
 }
 
 int32_t native_rcl_take_request(void *service_handle, void *request_header_handle, void *request_handle) {
@@ -185,9 +189,3 @@ int32_t native_rcl_take_response(void *client_handle, void *request_header_handl
   return ret;
 }
 
-int32_t native_rcl_wait(void *wait_set_handle, int64_t timeout) {
-  rcl_wait_set_t * wait_set = (rcl_wait_set_t *)wait_set_handle;
-  rcl_ret_t ret = rcl_wait(wait_set, timeout);
-
-  return ret;
-}
