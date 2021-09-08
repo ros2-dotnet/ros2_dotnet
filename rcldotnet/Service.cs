@@ -13,7 +13,12 @@ namespace ROS2
         {
         }
 
-        abstract internal IntPtr Handle { get; }
+        // Service does intentionaly (for now) not implement IDisposable as this
+        // needs some extra consideration how the type works after its
+        // internal handle is disposed.
+        // By relying on the GC/Finalizer of SafeHandle the handle only gets
+        // Disposed if the service is not live anymore.
+        abstract internal SafeServiceHandle Handle { get; }
 
         abstract internal IMessage CreateRequest();
 
@@ -29,13 +34,13 @@ namespace ROS2
     {
         private Action<TRequest, TResponse> _callback;
 
-        internal Service(IntPtr handle, Action<TRequest, TResponse> callback)
+        internal Service(SafeServiceHandle handle, Action<TRequest, TResponse> callback)
         {
             Handle = handle;
             _callback = callback;
         }
 
-        internal override IntPtr Handle { get; }
+        internal override SafeServiceHandle Handle { get; }
 
         internal override IMessage CreateRequest() => (IMessage)new TRequest();
 

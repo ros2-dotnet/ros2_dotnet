@@ -24,7 +24,7 @@ namespace ROS2 {
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate void NativeRCLPublishType (
-      IntPtr publisherHandle, IntPtr messageHandle);
+      SafePublisherHandle publisherHandle, IntPtr messageHandle);
 
     internal static NativeRCLPublishType native_rcl_publish = null;
 
@@ -46,22 +46,31 @@ namespace ROS2 {
     internal Publisher()
     {
     }
+
+    // Publisher does intentionaly (for now) not implement IDisposable as this
+    // needs some extra consideration how the type works after its
+    // internal handle is disposed.
+    // By relying on the GC/Finalizer of SafeHandle the handle only gets
+    // Disposed if the publisher is not live anymore.
+    internal abstract SafePublisherHandle Handle { get; }
+
   }
 
   public sealed class Publisher<T> : Publisher
     where T : IMessage {
 
-      internal Publisher (IntPtr handle) {
+      internal Publisher (SafePublisherHandle handle) {
         Handle = handle;
       }
 
-      internal IntPtr Handle { get; }
+      internal override SafePublisherHandle Handle { get; }
 
       public void Publish (T msg) {
         IntPtr messageHandle = msg._CREATE_NATIVE_MESSAGE ();
 
         msg._WRITE_HANDLE (messageHandle);
 
+        // TODO: (sh) Pass and handle return value.
         PublisherDelegates.native_rcl_publish (Handle, messageHandle);
 
         msg._DESTROY_NATIVE_MESSAGE (messageHandle);

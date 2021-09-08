@@ -30,6 +30,9 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_create_node_handle(void **, const char *, const char *);
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_destroy_node_handle(void *node_handle);
+
+RCLDOTNET_EXPORT
 void * RCLDOTNET_CDECL native_rcl_get_zero_initialized_wait_set();
 
 RCLDOTNET_EXPORT

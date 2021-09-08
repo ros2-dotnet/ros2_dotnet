@@ -11,6 +11,7 @@ find_package(DotNETExtra REQUIRED)
 set(CS_SOURCES
   DllLoadUtils.cs
   Interfaces.cs
+  RCLExceptionHelper.cs
   RCLRet.cs
 )
 

@@ -28,7 +28,12 @@ namespace ROS2 {
     {
     }
 
-    internal abstract IntPtr Handle { get; }
+    // Subscription does intentionaly (for now) not implement IDisposable as this
+    // needs some extra consideration how the type works after its
+    // internal handle is disposed.
+    // By relying on the GC/Finalizer of SafeHandle the handle only gets
+    // Disposed if the subscription is not live anymore.
+    internal abstract SafeSubscriptionHandle Handle { get; }
 
     internal abstract IMessage CreateMessage();
 
@@ -39,12 +44,12 @@ namespace ROS2 {
     where T : IMessage, new () {
       private Action<T> callback_;
 
-      internal Subscription(IntPtr handle, Action<T> callback) {
+      internal Subscription(SafeSubscriptionHandle handle, Action<T> callback) {
         Handle = handle;
         callback_ = callback;
       }
 
-      internal override IntPtr Handle { get; }
+      internal override SafeSubscriptionHandle Handle { get; }
 
       internal override IMessage CreateMessage() {
         IMessage msg = (IMessage) new T ();

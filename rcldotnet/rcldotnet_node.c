@@ -35,13 +35,23 @@ int32_t native_rcl_create_publisher_handle(void **publisher_handle,
 
   rcl_publisher_t *publisher =
       (rcl_publisher_t *)malloc(sizeof(rcl_publisher_t));
-  publisher->impl = NULL;
+  *publisher = rcl_get_zero_initialized_publisher();
   rcl_publisher_options_t publisher_ops = rcl_publisher_get_default_options();
 
   rcl_ret_t ret =
       rcl_publisher_init(publisher, node, ts, topic, &publisher_ops);
 
   *publisher_handle = (void *)publisher;
+
+  return ret;
+}
+
+int32_t native_rcl_destroy_publisher_handle(void *publisher_handle, void *node_handle) {
+  rcl_publisher_t *publisher = (rcl_publisher_t *)publisher_handle;
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+
+  rcl_ret_t ret = rcl_publisher_fini(publisher, node);
+  free(publisher);
 
   return ret;
 }
@@ -57,7 +67,7 @@ int32_t native_rcl_create_subscription_handle(void **subscription_handle,
 
   rcl_subscription_t *subscription =
       (rcl_subscription_t *)malloc(sizeof(rcl_subscription_t));
-  subscription->impl = NULL;
+  *subscription = rcl_get_zero_initialized_subscription();
   rcl_subscription_options_t subscription_ops =
       rcl_subscription_get_default_options();
 
@@ -67,6 +77,16 @@ int32_t native_rcl_create_subscription_handle(void **subscription_handle,
   *subscription_handle = (void *)subscription;
 
   return ret;
+}
+
+int32_t native_rcl_destroy_subscription_handle(void *subscription_handle, void *node_handle) {
+    rcl_subscription_t *subscription = (rcl_subscription_t *)subscription_handle;
+    rcl_node_t *node = (rcl_node_t *)node_handle;
+
+    rcl_ret_t ret = rcl_subscription_fini(subscription, node);
+    free(subscription);
+
+    return ret;
 }
 
 int32_t native_rcl_create_service_handle(void **service_handle,
@@ -80,7 +100,7 @@ int32_t native_rcl_create_service_handle(void **service_handle,
 
   rcl_service_t *service =
       (rcl_service_t *)malloc(sizeof(rcl_service_t));
-  service->impl = NULL;
+  *service = rcl_get_zero_initialized_service();
   rcl_service_options_t service_ops =
       rcl_service_get_default_options();
 
@@ -88,6 +108,16 @@ int32_t native_rcl_create_service_handle(void **service_handle,
       rcl_service_init(service, node, ts, service_name, &service_ops);
 
   *service_handle = (void *)service;
+
+  return ret;
+}
+
+int32_t native_rcl_destroy_service_handle(void *service_handle, void *node_handle) {
+  rcl_service_t *service = (rcl_service_t *)service_handle;
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+
+  rcl_ret_t ret = rcl_service_fini(service, node);
+  free(service);
 
   return ret;
 }
@@ -103,7 +133,7 @@ int32_t native_rcl_create_client_handle(void **client_handle,
 
   rcl_client_t *client =
       (rcl_client_t *)malloc(sizeof(rcl_client_t));
-  client->impl = NULL;
+  *client = rcl_get_zero_initialized_client();
   rcl_client_options_t client_ops =
       rcl_client_get_default_options();
 
@@ -111,6 +141,16 @@ int32_t native_rcl_create_client_handle(void **client_handle,
       rcl_client_init(client, node, ts, service_name, &client_ops);
 
   *client_handle = (void *)client;
+
+  return ret;
+}
+
+int32_t native_rcl_destroy_client_handle(void *client_handle, void *node_handle) {
+  rcl_client_t *client = (rcl_client_t *)client_handle;
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+
+  rcl_ret_t ret = rcl_client_fini(client, node);
+  free(client);
 
   return ret;
 }

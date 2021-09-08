@@ -23,9 +23,15 @@ int32_t RCLDOTNET_CDECL native_rcl_create_publisher_handle(void **, void *,
                                                            void *);
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_destroy_publisher_handle(void *publisher_handle, void *node_handle);
+
+RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_create_subscription_handle(void **, void *,
                                                               const char *,
                                                               void *);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_destroy_subscription_handle(void *subscription_handle, void *node_handle);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_create_service_handle(void **service_handle,
@@ -34,9 +40,15 @@ int32_t RCLDOTNET_CDECL native_rcl_create_service_handle(void **service_handle,
                                                          void *typesupport);
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_destroy_service_handle(void *service_handle, void *node_handle);
+
+RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_create_client_handle(void **client_handle,
                                                         void *node_handle,
                                                         const char *service_name,
                                                         void *typesupport);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_destroy_client_handle(void *client_handle, void *node_handle);
 
 #endif // RCLDOTNET_NODE_H
