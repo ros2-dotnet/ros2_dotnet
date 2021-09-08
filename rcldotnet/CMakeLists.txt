@@ -25,11 +25,18 @@ if(NOT WIN32)
   endif()
 endif()
 
+set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
+
 set(CS_SOURCES
   Client.cs
   Node.cs
   Publisher.cs
   RCLdotnet.cs
+  SafeClientHandle.cs
+  SafeNodeHandle.cs
+  SafePublisherHandle.cs
+  SafeServiceHandle.cs
+  SafeSubscriptionHandle.cs
   Service.cs
   Subscription.cs
 )

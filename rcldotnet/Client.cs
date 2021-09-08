@@ -14,13 +14,13 @@ namespace ROS2
 
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         internal delegate int NativeRCLSendRequestType(
-            IntPtr clientHandle, IntPtr requestHandle, out long seqneceNumber);
+            SafeClientHandle clientHandle, IntPtr requestHandle, out long seqneceNumber);
 
         internal static NativeRCLSendRequestType native_rcl_send_request = null;
 
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
         internal delegate int NativeRCLServiceServerIsAvailableType(
-            IntPtr nodeHandle, IntPtr clientHandle, out bool isAvailable);
+            SafeNodeHandle nodeHandle, SafeClientHandle clientHandle, out bool isAvailable);
 
         internal static NativeRCLServiceServerIsAvailableType native_rcl_service_server_is_available = null;
 
@@ -49,7 +49,12 @@ namespace ROS2
         {
         }
 
-        internal abstract IntPtr Handle { get; }
+        // Client does intentionaly (for now) not implement IDisposable as this
+        // needs some extra consideration how the type works after its
+        // internal handle is disposed.
+        // By relying on the GC/Finalizer of SafeHandle the handle only gets
+        // Disposed if the client is not live anymore.
+        internal abstract SafeClientHandle Handle { get; }
 
         internal abstract IMessage CreateResponse();
 
@@ -65,13 +70,13 @@ namespace ROS2
         private readonly Node _node;
         private readonly ConcurrentDictionary<long, PendingRequest> _pendingRequests = new ConcurrentDictionary<long, PendingRequest>();
         
-        internal Client(IntPtr handle, Node node)
+        internal Client(SafeClientHandle handle, Node node)
         {
             Handle = handle;
             _node = node;
         }
 
-        internal override IntPtr Handle { get; }
+        internal override SafeClientHandle Handle { get; }
 
         public bool ServiceIsReady()
         {

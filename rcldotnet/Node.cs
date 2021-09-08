@@ -26,28 +26,52 @@ namespace ROS2 {
     private static readonly DllLoadUtils dllLoadUtils;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate int NativeRCLCreatePublisherHandleType (
-      ref IntPtr publisherHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle);
+    internal delegate RCLRet NativeRCLCreatePublisherHandleType (
+      ref SafePublisherHandle publisherHandle, SafeNodeHandle nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle);
 
     internal static NativeRCLCreatePublisherHandleType native_rcl_create_publisher_handle = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate int NativeRCLCreateSubscriptionHandleType (
-      ref IntPtr subscriptionHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle);
+    internal delegate RCLRet NativeRCLDestroyPublisherHandleType (
+      IntPtr publisherHandle, SafeNodeHandle nodeHandle);
+
+    internal static NativeRCLDestroyPublisherHandleType native_rcl_destroy_publisher_handle = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate RCLRet NativeRCLCreateSubscriptionHandleType (
+      ref SafeSubscriptionHandle subscriptionHandle, SafeNodeHandle nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle);
 
     internal static NativeRCLCreateSubscriptionHandleType native_rcl_create_subscription_handle = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate int NativeRCLCreateServiceHandleType (
-      ref IntPtr serviceHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string serviceName, IntPtr typesupportHandle);
+    internal delegate RCLRet NativeRCLDestroySubscriptionHandleType (
+      IntPtr subscriptionHandle, SafeNodeHandle nodeHandle);
+
+    internal static NativeRCLDestroySubscriptionHandleType native_rcl_destroy_subscription_handle = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate RCLRet NativeRCLCreateServiceHandleType (
+      ref SafeServiceHandle serviceHandle, SafeNodeHandle nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string serviceName, IntPtr typesupportHandle);
 
     internal static NativeRCLCreateServiceHandleType native_rcl_create_service_handle = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate int NativeRCLCreateClientHandleType (
-      ref IntPtr clientHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string serviceName, IntPtr typesupportHandle);
+    internal delegate RCLRet NativeRCLDestroyServiceHandleType (
+      IntPtr serviceHandle, SafeNodeHandle nodeHandle);
+
+    internal static NativeRCLDestroyServiceHandleType native_rcl_destroy_service_handle = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate RCLRet NativeRCLCreateClientHandleType (
+      ref SafeClientHandle clientHandle, SafeNodeHandle nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string serviceName, IntPtr typesupportHandle);
 
     internal static NativeRCLCreateClientHandleType native_rcl_create_client_handle = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate RCLRet NativeRCLDestroyClientHandleType (
+      IntPtr clientHandle, SafeNodeHandle nodeHandle);
+
+    internal static NativeRCLDestroyClientHandleType native_rcl_destroy_client_handle = null;
 
     static NodeDelegates () {
       dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils ();
@@ -60,6 +84,13 @@ namespace ROS2 {
         (NativeRCLCreatePublisherHandleType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_create_publisher_handle_ptr, typeof (NativeRCLCreatePublisherHandleType));
 
+      IntPtr native_rcl_destroy_publisher_handle_ptr = dllLoadUtils.GetProcAddress (
+        nativelibrary, "native_rcl_destroy_publisher_handle");
+
+      NodeDelegates.native_rcl_destroy_publisher_handle =
+        (NativeRCLDestroyPublisherHandleType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_destroy_publisher_handle_ptr, typeof (NativeRCLDestroyPublisherHandleType));
+
       IntPtr native_rcl_create_subscription_handle_ptr = dllLoadUtils.GetProcAddress (
         nativelibrary, "native_rcl_create_subscription_handle");
 
@@ -67,6 +98,13 @@ namespace ROS2 {
         (NativeRCLCreateSubscriptionHandleType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_create_subscription_handle_ptr, typeof (NativeRCLCreateSubscriptionHandleType));
 
+      IntPtr native_rcl_destroy_subscription_handle_ptr = dllLoadUtils.GetProcAddress (
+        nativelibrary, "native_rcl_destroy_subscription_handle");
+
+      NodeDelegates.native_rcl_destroy_subscription_handle =
+        (NativeRCLDestroySubscriptionHandleType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_destroy_subscription_handle_ptr, typeof (NativeRCLDestroySubscriptionHandleType));
+          
       IntPtr native_rcl_create_service_handle_ptr = dllLoadUtils.GetProcAddress (
         nativelibrary, "native_rcl_create_service_handle");
 
@@ -74,12 +112,26 @@ namespace ROS2 {
         (NativeRCLCreateServiceHandleType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_create_service_handle_ptr, typeof (NativeRCLCreateServiceHandleType));
 
+      IntPtr native_rcl_destroy_service_handle_ptr = dllLoadUtils.GetProcAddress (
+        nativelibrary, "native_rcl_destroy_service_handle");
+
+      NodeDelegates.native_rcl_destroy_service_handle =
+        (NativeRCLDestroyServiceHandleType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_destroy_service_handle_ptr, typeof (NativeRCLDestroyServiceHandleType));
+
       IntPtr native_rcl_create_client_handle_ptr = dllLoadUtils.GetProcAddress (
         nativelibrary, "native_rcl_create_client_handle");
 
       NodeDelegates.native_rcl_create_client_handle =
         (NativeRCLCreateClientHandleType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_create_client_handle_ptr, typeof (NativeRCLCreateClientHandleType));
+
+      IntPtr native_rcl_destroy_client_handle_ptr = dllLoadUtils.GetProcAddress (
+        nativelibrary, "native_rcl_destroy_client_handle");
+
+      NodeDelegates.native_rcl_destroy_client_handle =
+        (NativeRCLDestroyClientHandleType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_destroy_client_handle_ptr, typeof (NativeRCLDestroyClientHandleType));
     }
   }
 
@@ -91,7 +143,7 @@ namespace ROS2 {
 
     private IList<Client> clients_;
 
-    internal Node (IntPtr handle) {
+    internal Node (SafeNodeHandle handle) {
       Handle = handle;
       subscriptions_ = new List<Subscription>();
       services_ = new List<Service>();
@@ -107,14 +159,25 @@ namespace ROS2 {
 
     public IList<Client> Clients => clients_;
 
-    public IntPtr Handle { get; }
+    // Node does intentionaly (for now) not implement IDisposable as this
+    // needs some extra consideration how the type works after its
+    // internal handle is disposed.
+    // By relying on the GC/Finalizer of SafeHandle the handle only gets
+    // Disposed if the node is not live anymore.
+    internal SafeNodeHandle Handle { get; }
 
     public Publisher<T> CreatePublisher<T> (string topic) where T : IMessage {
       MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("_GET_TYPE_SUPPORT");
-
       IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
-      IntPtr publisherHandle = IntPtr.Zero;
-      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_publisher_handle (ref publisherHandle, Handle, topic, typesupport);
+    
+      var publisherHandle = new SafePublisherHandle();
+      RCLRet ret = NodeDelegates.native_rcl_create_publisher_handle (ref publisherHandle, Handle, topic, typesupport);
+      publisherHandle.SetParent(Handle);
+      if (ret != RCLRet.Ok)
+      {
+        publisherHandle.Dispose();
+        RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_create_publisher_handle)}() failed.");
+      }
 
       // TODO: (sh) Add topic as propety to Publisher.
       Publisher<T> publisher = new Publisher<T> (publisherHandle);
@@ -123,10 +186,16 @@ namespace ROS2 {
 
     public Subscription<T> CreateSubscription<T> (string topic, Action<T> callback) where T : IMessage, new () {
       MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("_GET_TYPE_SUPPORT");
-
       IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
-      IntPtr subscriptionHandle = IntPtr.Zero;
-      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_subscription_handle (ref subscriptionHandle, Handle, topic, typesupport);
+      
+      var subscriptionHandle = new SafeSubscriptionHandle();
+      RCLRet ret = NodeDelegates.native_rcl_create_subscription_handle (ref subscriptionHandle, Handle, topic, typesupport);
+      subscriptionHandle.SetParent(Handle);
+      if (ret != RCLRet.Ok)
+      {
+        subscriptionHandle.Dispose();
+        RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_create_subscription_handle)}() failed.");
+      }
 
       // TODO: (sh) Add topic as propety to Subscription.
       Subscription<T> subscription = new Subscription<T> (subscriptionHandle, callback);
@@ -142,11 +211,15 @@ namespace ROS2 {
       MethodInfo m = typeof(TService).GetTypeInfo().GetDeclaredMethod("_GET_TYPE_SUPPORT");
       IntPtr typesupport = (IntPtr)m.Invoke (null, new object[] { });
 
-      // TODO: (sh) check return value
-      // TODO: (sh) natvie memory managment
-      IntPtr serviceHandle = IntPtr.Zero;
-      RCLRet ret = (RCLRet)NodeDelegates.native_rcl_create_service_handle(ref serviceHandle, Handle, serviceName, typesupport);
-      
+      var serviceHandle = new SafeServiceHandle();
+      RCLRet ret = NodeDelegates.native_rcl_create_service_handle(ref serviceHandle, Handle, serviceName, typesupport);
+      serviceHandle.SetParent(Handle);
+      if (ret != RCLRet.Ok)
+      {
+        serviceHandle.Dispose();
+        RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_create_service_handle)}() failed.");
+      }
+
       // TODO: (sh) Add serviceName to Service.
       var service = new Service<TService, TRequest, TResponse>(serviceHandle, callback);
       this.services_.Add(service);
@@ -161,11 +234,15 @@ namespace ROS2 {
       MethodInfo m = typeof(TService).GetTypeInfo().GetDeclaredMethod("_GET_TYPE_SUPPORT");
       IntPtr typesupport = (IntPtr)m.Invoke (null, new object[] { });
 
-      // TODO: (sh) check return value
-      // TODO: (sh) natvie memory managment
-      IntPtr clientHandle = IntPtr.Zero;
-      RCLRet ret = (RCLRet)NodeDelegates.native_rcl_create_client_handle(ref clientHandle, Handle, serviceName, typesupport);
-      
+      var clientHandle = new SafeClientHandle();
+      RCLRet ret = NodeDelegates.native_rcl_create_client_handle(ref clientHandle, Handle, serviceName, typesupport);
+      clientHandle.SetParent(Handle);
+      if (ret != RCLRet.Ok)
+      {
+        clientHandle.Dispose();
+        RCLExceptionHelper.ThrowFromReturnValue(ret,  $"{nameof(NodeDelegates.native_rcl_create_client_handle)}() failed.");
+      }
+
       // TODO: (sh) Add serviceName to Client.
       var client = new Client<TService, TRequest, TResponse>(clientHandle, this);
       this.clients_.Add(client);

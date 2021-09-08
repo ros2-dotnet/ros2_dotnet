@@ -63,6 +63,15 @@ int32_t native_rcl_create_node_handle(void **node_handle, const char *name, cons
   return ret;
 }
 
+int32_t native_rcl_destroy_node_handle(void *node_handle) {
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+
+  rcl_ret_t ret = rcl_node_fini(node);
+  free(node);
+
+  return ret;
+}
+
 void *native_rcl_get_zero_initialized_wait_set() {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)malloc(sizeof(rcl_wait_set_t));
   *wait_set = rcl_get_zero_initialized_wait_set();
@@ -119,6 +128,7 @@ int32_t native_rcl_wait_set_add_client(void *wait_set_handle, void *client_handl
 }
 
 void native_rcl_destroy_wait_set(void *wait_set_handle) {
+  // TODO: (sh) MemoryLeak: call rcl_wait_set_fini to free all pointers in the rcl_wait_set_t type.
   free((rcl_wait_set_t *)wait_set_handle);
 }
 
