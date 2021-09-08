@@ -51,45 +51,40 @@ namespace ROS2 {
     internal static NativeRCLGetRMWIdentifierType native_rcl_get_rmw_identifier = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate IntPtr NativeRCLGetZeroInitializedWaitSetType ();
+    internal delegate RCLRet NativeRCLCreateWaitSetHandleType (
+      ref SafeWaitSetHandle waitSetHandle, int numberOfSubscriptions,
+      int numberOfGuardConditions, int numberOfTimers,
+      int numberOfClients, int numberOfServices, int numberOfEvents);
 
-    internal static NativeRCLGetZeroInitializedWaitSetType native_rcl_get_zero_initialized_wait_set = null;
-
-    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate RCLRet NativeRCLWaitSetInitType (
-      IntPtr waitSetHandle, long numberOfSubscriptions,
-      long numberOfGuardConditions, long numberOfTimers,
-      long numberOfClients, long numberOfServices, long numberOfEvents);
-
-    internal static NativeRCLWaitSetInitType native_rcl_wait_set_init = null;
+    internal static NativeRCLCreateWaitSetHandleType native_rcl_create_wait_set_handle = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate void NativeRCLWaitSetClearType (IntPtr waitSetHandle);
+    internal delegate RCLRet NativeRCLDestroyWaitSetType (IntPtr waitSetHandle);
+
+    internal static NativeRCLDestroyWaitSetType native_rcl_destroy_wait_set_handle = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate RCLRet NativeRCLWaitSetClearType (SafeWaitSetHandle waitSetHandle);
 
     internal static NativeRCLWaitSetClearType native_rcl_wait_set_clear = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate RCLRet NativeRCLWaitSetAddSubscriptionType (IntPtr waitSetHandle, SafeSubscriptionHandle subscriptionHandle);
+    internal delegate RCLRet NativeRCLWaitSetAddSubscriptionType (SafeWaitSetHandle waitSetHandle, SafeSubscriptionHandle subscriptionHandle);
 
     internal static NativeRCLWaitSetAddSubscriptionType native_rcl_wait_set_add_subscription = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate RCLRet NativeRCLWaitSetAddServiceType (IntPtr waitSetHandle, SafeServiceHandle serviceHandle);
+    internal delegate RCLRet NativeRCLWaitSetAddServiceType (SafeWaitSetHandle waitSetHandle, SafeServiceHandle serviceHandle);
 
     internal static NativeRCLWaitSetAddServiceType native_rcl_wait_set_add_service = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate RCLRet NativeRCLWaitSetAddClientType (IntPtr waitSetHandle, SafeClientHandle clientHandle);
+    internal delegate RCLRet NativeRCLWaitSetAddClientType (SafeWaitSetHandle waitSetHandle, SafeClientHandle clientHandle);
 
     internal static NativeRCLWaitSetAddClientType native_rcl_wait_set_add_client = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate void NativeRCLDestroyWaitSetType (IntPtr waitSetHandle);
-
-    internal static NativeRCLDestroyWaitSetType native_rcl_destroy_wait_set = null;
-
-    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate RCLRet NativeRCLWaitType (IntPtr waitSetHandle, long timeout);
+    internal delegate RCLRet NativeRCLWaitType (SafeWaitSetHandle waitSetHandle, long timeout);
 
     internal static NativeRCLWaitType native_rcl_wait = null;
 
@@ -99,32 +94,33 @@ namespace ROS2 {
     internal static NativeRCLTakeType native_rcl_take = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate IntPtr NativeRCLCreateRequestHeaderHandleType ();
+    internal delegate RCLRet NativeRCLCreateRequestIdHandleType (
+      ref SafeRequestIdHandle requestIdHandle);
 
-    internal static NativeRCLCreateRequestHeaderHandleType native_rcl_create_request_header_handle = null;
-
-    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate void NativeRCLDestroyRequestHeaderHandleType (IntPtr requestHeaderHandle);
-
-    internal static NativeRCLDestroyRequestHeaderHandleType native_rcl_destroy_request_header_handle = null;
+    internal static NativeRCLCreateRequestIdHandleType native_rcl_create_request_id_handle = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate long NativeRCLRequestHeaderGetSequenceNumberType (IntPtr requestHeaderHandle);
+    internal delegate RCLRet NativeRCLDestroyRequestIdHandleType (IntPtr requestIdHandle);
 
-    internal static NativeRCLRequestHeaderGetSequenceNumberType native_rcl_request_header_get_sequence_number = null;
+    internal static NativeRCLDestroyRequestIdHandleType native_rcl_destroy_request_id_handle = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate RCLRet NativeRCLTakeRequestType (SafeServiceHandle serviceHandle, IntPtr requestHeaderHandle, IntPtr requestHandle);
+    internal delegate long NativeRCLRequestIdGetSequenceNumberType (SafeRequestIdHandle requestIdHandle);
+
+    internal static NativeRCLRequestIdGetSequenceNumberType native_rcl_request_id_get_sequence_number = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate RCLRet NativeRCLTakeRequestType (SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, IntPtr requestHandle);
 
     internal static NativeRCLTakeRequestType native_rcl_take_request = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate RCLRet NativeRCLSendResponseType (SafeServiceHandle serviceHandle, IntPtr requestHeaderHandle, IntPtr responseHandle);
+    internal delegate RCLRet NativeRCLSendResponseType (SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, IntPtr responseHandle);
 
     internal static NativeRCLSendResponseType native_rcl_send_response = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate RCLRet NativeRCLTakeResponseType (SafeClientHandle clientHandle, IntPtr requestHeaderHandle, IntPtr responseHandle);
+    internal delegate RCLRet NativeRCLTakeResponseType (SafeClientHandle clientHandle, SafeRequestIdHandle requestHeaderHandle, IntPtr responseHandle);
 
     internal static NativeRCLTakeResponseType native_rcl_take_response = null;
 
@@ -163,17 +159,17 @@ namespace ROS2 {
         (NativeRCLDestroyNodeHandleType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_destroy_node_handle_ptr, typeof (NativeRCLDestroyNodeHandleType));
 
-      IntPtr native_rcl_get_zero_initialized_wait_set_ptr =
-        dllLoadUtils.GetProcAddress (pDll, "native_rcl_get_zero_initialized_wait_set");
-      RCLdotnetDelegates.native_rcl_get_zero_initialized_wait_set =
-        (NativeRCLGetZeroInitializedWaitSetType) Marshal.GetDelegateForFunctionPointer (
-          native_rcl_get_zero_initialized_wait_set_ptr, typeof (NativeRCLGetZeroInitializedWaitSetType));
+      IntPtr native_rcl_create_wait_set_handle_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_create_wait_set_handle");
+      RCLdotnetDelegates.native_rcl_create_wait_set_handle =
+        (NativeRCLCreateWaitSetHandleType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_create_wait_set_handle_ptr, typeof (NativeRCLCreateWaitSetHandleType));
 
-      IntPtr native_rcl_wait_set_init_ptr =
-        dllLoadUtils.GetProcAddress (pDll, "native_rcl_wait_set_init");
-      RCLdotnetDelegates.native_rcl_wait_set_init =
-        (NativeRCLWaitSetInitType) Marshal.GetDelegateForFunctionPointer (
-          native_rcl_wait_set_init_ptr, typeof (NativeRCLWaitSetInitType));
+      IntPtr native_rcl_destroy_wait_set_handle_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_destroy_wait_set_handle");
+      RCLdotnetDelegates.native_rcl_destroy_wait_set_handle =
+        (NativeRCLDestroyWaitSetType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_destroy_wait_set_handle_ptr, typeof (NativeRCLDestroyWaitSetType));
 
       IntPtr native_rcl_wait_set_clear_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_wait_set_clear");
@@ -199,18 +195,11 @@ namespace ROS2 {
         (NativeRCLWaitSetAddClientType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_wait_set_add_client_ptr, typeof (NativeRCLWaitSetAddClientType));
 
-      IntPtr native_rcl_destroy_wait_set_ptr =
-        dllLoadUtils.GetProcAddress (pDll, "native_rcl_destroy_wait_set");
-      RCLdotnetDelegates.native_rcl_destroy_wait_set =
-        (NativeRCLDestroyWaitSetType) Marshal.GetDelegateForFunctionPointer (
-          native_rcl_destroy_wait_set_ptr, typeof (NativeRCLDestroyWaitSetType));
-
       IntPtr native_rcl_wait_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_wait");
       RCLdotnetDelegates.native_rcl_wait =
         (NativeRCLWaitType) Marshal.GetDelegateForFunctionPointer (
-          native_rcl_wait_ptr, typeof (NativeRCLWaitType)
-        );
+          native_rcl_wait_ptr, typeof (NativeRCLWaitType));
 
       IntPtr native_rcl_take_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_take");
@@ -218,23 +207,23 @@ namespace ROS2 {
         (NativeRCLTakeType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_take_ptr, typeof (NativeRCLTakeType));
 
-      IntPtr native_rcl_create_request_header_handle_ptr =
-        dllLoadUtils.GetProcAddress (pDll, "native_rcl_create_request_header_handle");
-      RCLdotnetDelegates.native_rcl_create_request_header_handle =
-        (NativeRCLCreateRequestHeaderHandleType) Marshal.GetDelegateForFunctionPointer (
-          native_rcl_create_request_header_handle_ptr, typeof (NativeRCLCreateRequestHeaderHandleType));
+      IntPtr native_rcl_create_request_id_handle_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_create_request_id_handle");
+      RCLdotnetDelegates.native_rcl_create_request_id_handle =
+        (NativeRCLCreateRequestIdHandleType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_create_request_id_handle_ptr, typeof (NativeRCLCreateRequestIdHandleType));
 
-      IntPtr native_rcl_destroy_request_header_handle_ptr =
-        dllLoadUtils.GetProcAddress (pDll, "native_rcl_destroy_request_header_handle");
-      RCLdotnetDelegates.native_rcl_destroy_request_header_handle =
-        (NativeRCLDestroyRequestHeaderHandleType) Marshal.GetDelegateForFunctionPointer (
-          native_rcl_destroy_request_header_handle_ptr, typeof (NativeRCLDestroyRequestHeaderHandleType));
+      IntPtr native_rcl_destroy_request_id_handle_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_destroy_request_id_handle");
+      RCLdotnetDelegates.native_rcl_destroy_request_id_handle =
+        (NativeRCLDestroyRequestIdHandleType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_destroy_request_id_handle_ptr, typeof (NativeRCLDestroyRequestIdHandleType));
 
-      IntPtr native_rcl_request_header_get_sequence_number_ptr =
-        dllLoadUtils.GetProcAddress (pDll, "native_rcl_request_header_get_sequence_number");
-      RCLdotnetDelegates.native_rcl_request_header_get_sequence_number =
-        (NativeRCLRequestHeaderGetSequenceNumberType) Marshal.GetDelegateForFunctionPointer (
-          native_rcl_request_header_get_sequence_number_ptr, typeof (NativeRCLRequestHeaderGetSequenceNumberType));
+      IntPtr native_rcl_request_id_get_sequence_number_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_request_id_get_sequence_number");
+      RCLdotnetDelegates.native_rcl_request_id_get_sequence_number =
+        (NativeRCLRequestIdGetSequenceNumberType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_request_id_get_sequence_number_ptr, typeof (NativeRCLRequestIdGetSequenceNumberType));
 
       IntPtr native_rcl_take_request_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_take_request");
@@ -287,50 +276,77 @@ namespace ROS2 {
       }
     }
 
-    private static IntPtr GetZeroInitializedWaitSet () {
-      return RCLdotnetDelegates.native_rcl_get_zero_initialized_wait_set ();
-    }
-
-    private static void WaitSetInit (
-      IntPtr waitSetHandle,
-      long numberOfSubscriptions,
-      long numberOfGuardConditions,
-      long numberOfTimers,
-      long numberOfClients,
-      long numberOfServices,
-      long numberOfEvents) {
-      RCLdotnetDelegates.native_rcl_wait_set_init (
-        waitSetHandle, numberOfSubscriptions, numberOfGuardConditions,
+    private static SafeWaitSetHandle CreateWaitSet(
+      int numberOfSubscriptions,
+      int numberOfGuardConditions,
+      int numberOfTimers,
+      int numberOfClients,
+      int numberOfServices,
+      int numberOfEvents) {
+      var waitSetHandle = new SafeWaitSetHandle();
+      RCLRet ret = RCLdotnetDelegates.native_rcl_create_wait_set_handle(
+        ref waitSetHandle, numberOfSubscriptions, numberOfGuardConditions,
         numberOfTimers, numberOfClients, numberOfServices, numberOfEvents);
+      if (ret != RCLRet.Ok)
+      {
+        waitSetHandle.Dispose();
+        RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_create_wait_set_handle)}() failed.");
+      }
+
+      return waitSetHandle;
     }
 
-    private static void WaitSetClear (IntPtr waitSetHandle) {
-      RCLdotnetDelegates.native_rcl_wait_set_clear (waitSetHandle);
+    private static void WaitSetClear(SafeWaitSetHandle waitSetHandle) {
+      RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_clear(waitSetHandle);
+      RCLExceptionHelper.CheckReturnValue(ret);
     }
 
-    private static void WaitSetAddSubscription (IntPtr waitSetHandle, SafeSubscriptionHandle subscriptionHandle) {
-      // TODO: (sh) Handle return value
-      RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_add_subscription (waitSetHandle, subscriptionHandle);
+    private static void WaitSetAddSubscription(SafeWaitSetHandle waitSetHandle, SafeSubscriptionHandle subscriptionHandle) {
+      RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_add_subscription(waitSetHandle, subscriptionHandle);
+      RCLExceptionHelper.CheckReturnValue(ret);
     }
 
-    private static void WaitSetAddService (IntPtr waitSetHandle, SafeServiceHandle serviceHandle) {
-      // TODO: (sh) Handle return value
+    private static void WaitSetAddService(SafeWaitSetHandle waitSetHandle, SafeServiceHandle serviceHandle) {
       RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_add_service(waitSetHandle, serviceHandle);
+      RCLExceptionHelper.CheckReturnValue(ret);
     }
 
-    private static void WaitSetAddClient (IntPtr waitSetHandle, SafeClientHandle clientHandle) {
-      // TODO: (sh) Handle return value
+    private static void WaitSetAddClient(SafeWaitSetHandle waitSetHandle, SafeClientHandle clientHandle) {
       RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_add_client(waitSetHandle, clientHandle);
+      RCLExceptionHelper.CheckReturnValue(ret);
     }
 
-    private static void DestroyWaitSet (IntPtr waitSetHandle) {
-      RCLdotnetDelegates.native_rcl_destroy_wait_set (waitSetHandle);
-    }
-
-    private static void Wait (IntPtr waitSetHandle, long timeout) {
+    /// <summary>
+    /// Block until the wait set is ready or until the timeout has been exceeded.
+    /// </summary>
+    /// <param name="waitSetHandle">The wait set.</param>
+    /// <param name="timeout">Timeout in ms.</param>
+    /// <returns>True if wait set is ready, False on timeout.</returns>
+    private static bool Wait(SafeWaitSetHandle waitSetHandle, long timeout) {
       long ns_timeout = timeout * 1000000;
-      RCLRet ret = RCLdotnetDelegates.native_rcl_wait (waitSetHandle, ns_timeout);
-      // TODO(esteve): do something with ret
+      RCLRet ret = RCLdotnetDelegates.native_rcl_wait(waitSetHandle, ns_timeout);
+      if (ret == RCLRet.Ok || ret == RCLRet.Timeout)
+      {
+        return ret == RCLRet.Ok;
+      }
+      else
+      {
+        RCLExceptionHelper.ThrowFromReturnValue(ret);
+        return false; // unreachable
+      }
+    }
+
+    private static SafeRequestIdHandle CreateRequestId()
+    {
+      var requestIdHandle = new SafeRequestIdHandle();
+      RCLRet ret = RCLdotnetDelegates.native_rcl_create_request_id_handle(ref requestIdHandle);
+      if (ret != RCLRet.Ok)
+      {
+        requestIdHandle.Dispose();
+        RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_create_request_id_handle)}() failed.");
+      }
+
+      return requestIdHandle;
     }
 
     private static bool Take (SafeSubscriptionHandle subscriptionHandle, IMessage message) {
@@ -354,7 +370,7 @@ namespace ROS2 {
       return status;
     }
 
-    private static bool TakeRequest(SafeServiceHandle serviceHandle, IntPtr requestHeaderHandle, IMessage request) {
+    private static bool TakeRequest(SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, IMessage request) {
       bool status = false;
       IntPtr requestHandle = request._CREATE_NATIVE_MESSAGE();
       RCLRet ret = RCLdotnetDelegates.native_rcl_take_request(serviceHandle, requestHeaderHandle, requestHandle);
@@ -378,7 +394,7 @@ namespace ROS2 {
       return status;
     }
 
-    private static bool TakeResponse(SafeClientHandle clientHandle, IntPtr requestHeaderHandle, IMessage response) {
+    private static bool TakeResponse(SafeClientHandle clientHandle, SafeRequestIdHandle requestHeaderHandle, IMessage response) {
       bool status = false;
       IntPtr responseHandle = response._CREATE_NATIVE_MESSAGE();
       RCLRet ret = RCLdotnetDelegates.native_rcl_take_response(clientHandle, requestHeaderHandle, responseHandle);
@@ -402,7 +418,7 @@ namespace ROS2 {
       return status;
     }
 
-    private static void SendResponse(SafeServiceHandle serviceHandle, IntPtr requestHeaderHandle, IMessage response)
+    private static void SendResponse(SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, IMessage response)
     {
       IntPtr responseHandle = response._CREATE_NATIVE_MESSAGE();
       response._WRITE_HANDLE (responseHandle);
@@ -415,42 +431,57 @@ namespace ROS2 {
     }
 
     public static void SpinOnce (Node node, long timeout) {
-      IntPtr waitSetHandle = GetZeroInitializedWaitSet ();
+      int numberOfSubscriptions = node.Subscriptions.Count;
+      int numberOfGuardConditions = 0;
+      int numberOfTimers = 0;
+      int numberOfClients = node.Clients.Count;
+      int numberOfServices = node.Services.Count;
+      int numberOfEvents = 0;
 
-      long numberOfSubscriptions = node.Subscriptions.Count;
-      long numberOfGuardConditions = 0;
-      long numberOfTimers = 0;
-      long numberOfClients = node.Clients.Count;
-      long numberOfServices = node.Services.Count;
-      long numberOfEvents = 0;
+      bool waitSetEmpty = numberOfSubscriptions == 0
+        && numberOfGuardConditions == 0
+        && numberOfTimers == 0
+        && numberOfClients == 0
+        && numberOfServices == 0
+        && numberOfEvents == 0;
 
-      WaitSetInit (
-        waitSetHandle,
-        numberOfSubscriptions,
-        numberOfGuardConditions,
-        numberOfTimers,
-        numberOfClients,
-        numberOfServices,
-        numberOfEvents
-      );
-
-      WaitSetClear (waitSetHandle);
-
-      foreach (Subscription subscription in node.Subscriptions) {
-        WaitSetAddSubscription (waitSetHandle, subscription.Handle);
-      }
-
-      foreach (var service in node.Services)
+      if (waitSetEmpty)
       {
-        WaitSetAddService(waitSetHandle, service.Handle);
+        // TODO: (sh) Should we sleep here for the timeout to avoid loops without sleep?
+        // Avoid WaitSetEmpty return value from rcl_wait.
+        return;
       }
 
-      foreach (var client in node.Clients)
+      // TODO: (sh) Reuse wait set (see executer in rclc, rclcpp and rclpy)
+      using (SafeWaitSetHandle waitSetHandle = CreateWaitSet(numberOfSubscriptions,
+                                                             numberOfGuardConditions,
+                                                             numberOfTimers,
+                                                             numberOfClients,
+                                                             numberOfServices,
+                                                             numberOfEvents))
       {
-        WaitSetAddClient(waitSetHandle, client.Handle);
-      }
+        WaitSetClear(waitSetHandle);
 
-      Wait (waitSetHandle, timeout);
+        foreach (Subscription subscription in node.Subscriptions) {
+          WaitSetAddSubscription(waitSetHandle, subscription.Handle);
+        }
+
+        foreach (var service in node.Services)
+        {
+          WaitSetAddService(waitSetHandle, service.Handle);
+        }
+
+        foreach (var client in node.Clients)
+        {
+          WaitSetAddClient(waitSetHandle, client.Handle);
+        }
+
+        bool ready = Wait(waitSetHandle, timeout);
+        if (!ready)
+        {
+          return; // timeout
+        }
+      }
 
       foreach (Subscription subscription in node.Subscriptions) {
         IMessage message = subscription.CreateMessage ();
@@ -460,40 +491,36 @@ namespace ROS2 {
         }
       }
       
-      // gets reused for each element in the for loop.
-      IntPtr requestHeaderHandle = RCLdotnetDelegates.native_rcl_create_request_header_handle();
-
-      foreach (var service in node.Services)
+      // requestIdHandle gets reused for each element in the loop.
+      using (SafeRequestIdHandle requestIdHandle = CreateRequestId())
       {
-        var request = service.CreateRequest();
-        var response = service.CreateResponse();
-
-        var result = TakeRequest(service.Handle, requestHeaderHandle, request);
-        if (result)
+        foreach (var service in node.Services)
         {
-          // TODO: (sh) catch exceptions
-          service.TriggerCallback(request, response);
+          var request = service.CreateRequest();
+          var response = service.CreateResponse();
 
-          SendResponse(service.Handle, requestHeaderHandle, response);
+          var result = TakeRequest(service.Handle, requestIdHandle, request);
+          if (result)
+          {
+            // TODO: (sh) catch exceptions
+            service.TriggerCallback(request, response);
+
+            SendResponse(service.Handle, requestIdHandle, response);
+          }
+        }
+
+        foreach (var client in node.Clients)
+        {
+          var response = client.CreateResponse();
+
+          var result = TakeResponse(client.Handle, requestIdHandle, response);
+          if (result)
+          {
+            var sequenceNumber = RCLdotnetDelegates.native_rcl_request_id_get_sequence_number(requestIdHandle);
+            client.HandleResponse(sequenceNumber, response);
+          }
         }
       }
-
-      foreach (var client in node.Clients)
-      {
-        var response = client.CreateResponse();
-
-        var result = TakeResponse(client.Handle, requestHeaderHandle, response);
-        if (result)
-        {
-          var sequenceNumber = RCLdotnetDelegates.native_rcl_request_header_get_sequence_number(requestHeaderHandle);
-          client.HandleResponse(sequenceNumber, response);
-        }
-      }
-
-      // TODO: (sh) don't leak memory on exceptions
-      RCLdotnetDelegates.native_rcl_destroy_request_header_handle(requestHeaderHandle);
-
-      DestroyWaitSet (waitSetHandle);
     }
 
     public static void Init () {

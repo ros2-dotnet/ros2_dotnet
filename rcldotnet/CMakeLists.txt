@@ -35,8 +35,10 @@ set(CS_SOURCES
   SafeClientHandle.cs
   SafeNodeHandle.cs
   SafePublisherHandle.cs
+  SafeRequestIdHandle.cs
   SafeServiceHandle.cs
   SafeSubscriptionHandle.cs
+  SafeWaitSetHandle.cs
   Service.cs
   Subscription.cs
 )
