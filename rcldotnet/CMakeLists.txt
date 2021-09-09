@@ -29,6 +29,7 @@ set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
 
 set(CS_SOURCES
   Client.cs
+  MessageStaticMemberCache.cs
   Node.cs
   Publisher.cs
   RCLdotnet.cs
@@ -40,6 +41,7 @@ set(CS_SOURCES
   SafeSubscriptionHandle.cs
   SafeWaitSetHandle.cs
   Service.cs
+  ServiceDefinitionStaticMemberCache.cs
   Subscription.cs
 )
 

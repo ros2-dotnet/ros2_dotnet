@@ -14,7 +14,6 @@
  */
 
 using System;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using ROS2.Common;
 using ROS2.Utils;
@@ -349,12 +348,10 @@ namespace ROS2 {
       return requestIdHandle;
     }
 
-    private static bool Take (SafeSubscriptionHandle subscriptionHandle, IRosMessage message) {
-      // TODO: (sh) Move to Subscription to take advantage of generic argument.
-      MethodInfo m = message.GetType().GetTypeInfo().GetDeclaredMethod("__CreateMessageHandle");
-      using (var messageHandle = (SafeHandle)m.Invoke(null, new object[] { }))
+    private static bool Take (Subscription subscription, IRosMessage message) {
+      using (var messageHandle = subscription.CreateMessageHandle())
       {
-        RCLRet ret = RCLdotnetDelegates.native_rcl_take(subscriptionHandle, messageHandle);
+        RCLRet ret = RCLdotnetDelegates.native_rcl_take(subscription.Handle, messageHandle);
         switch (ret)
         {
           case RCLRet.Ok:
@@ -389,12 +386,10 @@ namespace ROS2 {
       }
     }
 
-    private static bool TakeRequest(SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, IRosMessage request) {
-      // TODO: (sh) Move to Service to take advantage of generic argument.
-      MethodInfo m = request.GetType().GetTypeInfo().GetDeclaredMethod("__CreateMessageHandle");
-      using (var requestHandle = (SafeHandle)m.Invoke(null, new object[] { }))
+    private static bool TakeRequest(Service service, SafeRequestIdHandle requestHeaderHandle, IRosMessage request) {
+      using (var requestHandle = service.CreateRequestHandle())
       {
-        RCLRet ret = RCLdotnetDelegates.native_rcl_take_request(serviceHandle, requestHeaderHandle, requestHandle);
+        RCLRet ret = RCLdotnetDelegates.native_rcl_take_request(service.Handle, requestHeaderHandle, requestHandle);
         switch (ret)
         {
           case RCLRet.Ok:
@@ -429,12 +424,10 @@ namespace ROS2 {
       }
     }
 
-    private static bool TakeResponse(SafeClientHandle clientHandle, SafeRequestIdHandle requestHeaderHandle, IRosMessage response) {
-      // TODO: (sh) Move to Client to take advantage of generic argument.
-      MethodInfo m = response.GetType().GetTypeInfo().GetDeclaredMethod("__CreateMessageHandle");
-      using (var responseHandle = (SafeHandle)m.Invoke(null, new object[] { }))
+    private static bool TakeResponse(Client client, SafeRequestIdHandle requestHeaderHandle, IRosMessage response) {
+      using (var responseHandle = client.CreateResponseHandle())
       {
-        RCLRet ret = RCLdotnetDelegates.native_rcl_take_response(clientHandle, requestHeaderHandle, responseHandle);
+        RCLRet ret = RCLdotnetDelegates.native_rcl_take_response(client.Handle, requestHeaderHandle, responseHandle);
         switch (ret)
         {
           case RCLRet.Ok:
@@ -469,11 +462,9 @@ namespace ROS2 {
       }
     }
 
-    private static void SendResponse(SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, IRosMessage response)
+    private static void SendResponse(Service service, SafeRequestIdHandle requestHeaderHandle, IRosMessage response)
     {
-      // TODO: (sh) Move to Service to take advantage of generic argument.
-      MethodInfo m = response.GetType().GetTypeInfo().GetDeclaredMethod("__CreateMessageHandle");
-      using (var responseHandle = (SafeHandle)m.Invoke (null, new object[] { }))
+      using (var responseHandle = service.CreateResponseHandle())
       {
         bool mustRelease = false;
         try
@@ -494,7 +485,7 @@ namespace ROS2 {
           }
         }
         
-        RCLRet ret = RCLdotnetDelegates.native_rcl_send_response(serviceHandle, requestHeaderHandle, responseHandle);
+        RCLRet ret = RCLdotnetDelegates.native_rcl_send_response(service.Handle, requestHeaderHandle, responseHandle);
         if (ret != RCLRet.Ok)
         {
           RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_send_response)}() failed.");
@@ -558,7 +549,7 @@ namespace ROS2 {
 
       foreach (Subscription subscription in node.Subscriptions) {
         IRosMessage message = subscription.CreateMessage();
-        bool result = Take (subscription.Handle, message);
+        bool result = Take(subscription, message);
         if (result) {
           subscription.TriggerCallback (message);
         }
@@ -572,13 +563,13 @@ namespace ROS2 {
           var request = service.CreateRequest();
           var response = service.CreateResponse();
 
-          var result = TakeRequest(service.Handle, requestIdHandle, request);
+          var result = TakeRequest(service, requestIdHandle, request);
           if (result)
           {
             // TODO: (sh) catch exceptions
             service.TriggerCallback(request, response);
 
-            SendResponse(service.Handle, requestIdHandle, response);
+            SendResponse(service, requestIdHandle, response);
           }
         }
 
@@ -586,7 +577,7 @@ namespace ROS2 {
         {
           var response = client.CreateResponse();
 
-          var result = TakeResponse(client.Handle, requestIdHandle, response);
+          var result = TakeResponse(client, requestIdHandle, response);
           if (result)
           {
             var sequenceNumber = RCLdotnetDelegates.native_rcl_request_id_get_sequence_number(requestIdHandle);

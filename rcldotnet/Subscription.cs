@@ -14,6 +14,7 @@
  */
 
 using System;
+using System.Runtime.InteropServices;
 
 namespace ROS2 {
 
@@ -36,6 +37,8 @@ namespace ROS2 {
 
     internal abstract IRosMessage CreateMessage();
 
+    internal abstract SafeHandle CreateMessageHandle();
+
     internal abstract void TriggerCallback(IRosMessage message);
   }
 
@@ -51,6 +54,8 @@ namespace ROS2 {
     internal override SafeSubscriptionHandle Handle { get; }
 
     internal override IRosMessage CreateMessage() => (IRosMessage)new T();
+
+    internal override SafeHandle CreateMessageHandle() => MessageStaticMemberCache<T>.CreateMessageHandle();
 
     internal override void TriggerCallback(IRosMessage message) {
       callback_((T) message);

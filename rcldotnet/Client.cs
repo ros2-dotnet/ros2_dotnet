@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ROS2.Common;
@@ -58,6 +57,8 @@ namespace ROS2
 
         internal abstract IRosMessage CreateResponse();
 
+        internal abstract SafeHandle CreateResponseHandle();
+
         internal abstract void HandleResponse(long sequenceNumber, IRosMessage response);
     }
 
@@ -98,8 +99,7 @@ namespace ROS2
 
             long sequenceNumber;
 
-            MethodInfo m = typeof(TRequest).GetTypeInfo().GetDeclaredMethod ("__CreateMessageHandle");
-            using (var requestHandle = (SafeHandle)m.Invoke (null, new object[] { }))
+            using (var requestHandle = MessageStaticMemberCache<TRequest>.CreateMessageHandle())
             {
                 bool mustRelease = false;
                 try
@@ -139,6 +139,8 @@ namespace ROS2
         }
 
         internal override IRosMessage CreateResponse() => (IRosMessage)new TResponse();
+
+        internal override SafeHandle CreateResponseHandle() => MessageStaticMemberCache<TResponse>.CreateMessageHandle();
 
         internal override void HandleResponse(long sequenceNumber, IRosMessage response)
         {
