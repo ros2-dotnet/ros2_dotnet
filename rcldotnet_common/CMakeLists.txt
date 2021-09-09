@@ -12,8 +12,6 @@ set(CS_SOURCES
   DllLoadUtils.cs
   IRosMessage.cs
   IRosServiceDefinition.cs
-  RCLExceptionHelper.cs
-  RCLRet.cs
 )
 
 add_dotnet_library(${PROJECT_NAME} ${CS_SOURCES})

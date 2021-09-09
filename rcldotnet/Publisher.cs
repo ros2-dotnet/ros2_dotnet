@@ -15,7 +15,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using ROS2.Common;
 using ROS2.Utils;
 
 namespace ROS2
@@ -89,11 +88,7 @@ namespace ROS2
         }
 
         RCLRet ret = PublisherDelegates.native_rcl_publish(Handle, messageHandle);
-        if (ret != RCLRet.Ok)
-        {
-            RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(PublisherDelegates.native_rcl_publish)}() failed.");
-            return; // unrachable
-        }
+        RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(PublisherDelegates.native_rcl_publish)}() failed.");
       }
     }
   }

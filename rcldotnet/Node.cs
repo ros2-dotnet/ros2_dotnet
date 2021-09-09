@@ -16,7 +16,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using ROS2.Common;
 using ROS2.Utils;
 
 namespace ROS2 {
@@ -173,7 +172,7 @@ namespace ROS2 {
       if (ret != RCLRet.Ok)
       {
         publisherHandle.Dispose();
-        RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_create_publisher_handle)}() failed.");
+        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_create_publisher_handle)}() failed.");
       }
 
       // TODO: (sh) Add topic as propety to Publisher.
@@ -190,7 +189,7 @@ namespace ROS2 {
       if (ret != RCLRet.Ok)
       {
         subscriptionHandle.Dispose();
-        RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_create_subscription_handle)}() failed.");
+        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_create_subscription_handle)}() failed.");
       }
 
       // TODO: (sh) Add topic as propety to Subscription.
@@ -212,7 +211,7 @@ namespace ROS2 {
       if (ret != RCLRet.Ok)
       {
         serviceHandle.Dispose();
-        RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_create_service_handle)}() failed.");
+        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_create_service_handle)}() failed.");
       }
 
       // TODO: (sh) Add serviceName to Service.
@@ -234,7 +233,7 @@ namespace ROS2 {
       if (ret != RCLRet.Ok)
       {
         clientHandle.Dispose();
-        RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_create_client_handle)}() failed.");
+        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_create_client_handle)}() failed.");
       }
 
       // TODO: (sh) Add serviceName to Client.

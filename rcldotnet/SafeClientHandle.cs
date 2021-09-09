@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using Microsoft.Win32.SafeHandles;
-using ROS2.Common;
 
 namespace ROS2
 {

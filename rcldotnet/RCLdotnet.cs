@@ -15,7 +15,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using ROS2.Common;
 using ROS2.Utils;
 
 namespace ROS2 {
@@ -26,6 +25,17 @@ namespace ROS2 {
     internal delegate RCLRet NativeRCLInitType ();
 
     internal static NativeRCLInitType native_rcl_init = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate void NativeRCLGetErrorStringType(
+      byte[] buffer, int bufferSize);
+
+    internal static NativeRCLGetErrorStringType native_rcl_get_error_string = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate void NativeRCLResetErrorType ();
+
+    internal static NativeRCLResetErrorType native_rcl_reset_error = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate bool NativeRCLOkType ();
@@ -133,6 +143,18 @@ namespace ROS2 {
       RCLdotnetDelegates.native_rcl_init =
         (NativeRCLInitType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_init_ptr, typeof (NativeRCLInitType));
+
+      IntPtr native_rcl_get_error_string_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_get_error_string");
+      RCLdotnetDelegates.native_rcl_get_error_string =
+        (NativeRCLGetErrorStringType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_get_error_string_ptr, typeof (NativeRCLGetErrorStringType));
+      
+      IntPtr native_rcl_reset_error_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_reset_error");
+      RCLdotnetDelegates.native_rcl_reset_error =
+        (NativeRCLResetErrorType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_reset_error_ptr, typeof (NativeRCLResetErrorType));
 
       IntPtr native_rcl_get_rmw_identifier_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_get_rmw_identifier");
@@ -262,7 +284,7 @@ namespace ROS2 {
       if (ret != RCLRet.Ok)
       {
         nodeHandle.Dispose();
-        RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_create_node_handle)}() failed.");
+        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_create_node_handle)}() failed.");
       }
       
       Node node = new Node (nodeHandle);
@@ -289,7 +311,7 @@ namespace ROS2 {
       if (ret != RCLRet.Ok)
       {
         waitSetHandle.Dispose();
-        RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_create_wait_set_handle)}() failed.");
+        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_create_wait_set_handle)}() failed.");
       }
 
       return waitSetHandle;
@@ -297,22 +319,22 @@ namespace ROS2 {
 
     private static void WaitSetClear(SafeWaitSetHandle waitSetHandle) {
       RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_clear(waitSetHandle);
-      RCLExceptionHelper.CheckReturnValue(ret);
+      RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_wait_set_clear)}() failed.");
     }
 
     private static void WaitSetAddSubscription(SafeWaitSetHandle waitSetHandle, SafeSubscriptionHandle subscriptionHandle) {
       RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_add_subscription(waitSetHandle, subscriptionHandle);
-      RCLExceptionHelper.CheckReturnValue(ret);
+      RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_wait_set_add_subscription)}() failed.");
     }
 
     private static void WaitSetAddService(SafeWaitSetHandle waitSetHandle, SafeServiceHandle serviceHandle) {
       RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_add_service(waitSetHandle, serviceHandle);
-      RCLExceptionHelper.CheckReturnValue(ret);
+      RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_wait_set_add_service)}() failed.");
     }
 
     private static void WaitSetAddClient(SafeWaitSetHandle waitSetHandle, SafeClientHandle clientHandle) {
       RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_add_client(waitSetHandle, clientHandle);
-      RCLExceptionHelper.CheckReturnValue(ret);
+      RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_wait_set_add_client)}() failed.");
     }
 
     /// <summary>
@@ -330,8 +352,7 @@ namespace ROS2 {
       }
       else
       {
-        RCLExceptionHelper.ThrowFromReturnValue(ret);
-        return false; // unreachable
+        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_wait)}() failed.");
       }
     }
 
@@ -342,7 +363,7 @@ namespace ROS2 {
       if (ret != RCLRet.Ok)
       {
         requestIdHandle.Dispose();
-        RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_create_request_id_handle)}() failed.");
+        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_create_request_id_handle)}() failed.");
       }
 
       return requestIdHandle;
@@ -380,8 +401,7 @@ namespace ROS2 {
             return false;
 
           default:
-            RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_take)}() failed.");
-            return false; // unrachable
+            throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_take)}() failed.");
         }
       }
     }
@@ -418,8 +438,7 @@ namespace ROS2 {
             return false;
 
           default:
-            RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_take_request)}() failed.");
-            return false; // unrachable
+            throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_take_request)}() failed.");
         }
       }
     }
@@ -456,8 +475,7 @@ namespace ROS2 {
             return false;
           
           default:
-            RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_take_response)}() failed.");
-            return false; // unrachable
+            throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_take_response)}() failed.");
         }
       }
     }
@@ -488,8 +506,7 @@ namespace ROS2 {
         RCLRet ret = RCLdotnetDelegates.native_rcl_send_response(service.Handle, requestHeaderHandle, responseHandle);
         if (ret != RCLRet.Ok)
         {
-          RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_send_response)}() failed.");
-          return; // unrachable
+          throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_send_response)}() failed.");
         }
       }
     }
@@ -566,7 +583,6 @@ namespace ROS2 {
           var result = TakeRequest(service, requestIdHandle, request);
           if (result)
           {
-            // TODO: (sh) catch exceptions
             service.TriggerCallback(request, response);
 
             SendResponse(service, requestIdHandle, response);
@@ -590,8 +606,8 @@ namespace ROS2 {
     public static void Init () {
       lock (syncLock) {
         if (!initialized) {
-          // TODO: (sh) Handle return value
-          RCLRet ret = RCLdotnetDelegates.native_rcl_init ();
+          RCLRet ret = RCLdotnetDelegates.native_rcl_init();
+          RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_init)}() failed.");
           initialized = true;
         }
       }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using ROS2.Common;
 using ROS2.Utils;
 
 namespace ROS2
@@ -82,11 +81,7 @@ namespace ROS2
         public bool ServiceIsReady()
         {
             RCLRet ret = ClientDelegates.native_rcl_service_server_is_available(_node.Handle, Handle, out var serviceIsReady);
-            if (ret != RCLRet.Ok)
-            {
-                RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(ClientDelegates.native_rcl_service_server_is_available)}() failed.");
-                return false; // unrachable
-            }
+            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClientDelegates.native_rcl_service_server_is_available)}() failed.");
 
             return serviceIsReady;
         }
@@ -94,9 +89,6 @@ namespace ROS2
         public Task<TResponse> SendRequestAsync(TRequest request)
         {
             // TODO: (sh) Add cancellationToken(?), timeout (via cancellationToken?) and cleanup of pending requests.
-            // TODO: (sh) Catch all exceptions and return Task with error?
-            //       How should this be done according to best practices.
-
             long sequenceNumber;
 
             using (var requestHandle = MessageStaticMemberCache<TRequest>.CreateMessageHandle())
@@ -121,11 +113,7 @@ namespace ROS2
                 }
 
                 RCLRet ret = ClientDelegates.native_rcl_send_request(Handle, requestHandle, out sequenceNumber);
-                if (ret != RCLRet.Ok)
-                {
-                    RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(ClientDelegates.native_rcl_send_request)}() failed.");
-                    return null; // unrachable
-                }
+                RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClientDelegates.native_rcl_send_request)}() failed.");
             }
 
             var taskCompletionSource = new TaskCompletionSource<TResponse>();
