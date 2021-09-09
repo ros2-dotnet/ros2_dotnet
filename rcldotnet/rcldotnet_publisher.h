@@ -18,6 +18,6 @@
 #include "rcldotnet_macros.h"
 
 RCLDOTNET_EXPORT
-void RCLDOTNET_CDECL native_rcl_publish(void *, void *);
+int32_t RCLDOTNET_CDECL native_rcl_publish(void *, void *);
 
 #endif // RCLDOTNET_PUBLISHER_H

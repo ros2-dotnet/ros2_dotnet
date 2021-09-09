@@ -18,7 +18,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using ROS2.Common;
-using ROS2.Interfaces;
 using ROS2.Utils;
 
 namespace ROS2 {
@@ -166,8 +165,8 @@ namespace ROS2 {
     // Disposed if the node is not live anymore.
     internal SafeNodeHandle Handle { get; }
 
-    public Publisher<T> CreatePublisher<T> (string topic) where T : IMessage {
-      MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("_GET_TYPE_SUPPORT");
+    public Publisher<T> CreatePublisher<T> (string topic) where T : IRosMessage {
+      MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("__GetTypeSupport");
       IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
     
       var publisherHandle = new SafePublisherHandle();
@@ -184,8 +183,8 @@ namespace ROS2 {
       return publisher;
     }
 
-    public Subscription<T> CreateSubscription<T> (string topic, Action<T> callback) where T : IMessage, new () {
-      MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("_GET_TYPE_SUPPORT");
+    public Subscription<T> CreateSubscription<T> (string topic, Action<T> callback) where T : IRosMessage, new () {
+      MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("__GetTypeSupport");
       IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
       
       var subscriptionHandle = new SafeSubscriptionHandle();
@@ -205,10 +204,10 @@ namespace ROS2 {
 
     public Service<TService, TRequest, TResponse> CreateService<TService, TRequest, TResponse>(string serviceName, Action<TRequest, TResponse> callback)
         where TService : IRosServiceDefinition<TRequest, TResponse>
-        where TRequest : IMessage, new()
-        where TResponse : IMessage, new()
+        where TRequest : IRosMessage, new()
+        where TResponse : IRosMessage, new()
     {
-      MethodInfo m = typeof(TService).GetTypeInfo().GetDeclaredMethod("_GET_TYPE_SUPPORT");
+      MethodInfo m = typeof(TService).GetTypeInfo().GetDeclaredMethod("__GetTypeSupport");
       IntPtr typesupport = (IntPtr)m.Invoke (null, new object[] { });
 
       var serviceHandle = new SafeServiceHandle();
@@ -228,10 +227,10 @@ namespace ROS2 {
 
     public Client<TService, TRequest, TResponse> CreateClient<TService, TRequest, TResponse>(string serviceName)
         where TService : IRosServiceDefinition<TRequest, TResponse>
-        where TRequest : IMessage, new()
-        where TResponse : IMessage, new()
+        where TRequest : IRosMessage, new()
+        where TResponse : IRosMessage, new()
     {
-      MethodInfo m = typeof(TService).GetTypeInfo().GetDeclaredMethod("_GET_TYPE_SUPPORT");
+      MethodInfo m = typeof(TService).GetTypeInfo().GetDeclaredMethod("__GetTypeSupport");
       IntPtr typesupport = (IntPtr)m.Invoke (null, new object[] { });
 
       var clientHandle = new SafeClientHandle();

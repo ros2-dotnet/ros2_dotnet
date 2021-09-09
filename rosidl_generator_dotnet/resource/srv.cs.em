@@ -27,7 +27,7 @@ namespace @('.'.join(service.namespaced_type.namespaces))
 @# static abstract interface members are currently in preview, so maybe we could use the feature in the future.
 @# (if hey add support to derive from static only interfaces in static classes)
 @# Another option is to not use generics for passing the typesupport, but lets try this until we hit some wall.
-    public sealed class @(type_name) : IRosServiceDefinition<@(request_type_name), @(response_type_name)>
+    public sealed class @(type_name) : global::ROS2.IRosServiceDefinition<@(request_type_name), @(response_type_name)>
     {
         private static readonly DllLoadUtils dllLoadUtils;
 
@@ -52,7 +52,8 @@ namespace @('.'.join(service.namespaced_type.namespaces))
         private static NativeGetTypeSupportType native_get_typesupport = null;
 
 @# This method gets called via reflection as static abstract interface members are not supported yet.
-        public static IntPtr _GET_TYPE_SUPPORT() {
+        [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+        public static IntPtr __GetTypeSupport() {
             return native_get_typesupport();
         }
     }

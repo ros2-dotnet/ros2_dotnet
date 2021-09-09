@@ -14,7 +14,6 @@
  */
 
 using System;
-using ROS2.Interfaces;
 
 namespace ROS2 {
 
@@ -35,29 +34,26 @@ namespace ROS2 {
     // Disposed if the subscription is not live anymore.
     internal abstract SafeSubscriptionHandle Handle { get; }
 
-    internal abstract IMessage CreateMessage();
+    internal abstract IRosMessage CreateMessage();
 
-    internal abstract void TriggerCallback(IMessage message);
+    internal abstract void TriggerCallback(IRosMessage message);
   }
 
   public class Subscription<T> : Subscription
-    where T : IMessage, new () {
-      private Action<T> callback_;
+    where T : IRosMessage, new() {
+    private Action<T> callback_;
 
-      internal Subscription(SafeSubscriptionHandle handle, Action<T> callback) {
-        Handle = handle;
-        callback_ = callback;
-      }
-
-      internal override SafeSubscriptionHandle Handle { get; }
-
-      internal override IMessage CreateMessage() {
-        IMessage msg = (IMessage) new T ();
-        return msg;
-      }
-
-      internal override void TriggerCallback(IMessage message) {
-        callback_ ((T) message);
-      }
+    internal Subscription(SafeSubscriptionHandle handle, Action<T> callback) {
+      Handle = handle;
+      callback_ = callback;
     }
+
+    internal override SafeSubscriptionHandle Handle { get; }
+
+    internal override IRosMessage CreateMessage() => (IRosMessage)new T();
+
+    internal override void TriggerCallback(IRosMessage message) {
+      callback_((T) message);
+    }
+  }
 }

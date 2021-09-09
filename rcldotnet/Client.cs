@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ROS2.Common;
-using ROS2.Interfaces;
 using ROS2.Utils;
 
 namespace ROS2
@@ -13,13 +13,13 @@ namespace ROS2
         internal static readonly DllLoadUtils dllLoadUtils;
 
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        internal delegate int NativeRCLSendRequestType(
-            SafeClientHandle clientHandle, IntPtr requestHandle, out long seqneceNumber);
+        internal delegate RCLRet NativeRCLSendRequestType(
+            SafeClientHandle clientHandle, SafeHandle requestHandle, out long seqneceNumber);
 
         internal static NativeRCLSendRequestType native_rcl_send_request = null;
 
         [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-        internal delegate int NativeRCLServiceServerIsAvailableType(
+        internal delegate RCLRet NativeRCLServiceServerIsAvailableType(
             SafeNodeHandle nodeHandle, SafeClientHandle clientHandle, out bool isAvailable);
 
         internal static NativeRCLServiceServerIsAvailableType native_rcl_service_server_is_available = null;
@@ -56,15 +56,15 @@ namespace ROS2
         // Disposed if the client is not live anymore.
         internal abstract SafeClientHandle Handle { get; }
 
-        internal abstract IMessage CreateResponse();
+        internal abstract IRosMessage CreateResponse();
 
-        internal abstract void HandleResponse(long sequenceNumber, IMessage response);
+        internal abstract void HandleResponse(long sequenceNumber, IRosMessage response);
     }
 
     public sealed class Client<TService, TRequest, TResponse> : Client
         where TService : IRosServiceDefinition<TRequest, TResponse>
-        where TRequest : IMessage, new()
-        where TResponse : IMessage, new()
+        where TRequest : IRosMessage, new()
+        where TResponse : IRosMessage, new()
     {
         // ros2_java uses a WeakReference here. Not sure if its needed or not.
         private readonly Node _node;
@@ -80,10 +80,11 @@ namespace ROS2
 
         public bool ServiceIsReady()
         {
-            var ret = (RCLRet)ClientDelegates.native_rcl_service_server_is_available(_node.Handle, Handle, out var serviceIsReady);
+            RCLRet ret = ClientDelegates.native_rcl_service_server_is_available(_node.Handle, Handle, out var serviceIsReady);
             if (ret != RCLRet.Ok)
             {
-                throw new Exception($"rcl_service_server_is_available() failed: {ret}");
+                RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(ClientDelegates.native_rcl_service_server_is_available)}() failed.");
+                return false; // unrachable
             }
 
             return serviceIsReady;
@@ -94,14 +95,38 @@ namespace ROS2
             // TODO: (sh) Add cancellationToken(?), timeout (via cancellationToken?) and cleanup of pending requests.
             // TODO: (sh) Catch all exceptions and return Task with error?
             //       How should this be done according to best practices.
-            IntPtr requestHandle = request._CREATE_NATIVE_MESSAGE();
 
-            request._WRITE_HANDLE(requestHandle);
+            long sequenceNumber;
 
-            RCLRet ret = (RCLRet)ClientDelegates.native_rcl_send_request(Handle, requestHandle, out var sequenceNumber);
+            MethodInfo m = typeof(TRequest).GetTypeInfo().GetDeclaredMethod ("__CreateMessageHandle");
+            using (var requestHandle = (SafeHandle)m.Invoke (null, new object[] { }))
+            {
+                bool mustRelease = false;
+                try
+                {
+                    // Using SafeHandles for __WriteToHandle() is very tedious as this needs to be
+                    // handled in generated code across multiple assemblies.
+                    // Array and collection indexing would need to create SafeHandles everywere.
+                    // It's not worth it, especialy considering the extra allocations for SafeHandles in
+                    // arrays or collections that don't realy represent their own native recource.
+                    requestHandle.DangerousAddRef(ref mustRelease);
+                    request.__WriteToHandle(requestHandle.DangerousGetHandle());
+                }
+                finally
+                {
+                    if (mustRelease)
+                    {
+                        requestHandle.DangerousRelease();
+                    }
+                }
 
-            // TODO: (sh) don't leak memory on exceptions
-            request._DESTROY_NATIVE_MESSAGE(requestHandle);
+                RCLRet ret = ClientDelegates.native_rcl_send_request(Handle, requestHandle, out sequenceNumber);
+                if (ret != RCLRet.Ok)
+                {
+                    RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(ClientDelegates.native_rcl_send_request)}() failed.");
+                    return null; // unrachable
+                }
+            }
 
             var taskCompletionSource = new TaskCompletionSource<TResponse>();
             var pendingRequest = new PendingRequest(taskCompletionSource);
@@ -113,9 +138,9 @@ namespace ROS2
             return taskCompletionSource.Task;
         }
 
-        internal override IMessage CreateResponse() => (IMessage)new TResponse();
+        internal override IRosMessage CreateResponse() => (IRosMessage)new TResponse();
 
-        internal override void HandleResponse(long sequenceNumber, IMessage response)
+        internal override void HandleResponse(long sequenceNumber, IRosMessage response)
         {
             if (!_pendingRequests.TryRemove(sequenceNumber, out var pendingRequest))
             {

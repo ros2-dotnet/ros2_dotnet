@@ -14,9 +14,9 @@
  */
 
 using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using ROS2.Common;
-using ROS2.Interfaces;
 using ROS2.Utils;
 
 namespace ROS2 {
@@ -89,7 +89,7 @@ namespace ROS2 {
     internal static NativeRCLWaitType native_rcl_wait = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate RCLRet NativeRCLTakeType (SafeSubscriptionHandle subscriptionHandle, IntPtr messageHandle);
+    internal delegate RCLRet NativeRCLTakeType (SafeSubscriptionHandle subscriptionHandle, SafeHandle messageHandle);
 
     internal static NativeRCLTakeType native_rcl_take = null;
 
@@ -110,17 +110,17 @@ namespace ROS2 {
     internal static NativeRCLRequestIdGetSequenceNumberType native_rcl_request_id_get_sequence_number = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate RCLRet NativeRCLTakeRequestType (SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, IntPtr requestHandle);
+    internal delegate RCLRet NativeRCLTakeRequestType (SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, SafeHandle requestHandle);
 
     internal static NativeRCLTakeRequestType native_rcl_take_request = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate RCLRet NativeRCLSendResponseType (SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, IntPtr responseHandle);
+    internal delegate RCLRet NativeRCLSendResponseType (SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, SafeHandle responseHandle);
 
     internal static NativeRCLSendResponseType native_rcl_send_response = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate RCLRet NativeRCLTakeResponseType (SafeClientHandle clientHandle, SafeRequestIdHandle requestHeaderHandle, IntPtr responseHandle);
+    internal delegate RCLRet NativeRCLTakeResponseType (SafeClientHandle clientHandle, SafeRequestIdHandle requestHeaderHandle, SafeHandle responseHandle);
 
     internal static NativeRCLTakeResponseType native_rcl_take_response = null;
 
@@ -349,85 +349,158 @@ namespace ROS2 {
       return requestIdHandle;
     }
 
-    private static bool Take (SafeSubscriptionHandle subscriptionHandle, IMessage message) {
-      bool status = false;
-      IntPtr messageHandle = message._CREATE_NATIVE_MESSAGE ();
-      RCLRet ret = RCLdotnetDelegates.native_rcl_take (subscriptionHandle, messageHandle);
-      
-      // TODO: (sh) Handle all return values (exceptions)
-      switch (ret) {
-        case RCLRet.Ok:
-          message._READ_HANDLE (messageHandle);
-          status = true;
-          break;
-        case RCLRet.SubscriptionTakeFailed:
-          status = false;
-          break;
-        default:
-          break;
-      }
-      message._DESTROY_NATIVE_MESSAGE (messageHandle);
-      return status;
-    }
-
-    private static bool TakeRequest(SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, IMessage request) {
-      bool status = false;
-      IntPtr requestHandle = request._CREATE_NATIVE_MESSAGE();
-      RCLRet ret = RCLdotnetDelegates.native_rcl_take_request(serviceHandle, requestHeaderHandle, requestHandle);
-      
-      // TODO: (sh) Handle all return values (exceptions)
-      switch (ret)
+    private static bool Take (SafeSubscriptionHandle subscriptionHandle, IRosMessage message) {
+      // TODO: (sh) Move to Subscription to take advantage of generic argument.
+      MethodInfo m = message.GetType().GetTypeInfo().GetDeclaredMethod("__CreateMessageHandle");
+      using (var messageHandle = (SafeHandle)m.Invoke(null, new object[] { }))
       {
-        case RCLRet.Ok:
-          request._READ_HANDLE(requestHandle);
-          status = true;
-          break;
-        case RCLRet.ServiceTakeFailed:
-          status = false;
-          break;
-        default:
-          break;
-      }
+        RCLRet ret = RCLdotnetDelegates.native_rcl_take(subscriptionHandle, messageHandle);
+        switch (ret)
+        {
+          case RCLRet.Ok:
+            bool mustRelease = false;
+            try
+            {
+              // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
+              // handled in generated code across multiple assemblies.
+              // Array and collection indexing would need to create SafeHandles everywere.
+              // It's not worth it, especialy considering the extra allocations for SafeHandles in
+              // arrays or collections that don't realy represent their own native recource.
+              messageHandle.DangerousAddRef(ref mustRelease);
+              message.__ReadFromHandle(messageHandle.DangerousGetHandle());
+            }
+            finally
+            {
+              if (mustRelease)
+              {
+                messageHandle.DangerousRelease();
+              }
+            }
 
-      // TODO: (sh) don't leak memory on exceptions
-      request._DESTROY_NATIVE_MESSAGE (requestHandle);
-      return status;
+            return true;
+
+          case RCLRet.SubscriptionTakeFailed:
+            return false;
+
+          default:
+            RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_take)}() failed.");
+            return false; // unrachable
+        }
+      }
     }
 
-    private static bool TakeResponse(SafeClientHandle clientHandle, SafeRequestIdHandle requestHeaderHandle, IMessage response) {
-      bool status = false;
-      IntPtr responseHandle = response._CREATE_NATIVE_MESSAGE();
-      RCLRet ret = RCLdotnetDelegates.native_rcl_take_response(clientHandle, requestHeaderHandle, responseHandle);
-      
-      // TODO: (sh) Handle all return values (exceptions)
-      switch (ret)
+    private static bool TakeRequest(SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, IRosMessage request) {
+      // TODO: (sh) Move to Service to take advantage of generic argument.
+      MethodInfo m = request.GetType().GetTypeInfo().GetDeclaredMethod("__CreateMessageHandle");
+      using (var requestHandle = (SafeHandle)m.Invoke(null, new object[] { }))
       {
-        case RCLRet.Ok:
-          response._READ_HANDLE(responseHandle);
-          status = true;
-          break;
-        case RCLRet.ClientTakeFailed:
-          status = false;
-          break;
-        default:
-          break;
-      }
+        RCLRet ret = RCLdotnetDelegates.native_rcl_take_request(serviceHandle, requestHeaderHandle, requestHandle);
+        switch (ret)
+        {
+          case RCLRet.Ok:
+            bool mustRelease = false;
+            try
+            {
+              // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
+              // handled in generated code across multiple assemblies.
+              // Array and collection indexing would need to create SafeHandles everywere.
+              // It's not worth it, especialy considering the extra allocations for SafeHandles in
+              // arrays or collections that don't realy represent their own native recource.
+              requestHandle.DangerousAddRef(ref mustRelease);
+              request.__ReadFromHandle(requestHandle.DangerousGetHandle());
+            }
+            finally
+            {
+              if (mustRelease)
+              {
+                requestHandle.DangerousRelease();
+              }
+            }
 
-      // TODO: (sh) don't leak memory on exceptions
-      response._DESTROY_NATIVE_MESSAGE (responseHandle);
-      return status;
+            return true;
+
+          case RCLRet.ServiceTakeFailed:
+            return false;
+
+          default:
+            RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_take_request)}() failed.");
+            return false; // unrachable
+        }
+      }
     }
 
-    private static void SendResponse(SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, IMessage response)
+    private static bool TakeResponse(SafeClientHandle clientHandle, SafeRequestIdHandle requestHeaderHandle, IRosMessage response) {
+      // TODO: (sh) Move to Client to take advantage of generic argument.
+      MethodInfo m = response.GetType().GetTypeInfo().GetDeclaredMethod("__CreateMessageHandle");
+      using (var responseHandle = (SafeHandle)m.Invoke(null, new object[] { }))
+      {
+        RCLRet ret = RCLdotnetDelegates.native_rcl_take_response(clientHandle, requestHeaderHandle, responseHandle);
+        switch (ret)
+        {
+          case RCLRet.Ok:
+            bool mustRelease = false;
+            try
+            {
+              // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
+              // handled in generated code across multiple assemblies.
+              // Array and collection indexing would need to create SafeHandles everywere.
+              // It's not worth it, especialy considering the extra allocations for SafeHandles in
+              // arrays or collections that don't realy represent their own native recource.
+              responseHandle.DangerousAddRef(ref mustRelease);
+              response.__ReadFromHandle(responseHandle.DangerousGetHandle());
+            }
+            finally
+            {
+              if (mustRelease)
+              {
+                responseHandle.DangerousRelease();
+              }
+            }
+
+            return true;
+
+          case RCLRet.ClientTakeFailed:
+            return false;
+          
+          default:
+            RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_take_response)}() failed.");
+            return false; // unrachable
+        }
+      }
+    }
+
+    private static void SendResponse(SafeServiceHandle serviceHandle, SafeRequestIdHandle requestHeaderHandle, IRosMessage response)
     {
-      IntPtr responseHandle = response._CREATE_NATIVE_MESSAGE();
-      response._WRITE_HANDLE (responseHandle);
-
-      // TODO: (sh) check return values
-      RCLRet ret = RCLdotnetDelegates.native_rcl_send_response(serviceHandle, requestHeaderHandle, responseHandle);
-
-      // TODO: (sh) don't leak memory on exceptions
-      response._DESTROY_NATIVE_MESSAGE (responseHandle);
+      // TODO: (sh) Move to Service to take advantage of generic argument.
+      MethodInfo m = response.GetType().GetTypeInfo().GetDeclaredMethod("__CreateMessageHandle");
+      using (var responseHandle = (SafeHandle)m.Invoke (null, new object[] { }))
+      {
+        bool mustRelease = false;
+        try
+        {
+          // Using SafeHandles for __WriteToHandle() is very tedious as this needs to be
+          // handled in generated code across multiple assemblies.
+          // Array and collection indexing would need to create SafeHandles everywere.
+          // It's not worth it, especialy considering the extra allocations for SafeHandles in
+          // arrays or collections that don't realy represent their own native recource.
+          responseHandle.DangerousAddRef(ref mustRelease);
+          response.__WriteToHandle(responseHandle.DangerousGetHandle());
+        }
+        finally
+        {
+          if (mustRelease)
+          {
+            responseHandle.DangerousRelease();
+          }
+        }
+        
+        RCLRet ret = RCLdotnetDelegates.native_rcl_send_response(serviceHandle, requestHeaderHandle, responseHandle);
+        if (ret != RCLRet.Ok)
+        {
+          RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_send_response)}() failed.");
+          return; // unrachable
+        }
+      }
     }
 
     public static void SpinOnce (Node node, long timeout) {
@@ -484,7 +557,7 @@ namespace ROS2 {
       }
 
       foreach (Subscription subscription in node.Subscriptions) {
-        IMessage message = subscription.CreateMessage ();
+        IRosMessage message = subscription.CreateMessage();
         bool result = Take (subscription.Handle, message);
         if (result) {
           subscription.TriggerCallback (message);

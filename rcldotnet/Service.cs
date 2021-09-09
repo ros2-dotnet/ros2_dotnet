@@ -1,5 +1,4 @@
 using System;
-using ROS2.Interfaces;
 
 namespace ROS2
 {
@@ -20,17 +19,17 @@ namespace ROS2
         // Disposed if the service is not live anymore.
         abstract internal SafeServiceHandle Handle { get; }
 
-        abstract internal IMessage CreateRequest();
+        abstract internal IRosMessage CreateRequest();
 
-        abstract internal IMessage CreateResponse();
+        abstract internal IRosMessage CreateResponse();
 
-        abstract internal void TriggerCallback(IMessage request, IMessage response);
+        abstract internal void TriggerCallback(IRosMessage request, IRosMessage response);
     }
 
     public sealed class Service<TService, TRequest, TResponse> : Service
         where TService : IRosServiceDefinition<TRequest, TResponse>
-        where TRequest : IMessage, new()
-        where TResponse : IMessage, new()
+        where TRequest : IRosMessage, new()
+        where TResponse : IRosMessage, new()
     {
         private Action<TRequest, TResponse> _callback;
 
@@ -40,13 +39,13 @@ namespace ROS2
             _callback = callback;
         }
 
-        internal override SafeServiceHandle Handle { get; }
+        internal override SafeServiceHandle Handle { get; } 
 
-        internal override IMessage CreateRequest() => (IMessage)new TRequest();
+        internal override IRosMessage CreateRequest() => (IRosMessage)new TRequest();
 
-        internal override IMessage CreateResponse() => (IMessage)new TResponse();
+        internal override IRosMessage CreateResponse() => (IRosMessage)new TResponse();
 
-        internal override void TriggerCallback(IMessage request, IMessage response)
+        internal override void TriggerCallback(IRosMessage request, IRosMessage response)
         {
             _callback((TRequest)request, (TResponse)response);
         }
