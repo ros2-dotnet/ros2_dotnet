@@ -24,6 +24,12 @@ RCLDOTNET_EXPORT
 const char * RCLDOTNET_CDECL native_rcl_get_rmw_identifier();
 
 RCLDOTNET_EXPORT
+void RCLDOTNET_CDECL native_rcl_get_error_string(char *buffer, int32_t bufferSize);
+
+RCLDOTNET_EXPORT
+void RCLDOTNET_CDECL native_rcl_reset_error(void);
+
+RCLDOTNET_EXPORT
 bool RCLDOTNET_CDECL native_rcl_ok();
 
 RCLDOTNET_EXPORT

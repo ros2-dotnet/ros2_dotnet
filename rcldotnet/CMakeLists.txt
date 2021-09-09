@@ -33,6 +33,8 @@ set(CS_SOURCES
   Node.cs
   Publisher.cs
   RCLdotnet.cs
+  RCLExceptionHelper.cs
+  RCLRet.cs
   SafeClientHandle.cs
   SafeNodeHandle.cs
   SafePublisherHandle.cs

@@ -45,11 +45,17 @@ const char *native_rcl_get_rmw_identifier() {
   return rmw_get_implementation_identifier();
 }
 
-const char *native_rcl_get_error_string() {
-  return rcl_get_error_string().str;
+void native_rcl_get_error_string(char *buffer, int32_t bufferSize) {
+  size_t minBufferSize = (size_t)bufferSize < (size_t)RCUTILS_ERROR_MESSAGE_MAX_LENGTH
+    ? (size_t)bufferSize
+    : (size_t)RCUTILS_ERROR_MESSAGE_MAX_LENGTH;
+  
+  strncpy(buffer, rcl_get_error_string().str, minBufferSize);
 }
 
-void native_rcl_reset_error() { rcl_reset_error(); }
+void native_rcl_reset_error(void) {
+  rcl_reset_error();
+}
 
 bool native_rcl_ok() { return rcl_context_is_valid(&context); }
 
