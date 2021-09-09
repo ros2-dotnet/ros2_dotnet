@@ -19,7 +19,7 @@ msg_typename = '%s__%s' % ('__'.join(message.structure.namespaced_type.namespace
 namespace @('.'.join(message.structure.namespaced_type.namespaces))
 {
 
-public class @(type_name) : IMessage {
+public class @(type_name) : global::ROS2.IRosMessage {
     private static readonly DllLoadUtils dllLoadUtils;
 
 @[for member in message.structure.members]@
@@ -142,7 +142,7 @@ public class @(type_name) : IMessage {
     private static NativeGetTypeSupportType native_get_typesupport = null;
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr NativeCreateNativeType();
+    private delegate Safe@(type_name)Handle NativeCreateNativeType();
 
     private static NativeCreateNativeType native_create_native_message = null;
 
@@ -217,15 +217,16 @@ public class @(type_name) : IMessage {
 @[    end if]@
 @[end for]@
 
-    public static IntPtr _GET_TYPE_SUPPORT() {
-        return native_get_typesupport();
-    }
+@# This method gets called via reflection as static abstract interface members are not supported yet.
+    [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+    public static global::System.IntPtr __GetTypeSupport() => native_get_typesupport();
 
-    public IntPtr _CREATE_NATIVE_MESSAGE() {
-        return native_create_native_message();
-    }
+@# This method gets called via reflection as static abstract interface members are not supported yet.
+    [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+    public static global::System.Runtime.InteropServices.SafeHandle __CreateMessageHandle() => native_create_native_message();
 
-    public void _READ_HANDLE(IntPtr messageHandle) {
+    [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+    public void __ReadFromHandle(global::System.IntPtr messageHandle) {
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
       {
@@ -241,7 +242,7 @@ public class @(type_name) : IMessage {
               // TODO: Unicode types are not supported  
 @[        else]@
               @(get_field_name(type_name, member.name))[i__local_variable] = new @(get_dotnet_type(member.type.value_type))();
-              @(get_field_name(type_name, member.name))[i__local_variable]._READ_HANDLE(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
+              @(get_field_name(type_name, member.name))[i__local_variable].__ReadFromHandle(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
 @[        end if]
           }
       }
@@ -260,7 +261,7 @@ public class @(type_name) : IMessage {
               // TODO: Unicode types are not supported  
 @[        else]@
               @(get_field_name(type_name, member.name)).Add(new @(get_dotnet_type(member.type.value_type))());
-              @(get_field_name(type_name, member.name))[i__local_variable]._READ_HANDLE(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
+              @(get_field_name(type_name, member.name))[i__local_variable].__ReadFromHandle(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
 @[        end if]
           }
       }
@@ -274,12 +275,13 @@ public class @(type_name) : IMessage {
         @(get_field_name(type_name, member.name)) = native_read_field_@(member.name)(messageHandle);
 @[        end if]@
 @[    else]@
-        @(get_field_name(type_name, member.name))._READ_HANDLE(native_get_field_@(member.name)_HANDLE(messageHandle));
+        @(get_field_name(type_name, member.name)).__ReadFromHandle(native_get_field_@(member.name)_HANDLE(messageHandle));
 @[    end if]@
 @[end for]@
     }
 
-    public void _WRITE_HANDLE(IntPtr messageHandle) {
+    [global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]
+    public void __WriteToHandle(global::System.IntPtr messageHandle) {
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array) or isinstance(member.type, AbstractSequence)]@
         {
@@ -310,7 +312,7 @@ public class @(type_name) : IMessage {
 @[        elif isinstance(member.type.value_type, AbstractWString)]
 // TODO: Unicode types are not supported  
 @[        else]@
-                value__local_variable._WRITE_HANDLE(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
+                value__local_variable.__WriteToHandle(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
 @[        end if]@
             }
         }
@@ -320,13 +322,9 @@ public class @(type_name) : IMessage {
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
         native_write_field_@(member.name)(messageHandle, @(get_field_name(type_name, member.name)));
 @[    else]@
-        @(get_field_name(type_name, member.name))._WRITE_HANDLE(native_get_field_@(member.name)_HANDLE(messageHandle));
+        @(get_field_name(type_name, member.name)).__WriteToHandle(native_get_field_@(member.name)_HANDLE(messageHandle));
 @[    end if]@
 @[end for]@
-    }
-
-    public void _DESTROY_NATIVE_MESSAGE(IntPtr messageHandle) {
-        native_destroy_native_message(messageHandle);
     }
 
 @[for constant in message.constants]@
@@ -345,6 +343,19 @@ public class @(type_name) : IMessage {
     public @(get_dotnet_type(member.type)) @(get_field_name(type_name, member.name)) { get; set; }
 @[    end if]@
 @[end for]@
+
+    private sealed class Safe@(type_name)Handle : global::System.Runtime.InteropServices.SafeHandle
+    {
+        public Safe@(type_name)Handle() : base(global::System.IntPtr.Zero, true) { }
+
+        public override bool IsInvalid => handle == global::System.IntPtr.Zero;
+
+        protected override bool ReleaseHandle()
+        {
+            native_destroy_native_message(handle);
+            return true;
+        }
+    }
 }
 
 }

@@ -10,7 +10,8 @@ find_package(DotNETExtra REQUIRED)
 
 set(CS_SOURCES
   DllLoadUtils.cs
-  Interfaces.cs
+  IRosMessage.cs
+  IRosServiceDefinition.cs
   RCLExceptionHelper.cs
   RCLRet.cs
 )

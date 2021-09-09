@@ -14,8 +14,9 @@
  */
 
 using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using ROS2.Interfaces;
+using ROS2.Common;
 using ROS2.Utils;
 
 namespace ROS2 {
@@ -23,14 +24,15 @@ namespace ROS2 {
     internal static readonly DllLoadUtils dllLoadUtils;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate void NativeRCLPublishType (
-      SafePublisherHandle publisherHandle, IntPtr messageHandle);
+    internal delegate RCLRet NativeRCLPublishType (
+      SafePublisherHandle publisherHandle, SafeHandle messageHandle);
 
     internal static NativeRCLPublishType native_rcl_publish = null;
 
     static PublisherDelegates () {
       dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils ();
       IntPtr nativelibrary = dllLoadUtils.LoadLibrary ("rcldotnet_publisher");
+
       IntPtr native_rcl_publish_ptr = dllLoadUtils.GetProcAddress (nativelibrary, "native_rcl_publish");
       PublisherDelegates.native_rcl_publish = (NativeRCLPublishType) Marshal.GetDelegateForFunctionPointer (
         native_rcl_publish_ptr, typeof (NativeRCLPublishType));
@@ -53,27 +55,47 @@ namespace ROS2 {
     // By relying on the GC/Finalizer of SafeHandle the handle only gets
     // Disposed if the publisher is not live anymore.
     internal abstract SafePublisherHandle Handle { get; }
-
   }
 
   public sealed class Publisher<T> : Publisher
-    where T : IMessage {
+    where T : IRosMessage {
 
-      internal Publisher (SafePublisherHandle handle) {
-        Handle = handle;
-      }
+    internal Publisher (SafePublisherHandle handle) {
+      Handle = handle;
+    }
 
-      internal override SafePublisherHandle Handle { get; }
+    internal override SafePublisherHandle Handle { get; }
 
-      public void Publish (T msg) {
-        IntPtr messageHandle = msg._CREATE_NATIVE_MESSAGE ();
+    public void Publish (T message) {
+      MethodInfo m = typeof(T).GetTypeInfo().GetDeclaredMethod("__CreateMessageHandle");
+      using (var messageHandle = (SafeHandle)m.Invoke(null, new object[] { }))
+      {
+        bool mustRelease = false;
+        try
+        {
+          // Using SafeHandles for __WriteToHandle() is very tedious as this needs to be
+          // handled in generated code across multiple assemblies.
+          // Array and collection indexing would need to create SafeHandles everywere.
+          // It's not worth it, especialy considering the extra allocations for SafeHandles in
+          // arrays or collections that don't realy represent their own native recource.
+          messageHandle.DangerousAddRef(ref mustRelease);
+          message.__WriteToHandle(messageHandle.DangerousGetHandle());
+        }
+        finally
+        {
+          if (mustRelease)
+          {
+            messageHandle.DangerousRelease();
+          }
+        }
 
-        msg._WRITE_HANDLE (messageHandle);
-
-        // TODO: (sh) Pass and handle return value.
-        PublisherDelegates.native_rcl_publish (Handle, messageHandle);
-
-        msg._DESTROY_NATIVE_MESSAGE (messageHandle);
+        RCLRet ret = PublisherDelegates.native_rcl_publish(Handle, messageHandle);
+        if (ret != RCLRet.Ok)
+        {
+            RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(PublisherDelegates.native_rcl_publish)}() failed.");
+            return; // unrachable
+        }
       }
     }
+  }
 }
