@@ -15,7 +15,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using ROS2.Common;
 using ROS2.Utils;
@@ -166,8 +165,7 @@ namespace ROS2 {
     internal SafeNodeHandle Handle { get; }
 
     public Publisher<T> CreatePublisher<T> (string topic) where T : IRosMessage {
-      MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("__GetTypeSupport");
-      IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
+      IntPtr typesupport = MessageStaticMemberCache<T>.GetTypeSupport();
     
       var publisherHandle = new SafePublisherHandle();
       RCLRet ret = NodeDelegates.native_rcl_create_publisher_handle (ref publisherHandle, Handle, topic, typesupport);
@@ -184,8 +182,7 @@ namespace ROS2 {
     }
 
     public Subscription<T> CreateSubscription<T> (string topic, Action<T> callback) where T : IRosMessage, new () {
-      MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("__GetTypeSupport");
-      IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
+      IntPtr typesupport = MessageStaticMemberCache<T>.GetTypeSupport();
       
       var subscriptionHandle = new SafeSubscriptionHandle();
       RCLRet ret = NodeDelegates.native_rcl_create_subscription_handle (ref subscriptionHandle, Handle, topic, typesupport);
@@ -207,8 +204,7 @@ namespace ROS2 {
         where TRequest : IRosMessage, new()
         where TResponse : IRosMessage, new()
     {
-      MethodInfo m = typeof(TService).GetTypeInfo().GetDeclaredMethod("__GetTypeSupport");
-      IntPtr typesupport = (IntPtr)m.Invoke (null, new object[] { });
+      IntPtr typesupport = ServiceDefinitionStaticMemberCache<TService, TRequest, TResponse>.GetTypeSupport();
 
       var serviceHandle = new SafeServiceHandle();
       RCLRet ret = NodeDelegates.native_rcl_create_service_handle(ref serviceHandle, Handle, serviceName, typesupport);
@@ -230,8 +226,7 @@ namespace ROS2 {
         where TRequest : IRosMessage, new()
         where TResponse : IRosMessage, new()
     {
-      MethodInfo m = typeof(TService).GetTypeInfo().GetDeclaredMethod("__GetTypeSupport");
-      IntPtr typesupport = (IntPtr)m.Invoke (null, new object[] { });
+      IntPtr typesupport = ServiceDefinitionStaticMemberCache<TService, TRequest, TResponse>.GetTypeSupport();
 
       var clientHandle = new SafeClientHandle();
       RCLRet ret = NodeDelegates.native_rcl_create_client_handle(ref clientHandle, Handle, serviceName, typesupport);
@@ -239,7 +234,7 @@ namespace ROS2 {
       if (ret != RCLRet.Ok)
       {
         clientHandle.Dispose();
-        RCLExceptionHelper.ThrowFromReturnValue(ret,  $"{nameof(NodeDelegates.native_rcl_create_client_handle)}() failed.");
+        RCLExceptionHelper.ThrowFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_create_client_handle)}() failed.");
       }
 
       // TODO: (sh) Add serviceName to Client.

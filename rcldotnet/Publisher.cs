@@ -14,12 +14,12 @@
  */
 
 using System;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using ROS2.Common;
 using ROS2.Utils;
 
-namespace ROS2 {
+namespace ROS2
+{
   internal static class PublisherDelegates {
     internal static readonly DllLoadUtils dllLoadUtils;
 
@@ -67,8 +67,7 @@ namespace ROS2 {
     internal override SafePublisherHandle Handle { get; }
 
     public void Publish (T message) {
-      MethodInfo m = typeof(T).GetTypeInfo().GetDeclaredMethod("__CreateMessageHandle");
-      using (var messageHandle = (SafeHandle)m.Invoke(null, new object[] { }))
+      using (var messageHandle = MessageStaticMemberCache<T>.CreateMessageHandle())
       {
         bool mustRelease = false;
         try
