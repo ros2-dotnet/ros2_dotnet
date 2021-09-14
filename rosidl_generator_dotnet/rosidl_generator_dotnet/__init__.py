@@ -133,7 +133,6 @@ def get_builtin_dotnet_type(type_, use_primitives=True):
 
     assert False, "unknown type '%s'" % type_
 
-
 def get_dotnet_type(type_, use_primitives=True):
     if isinstance(type_, AbstractGenericString):
         return 'System.String'

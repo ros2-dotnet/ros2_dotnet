@@ -23,13 +23,13 @@ header_filename = "{0}/rcldotnet_{1}.h".format('/'.join(message.structure.namesp
 #include <stdint.h>
 
 #include <@('/'.join(message.structure.namespaced_type.namespaces))/@(convert_camel_case_to_lower_case_underscore(type_name)).h>
-#include "rosidl_generator_c/message_type_support_struct.h"
+#include "rosidl_runtime_c/message_type_support_struct.h"
 
-#include <rosidl_generator_c/string.h>
-#include <rosidl_generator_c/string_functions.h>
+#include <rosidl_runtime_c/string.h>
+#include <rosidl_runtime_c/string_functions.h>
 
-#include <rosidl_generator_c/primitives_sequence.h>
-#include <rosidl_generator_c/primitives_sequence_functions.h>
+#include <rosidl_runtime_c/primitives_sequence.h>
+#include <rosidl_runtime_c/primitives_sequence_functions.h>
 
 
 #include "@(header_filename)"
@@ -46,7 +46,45 @@ const void * @(msg_typename)__get_typesupport() {
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
-// TODO: Array types are not supported
+void * @(msg_typename)__get_field_@(member.name)_message(void *message_handle, int index) {
+  @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
+  return &(ros_message->@(member.name)[index]);
+}
+
+int @(msg_typename)__getsize_array_field_@(member.name)_message() {
+@[        if isinstance(member.type, Array)]@
+  return @(member.type.size);
+@[        else]@
+  return 0;
+@[        end if]@
+}
+
+@[        if isinstance(member.type.value_type, BasicType)]@
+void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_type_to_c(member.type.value_type)) value)
+{
+  @(msg_type_to_c(member.type.value_type)) * ros_message = (@(msg_type_to_c(member.type.value_type)) *)message_handle;
+  *ros_message = value;
+}
+
+@(msg_type_to_c(member.type.value_type)) @(msg_typename)__read_field_@(member.name)(void *message_handle)
+{
+  @(msg_type_to_c(member.type.value_type)) * ros_message = (@(msg_type_to_c(member.type.value_type)) *)message_handle;
+  return *ros_message;
+}
+@[        elif isinstance(member.type.value_type, AbstractString)]@
+void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_type_to_c(member.type.value_type)) value)
+{
+  
+}
+
+@(msg_type_to_c(member.type.value_type)) @(msg_typename)__read_field_@(member.name)(void *message_handle)
+{
+  @(msg_typename) * ros_message = (@(msg_typename)*)message_handle;
+  return ros_message->@(member.name)->data;
+}
+@[        end if]@
+
+////////////////////////////////////////////////////////
 @[    elif isinstance(member.type, AbstractSequence)]@
 // TODO: Sequence types are not supported
 @[    elif isinstance(member.type, AbstractWString)]@
@@ -63,7 +101,7 @@ const void * @(msg_typename)__get_typesupport() {
 void @(msg_typename)__write_field_@(member.name)(void * message_handle, @(msg_type_to_c(member.type)) value) {
   @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
 @[        if isinstance(member.type, AbstractGenericString)]@
-  rosidl_generator_c__String__assign(
+  rosidl_runtime_c__String__assign(
     &ros_message->@(member.name), value);
 @[        else]@
   ros_message->@(member.name) = value;
