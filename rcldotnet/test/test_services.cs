@@ -78,24 +78,24 @@ namespace RCLdotnetTests
             Assert.Equal((ulong)47, clientReceivedResponse.Uint64_value);
             Assert.Equal("one", clientReceivedResponse.String_value);
 
-            void HandleRequest(test_msgs.srv.BasicTypes_Request request, test_msgs.srv.BasicTypes_Response response)
+            void HandleRequest(test_msgs.srv.BasicTypes_Request req, test_msgs.srv.BasicTypes_Response response)
             {
-                serviceReceivedRequest = request;
+                serviceReceivedRequest = req;
 
-                response.Bool_value = request.Bool_value;
-                response.Byte_value = request.Byte_value;
-                response.Char_value = request.Char_value;
-                response.Float32_value = request.Float32_value;
-                response.Float64_value = request.Float64_value;
-                response.Int8_value = request.Int8_value;
-                response.Uint8_value = request.Uint8_value;
-                response.Int16_value = request.Int16_value;
-                response.Uint16_value = request.Uint16_value;
-                response.Int32_value = request.Int32_value + 100;
-                response.Uint32_value = request.Uint32_value;
-                response.Int64_value = request.Int64_value;
-                response.Uint64_value = request.Uint64_value;
-                response.String_value = request.String_value;
+                response.Bool_value = req.Bool_value;
+                response.Byte_value = req.Byte_value;
+                response.Char_value = req.Char_value;
+                response.Float32_value = req.Float32_value;
+                response.Float64_value = req.Float64_value;
+                response.Int8_value = req.Int8_value;
+                response.Uint8_value = req.Uint8_value;
+                response.Int16_value = req.Int16_value;
+                response.Uint16_value = req.Uint16_value;
+                response.Int32_value = req.Int32_value + 100;
+                response.Uint32_value = req.Uint32_value;
+                response.Int64_value = req.Int64_value;
+                response.Uint64_value = req.Uint64_value;
+                response.String_value = req.String_value;
             }
         }
     }
