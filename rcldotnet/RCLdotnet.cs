@@ -35,6 +35,11 @@ namespace ROS2 {
     internal static NativeRCLInitType native_rcl_init = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate int NativeRCLShutdownType ();
+
+    internal static NativeRCLShutdownType native_rcl_shutdown = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate bool NativeRCLOkType ();
 
     internal static NativeRCLOkType native_rcl_ok = null;
@@ -56,6 +61,11 @@ namespace ROS2 {
     internal static NativeRCLGetErrorStringType native_rcl_get_error_string = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate IntPtr NativeRCLResetErrorType ();
+
+    internal static NativeRCLResetErrorType native_rcl_reset_error = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate IntPtr NativeRCLGetZeroInitializedWaitSetType ();
 
     internal static NativeRCLGetZeroInitializedWaitSetType native_rcl_get_zero_initialized_wait_set = null;
@@ -74,9 +84,13 @@ namespace ROS2 {
     internal static NativeRCLWaitSetClearType native_rcl_wait_set_clear = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate void NativeRCLWaitSetAddSubscriptionType (IntPtr waitSetHandle, IntPtr subscriptionHandle);
+    internal delegate void NativeRCLWaitSetAddType (IntPtr waitSetHandle, IntPtr handle);
 
-    internal static NativeRCLWaitSetAddSubscriptionType native_rcl_wait_set_add_subscription = null;
+    internal static NativeRCLWaitSetAddType native_rcl_wait_set_add_subscription = null;
+
+    internal static NativeRCLWaitSetAddType native_rcl_wait_set_add_service = null;
+
+    internal static NativeRCLWaitSetAddType native_rcl_wait_set_add_client = null;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
     internal delegate void NativeRCLDestroyWaitSetType (IntPtr waitSetHandle);
@@ -93,6 +107,23 @@ namespace ROS2 {
 
     internal static NativeRCLTakeType native_rcl_take = null;
 
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate int NativeRCLServiceType (IntPtr serviceHandle, IntPtr requestHeader, IntPtr messageHandle);
+
+    internal static NativeRCLServiceType native_rcl_take_request = null;
+
+    internal static NativeRCLServiceType native_rcl_send_response = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate void NativeRCLCreateRequestHeaderType (ref IntPtr header);
+
+    internal static NativeRCLCreateRequestHeaderType native_rcl_create_request_header = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate void NativeRCLFreeRequestHeaderType (IntPtr header);
+
+    internal static NativeRCLFreeRequestHeaderType native_rcl_free_request_header = null;
+
     static RCLdotnetDelegates () {
       dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils ();
       string library_name = "rcldotnet";
@@ -104,11 +135,23 @@ namespace ROS2 {
         (NativeRCLInitType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_init_ptr, typeof (NativeRCLInitType));
 
+      IntPtr native_rcl_shutdown_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_shutdown");
+      RCLdotnetDelegates.native_rcl_shutdown =
+        (NativeRCLShutdownType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_shutdown_ptr, typeof (NativeRCLShutdownType));
+
       IntPtr native_rcl_get_error_string_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_get_error_string");
       RCLdotnetDelegates.native_rcl_get_error_string =
         (NativeRCLGetErrorStringType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_get_error_string_ptr, typeof (NativeRCLGetErrorStringType));
+
+      IntPtr native_rcl_reset_error_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_reset_error");
+      RCLdotnetDelegates.native_rcl_reset_error =
+        (NativeRCLResetErrorType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_reset_error_ptr, typeof (NativeRCLResetErrorType));
 
       IntPtr native_rcl_get_rmw_identifier_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_get_rmw_identifier");
@@ -149,8 +192,20 @@ namespace ROS2 {
       IntPtr native_rcl_wait_set_add_subscription_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_wait_set_add_subscription");
       RCLdotnetDelegates.native_rcl_wait_set_add_subscription =
-        (NativeRCLWaitSetAddSubscriptionType) Marshal.GetDelegateForFunctionPointer (
-          native_rcl_wait_set_add_subscription_ptr, typeof (NativeRCLWaitSetAddSubscriptionType));
+        (NativeRCLWaitSetAddType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_wait_set_add_subscription_ptr, typeof (NativeRCLWaitSetAddType));
+
+      IntPtr native_rcl_wait_set_add_service_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_wait_set_add_service");
+      RCLdotnetDelegates.native_rcl_wait_set_add_service =
+        (NativeRCLWaitSetAddType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_wait_set_add_service_ptr, typeof (NativeRCLWaitSetAddType));
+
+      IntPtr native_rcl_wait_set_add_client_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_wait_set_add_client");
+      RCLdotnetDelegates.native_rcl_wait_set_add_client =
+        (NativeRCLWaitSetAddType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_wait_set_add_client_ptr, typeof (NativeRCLWaitSetAddType));
 
       IntPtr native_rcl_destroy_wait_set_ptr =
         dllLoadUtils.GetProcAddress (pDll, "native_rcl_destroy_wait_set");
@@ -170,6 +225,30 @@ namespace ROS2 {
       RCLdotnetDelegates.native_rcl_take =
         (NativeRCLTakeType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_take_ptr, typeof (NativeRCLTakeType));
+    
+      IntPtr native_rcl_take_request_ptr = 
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_take_request");
+      RCLdotnetDelegates.native_rcl_take_request = 
+        (NativeRCLServiceType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_take_request_ptr, typeof (NativeRCLServiceType));
+
+      IntPtr native_rcl_send_response_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_send_response");
+      RCLdotnetDelegates.native_rcl_send_response = 
+        (NativeRCLServiceType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_send_response_ptr, typeof (NativeRCLServiceType));
+      
+      IntPtr native_rcl_create_request_header_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_create_request_header");
+      RCLdotnetDelegates.native_rcl_create_request_header = 
+        (NativeRCLCreateRequestHeaderType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_create_request_header_ptr, typeof (NativeRCLCreateRequestHeaderType));
+      
+      IntPtr native_rcl_free_request_header_ptr =
+        dllLoadUtils.GetProcAddress (pDll, "native_rcl_free_request_header");
+      RCLdotnetDelegates.native_rcl_free_request_header = 
+        (NativeRCLFreeRequestHeaderType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_free_request_header_ptr, typeof (NativeRCLFreeRequestHeaderType));
     }
   }
 
@@ -187,9 +266,28 @@ namespace ROS2 {
 
     public static Node CreateNode (string nodeName, string nodeNamespace) {
       IntPtr nodeHandle = IntPtr.Zero;
-      int ret = RCLdotnetDelegates.native_rcl_create_node_handle (ref nodeHandle, nodeName, nodeNamespace);
+      RCLRet ret = (RCLRet) RCLdotnetDelegates.native_rcl_create_node_handle (ref nodeHandle, nodeName, nodeNamespace);
+      if (ret != RCLRet.Ok)
+      {
+          // TODO: SHS: Log this somewhere.
+          ResetRclError();
+          return null;
+      }
+
       Node node = new Node (nodeHandle);
       return node;
+    }
+
+    public static IntPtr CreateRequestHeader ()
+    {
+      IntPtr header = IntPtr.Zero;
+      RCLdotnetDelegates.native_rcl_create_request_header (ref header);
+      return header;
+    }
+
+    public static void FreeRequestHeader (IntPtr header)
+    {
+      RCLdotnetDelegates.native_rcl_free_request_header (header);      
     }
 
     public static void Spin (INode node) {
@@ -198,11 +296,11 @@ namespace ROS2 {
       }
     }
 
-    private static IntPtr GetZeroInitializedWaitSet () {
+    public static IntPtr GetZeroInitializedWaitSet () {
       return RCLdotnetDelegates.native_rcl_get_zero_initialized_wait_set ();
     }
 
-    private static void WaitSetInit (
+    public static bool WaitSetInit (
       IntPtr waitSetHandle,
       long numberOfSubscriptions,
       long numberOfGuardConditions,
@@ -210,27 +308,42 @@ namespace ROS2 {
       long numberOfClients,
       long numberOfServices,
       long numberOfEvents) {
-      RCLdotnetDelegates.native_rcl_wait_set_init (
+      RCLRet ret = (RCLRet) RCLdotnetDelegates.native_rcl_wait_set_init (
         waitSetHandle, numberOfSubscriptions, numberOfGuardConditions,
         numberOfTimers, numberOfClients, numberOfServices, numberOfEvents);
+      if (ret != RCLRet.Ok)
+      {
+          // TODO: SHS: Log this somewhere.
+          ResetRclError();
+          return false;
+      }
+
+      return true;
     }
 
-    private static void WaitSetClear (IntPtr waitSetHandle) {
+    public static void WaitSetClear (IntPtr waitSetHandle) {
       RCLdotnetDelegates.native_rcl_wait_set_clear (waitSetHandle);
     }
 
-    private static void WaitSetAddSubscription (IntPtr waitSetHandle, IntPtr subscriptionHandle) {
+    public static void WaitSetAddSubscription (IntPtr waitSetHandle, IntPtr subscriptionHandle) {
       RCLdotnetDelegates.native_rcl_wait_set_add_subscription (waitSetHandle, subscriptionHandle);
     }
 
-    private static void DestroyWaitSet (IntPtr waitSetHandle) {
+    public static void WaitSetAddService (IntPtr waitSetHandle, IntPtr serviceHandle) {
+      RCLdotnetDelegates.native_rcl_wait_set_add_service (waitSetHandle, serviceHandle);
+    }
+
+    public static void WaitSetAddClient (IntPtr waitSetHandle, IntPtr clientHandle) {
+      RCLdotnetDelegates.native_rcl_wait_set_add_client (waitSetHandle, clientHandle);
+    }
+
+    public static void DestroyWaitSet (IntPtr waitSetHandle) {
       RCLdotnetDelegates.native_rcl_destroy_wait_set (waitSetHandle);
     }
 
-    private static void Wait (IntPtr waitSetHandle, long timeout) {
+    public static int Wait (IntPtr waitSetHandle, long timeout) {
       long ns_timeout = timeout * 1000000;
-      RCLRet ret = (RCLRet) RCLdotnetDelegates.native_rcl_wait (waitSetHandle, ns_timeout);
-      // TODO(esteve): do something with ret
+      return RCLdotnetDelegates.native_rcl_wait (waitSetHandle, ns_timeout);
     }
 
     private static bool Take (IntPtr subscriptionHandle, IMessage message) {
@@ -244,6 +357,8 @@ namespace ROS2 {
           break;
         case RCLRet.SubscriptionTakeFailed:
           status = false;
+          // TODO: SHS: Log this somewhere.
+          ResetRclError();
           break;
         default:
           break;
@@ -252,17 +367,66 @@ namespace ROS2 {
       return status;
     }
 
+    private static bool TakeRequest (IntPtr serviceHandle, IntPtr requestHeader, IMessage message) {
+      bool status = false;
+      IntPtr messageHandle = message._CREATE_NATIVE_MESSAGE ();
+      RCLRet ret = (RCLRet) RCLdotnetDelegates.native_rcl_take_request (serviceHandle, requestHeader, messageHandle);
+      switch (ret) {
+        case RCLRet.Ok:
+          message._READ_HANDLE (messageHandle);
+          status = true;
+          break;
+        case RCLRet.ServiceTakeFailed:
+          status = false;
+          // TODO: SHS: Log this somewhere.
+          ResetRclError();
+          break;
+        default:
+          break;
+      }
+      message._DESTROY_NATIVE_MESSAGE (messageHandle);
+      return status;
+    }
+
+    private static bool SendResponse (IntPtr serviceHandle, IntPtr requestHeader, IMessage message) {
+      bool status = false;
+      IntPtr messageHandle = message._CREATE_NATIVE_MESSAGE ();
+      message._WRITE_HANDLE (messageHandle);
+      RCLRet ret = (RCLRet) RCLdotnetDelegates.native_rcl_send_response (serviceHandle, requestHeader, messageHandle);
+      switch (ret) {
+        case RCLRet.Ok:          
+          status = true;
+          break;
+        case RCLRet.Error:
+          status = false;
+          // TODO: SHS: Log this somewhere.
+          ResetRclError();
+          break;
+        default:
+          break;
+      }
+      message._DESTROY_NATIVE_MESSAGE (messageHandle);
+      return status;  
+    }
+
     public static void SpinOnce (INode node, long timeout) {
       IntPtr waitSetHandle = GetZeroInitializedWaitSet ();
+
+      // If this node does not have anything to wait on, just sleep
+      if (node.Subscriptions.Count + node.Services.Count == 0)
+      {
+        System.Threading.Thread.Sleep((int)timeout);
+        return;
+      }
 
       long numberOfSubscriptions = node.Subscriptions.Count;
       long numberOfGuardConditions = 0;
       long numberOfTimers = 0;
       long numberOfClients = 0;
-      long numberOfServices = 0;
+      long numberOfServices = node.Services.Count;
       long numberOfEvents = 0;
 
-      WaitSetInit (
+      if (!WaitSetInit (
         waitSetHandle,
         numberOfSubscriptions,
         numberOfGuardConditions,
@@ -270,7 +434,10 @@ namespace ROS2 {
         numberOfClients,
         numberOfServices,
         numberOfEvents
-      );
+      )) {
+        // We will spin again
+        return;
+      }
 
       WaitSetClear (waitSetHandle);
 
@@ -278,7 +445,18 @@ namespace ROS2 {
         WaitSetAddSubscription (waitSetHandle, subscription.Handle);
       }
 
-      Wait (waitSetHandle, timeout);
+      foreach (IServiceBase service in node.Services) {
+        WaitSetAddService (waitSetHandle, service.Handle);
+      }
+
+      RCLRet ret = (RCLRet) Wait (waitSetHandle, timeout);
+      if (ret != RCLRet.Ok)
+      {
+          // TODO: SHS: Log this somewhere.
+          ResetRclError();
+          DestroyWaitSet (waitSetHandle);
+          return;
+      }
 
       foreach (ISubscriptionBase subscription in node.Subscriptions) {
         IMessage message = subscription.CreateMessage ();
@@ -287,6 +465,18 @@ namespace ROS2 {
           subscription.TriggerCallback (message);
         }
       }
+
+      foreach (IServiceBase service in node.Services) {
+        IMessage request = service.CreateRequestMessage ();
+        IntPtr header = CreateRequestHeader();
+        bool result = TakeRequest (service.Handle, header, request);
+        if (result) {
+          var response = service.HandleRequest (request);
+          SendResponse (service.Handle, header, response);
+        }
+        FreeRequestHeader(header);
+      }
+
       DestroyWaitSet (waitSetHandle);
     }
 
@@ -295,7 +485,28 @@ namespace ROS2 {
       lock (syncLock) {
         if (!initialized) {
           ret = (RCLRet)RCLdotnetDelegates.native_rcl_init ();
-          initialized = true;
+          if (ret == RCLRet.Ok)
+          {
+            initialized = true;
+          }
+        }
+      }
+
+      return ret;
+    }
+
+    public static RCLRet Shutdown()
+    {
+      RCLRet ret = RCLRet.Ok;
+      lock (syncLock)
+      {
+        if (initialized)
+        {
+          ret = (RCLRet)RCLdotnetDelegates.native_rcl_shutdown();
+          if (ret == RCLRet.Ok)
+          {
+            initialized = false;
+          }
         }
       }
 
@@ -306,6 +517,10 @@ namespace ROS2 {
       StringBuilder buffer = new StringBuilder(1024);
       RCLdotnetDelegates.native_rcl_get_error_string (buffer.Capacity, buffer);
       return buffer.ToString();
+    }
+
+    public static void ResetRclError () {
+      RCLdotnetDelegates.native_rcl_reset_error ();
     }
 
     public static string GetRMWIdentifier () {

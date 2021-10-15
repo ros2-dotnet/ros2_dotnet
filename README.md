@@ -13,8 +13,7 @@ Build status
 Introduction
 ------------
 
-This is a collection of projects (bindings, code generator, examples and more) for writing ROS2
-applications for .NET Core and .NET Standard.
+This is a collection of projects (bindings, code generator, examples and more) for writing ROS2 applications for .NET Core and .NET Standard.
 
 Features
 --------
@@ -22,6 +21,7 @@ Features
 The current set of features include:
 - Generation of all builtin ROS types
 - Support for publishers and subscriptions
+- Support for clients and services
 - Cross-platform support (Linux, Windows, Windows IoT Core, UWP)
 
 What's missing?
@@ -32,7 +32,6 @@ Lots of things!
 - String constants (specifically BoundedString)
 - Nested types
 - Component nodes
-- Clients and services
 - Actions
 - Tests
 - Documentation
@@ -180,7 +179,47 @@ Linux
 ros2 run rcldotnet_examples rcldotnet_listener
 ```
 
-Enjoy!
+### Service and client
+
+Service:
+
+Windows
+-------
+
+```
+call \dev\ros2_dotnet_ws\install\local_setup.bat
+
+ros2 run rcldotnet_examples rcldotnet_server
+```
+
+Linux
+-----
+
+```
+. ~/ros2_dotnet_ws/install/local_setup.sh
+
+ros2 run rcldotnet_examples rcldotnet_server
+```
+
+Client:
+
+Windows
+-------
+
+```
+call \dev\ros2_dotnet_ws\install\local_setup.bat
+
+ros2 run rcldotnet_examples rcldotnet_client
+```
+
+Linux
+-----
+
+```
+. ~/ros2_dotnet_ws/install/local_setup.sh
+
+ros2 run rcldotnet_examples rcldotnet_client
+```
 
 ## Using generated DLLs in your UWP application from Visual Studio
 

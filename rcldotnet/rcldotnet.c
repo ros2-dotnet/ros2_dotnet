@@ -21,6 +21,7 @@
 #include <rmw/rmw.h>
 
 #include "rosidl_runtime_c/message_type_support_struct.h"
+#include "rosidl_runtime_c/service_type_support_struct.h"
 
 #include "rcldotnet.h"
 
@@ -41,6 +42,15 @@ int32_t native_rcl_init() {
 
   rmw_set_log_severity(RMW_LOG_SEVERITY_DEBUG);
   return ret;
+}
+
+int32_t native_rcl_shutdown() {
+  rcl_ret_t ret =  rcl_shutdown(&context);
+  if (RCL_RET_OK != ret) {
+    return ret;
+  }
+  
+  return rcl_context_fini(&context);
 }
 
 const char *native_rcl_get_rmw_identifier() {
@@ -104,12 +114,28 @@ int32_t native_rcl_wait_set_add_subscription(void *wait_set_handle, void *subscr
   return ret;
 }
 
+int32_t native_rcl_wait_set_add_service(void *wait_set_handle, void *service_handle) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+  rcl_service_t *service = (rcl_service_t *)service_handle;
+  rcl_ret_t ret = rcl_wait_set_add_service(wait_set, service, NULL);
+
+  return ret;
+}
+
+int32_t native_rcl_wait_set_add_client(void *wait_set_handle, void *client_handle) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+  rcl_client_t *client = (rcl_client_t *)client_handle;
+  rcl_ret_t ret = rcl_wait_set_add_client(wait_set, client, NULL);
+
+  return ret;
+}
+
 void native_rcl_destroy_wait_set(void *wait_set_handle) {
   free((rcl_wait_set_t *)wait_set_handle);
 }
 
-int32_t native_rcl_wait_set(void *wait_set_handle, long timeout) {
-  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+int32_t native_rcl_wait(void *wait_set_handle, long timeout) {
+  rcl_wait_set_t * wait_set = (rcl_wait_set_t *)wait_set_handle;
   rcl_ret_t ret = rcl_wait(wait_set, timeout);
 
   return ret;
@@ -122,9 +148,33 @@ int32_t native_rcl_take(void *subscription_handle, void *message_handle) {
   return ret;
 }
 
-int32_t native_rcl_wait(void *wait_set_handle, int64_t timeout) {
-  rcl_wait_set_t * wait_set = (rcl_wait_set_t *)wait_set_handle;
-  rcl_ret_t ret = rcl_wait(wait_set, timeout);
+int32_t native_rcl_take_request(void * service_handle, void *request_header, void * raw_ros_message)
+{
+  rcl_service_t * service = (rcl_service_t *)service_handle;
+  rmw_request_id_t * header = (rmw_request_id_t *)request_header;
+
+  rcl_ret_t ret = rcl_take_request(service, header, raw_ros_message);
 
   return ret;
+}
+
+int32_t native_rcl_send_response(void * service_handle, void *request_header, void * raw_ros_message)
+{
+  rcl_service_t * service = (rcl_service_t *)service_handle;
+  rmw_request_id_t * header = (rmw_request_id_t *)request_header;
+
+  rcl_ret_t ret = rcl_send_response(service, header, raw_ros_message);
+  return ret;
+}
+
+void native_rcl_create_request_header(void **header)
+{
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  *header = (void *) allocator.allocate(sizeof(rmw_request_id_t), allocator.state);
+}
+
+void native_rcl_free_request_header(void *header)
+{
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  allocator.deallocate(header, allocator.state);
 }

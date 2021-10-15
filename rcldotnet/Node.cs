@@ -42,6 +42,18 @@ namespace ROS2 {
 
     internal static NativeRCLCreateSubscriptionHandleType native_rcl_create_subscription_handle = null;
 
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate int NativeRCLCreateServiceHandleType (
+      ref IntPtr serviceHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle, QosProfile.Profile profile_id);
+
+    internal static NativeRCLCreateServiceHandleType native_rcl_create_service_handle = null;
+
+    [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+    internal delegate int NativeRCLCreateClientHandleType (
+      ref IntPtr clientHandle, IntPtr nodeHandle, [MarshalAs (UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle, QosProfile.Profile profile_id);
+
+    internal static NativeRCLCreateClientHandleType native_rcl_create_client_handle = null;
+
     static NodeDelegates () {
       dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils ();
       IntPtr nativelibrary = dllLoadUtils.LoadLibrary ("rcldotnet_node");
@@ -59,6 +71,20 @@ namespace ROS2 {
       NodeDelegates.native_rcl_create_subscription_handle =
         (NativeRCLCreateSubscriptionHandleType) Marshal.GetDelegateForFunctionPointer (
           native_rcl_create_subscription_handle_ptr, typeof (NativeRCLCreateSubscriptionHandleType));
+
+      IntPtr native_rcl_create_service_handle_ptr = dllLoadUtils.GetProcAddress (
+        nativelibrary, "native_rcl_create_service_handle");
+
+      NodeDelegates.native_rcl_create_service_handle =
+        (NativeRCLCreateServiceHandleType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_create_service_handle_ptr, typeof (NativeRCLCreateServiceHandleType));
+
+      IntPtr native_rcl_create_client_handle_ptr = dllLoadUtils.GetProcAddress (
+        nativelibrary, "native_rcl_create_client_handle");
+
+      NodeDelegates.native_rcl_create_client_handle =
+        (NativeRCLCreateClientHandleType) Marshal.GetDelegateForFunctionPointer (
+          native_rcl_create_client_handle_ptr, typeof (NativeRCLCreateClientHandleType));
     }
   }
 
@@ -66,34 +92,64 @@ namespace ROS2 {
 
     private IList<ISubscriptionBase> subscriptions_;
 
+    private IList<IServiceBase> services_;
+
     public Node (IntPtr handle) {
       Handle = handle;
       subscriptions_ = new List<ISubscriptionBase> ();
+      services_ = new List<IServiceBase> ();
     }
 
     public IList<ISubscriptionBase> Subscriptions { get { return subscriptions_; } }
 
+    public IList<IServiceBase> Services { get { return services_; } }
+
     public IntPtr Handle { get; }
 
-    public IPublisher<T> CreatePublisher<T> (string topic, QosProfile.Profile profile_id) where T : IMessage {
+    public IPublisher<T> CreatePublisher<T> (string topic, QosProfile.Profile profileId) where T : IMessage {
       MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("_GET_TYPE_SUPPORT");
 
       IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
       IntPtr publisherHandle = IntPtr.Zero;
-      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_publisher_handle (ref publisherHandle, Handle, topic, typesupport, profile_id);
+      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_publisher_handle (ref publisherHandle, Handle, topic, typesupport, profileId);
       Publisher<T> publisher = new Publisher<T> (publisherHandle);
       return publisher;
     }
 
-    public ISubscription<T> CreateSubscription<T> (string topic, Action<T> callback, QosProfile.Profile profile_id) where T : IMessage, new () {
+    public ISubscription<T> CreateSubscription<T> (string topic, Action<T> callback, QosProfile.Profile profileId) where T : IMessage, new () {
       MethodInfo m = typeof (T).GetTypeInfo().GetDeclaredMethod ("_GET_TYPE_SUPPORT");
 
       IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
       IntPtr subscriptionHandle = IntPtr.Zero;
-      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_subscription_handle (ref subscriptionHandle, Handle, topic, typesupport, profile_id);
+      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_subscription_handle (ref subscriptionHandle, Handle, topic, typesupport, profileId);
       Subscription<T> subscription = new Subscription<T> (subscriptionHandle, callback);
       this.subscriptions_.Add (subscription);
       return subscription;
+    }
+
+    public IService<TRequest, TResponse> CreateService<TService, TRequest, TResponse>(string serviceName, Func<TRequest, TResponse> callback, QosProfile.Profile profileId = QosProfile.Profile.Default)
+            where TRequest : IMessage, new()
+            where TResponse : IMessage, new() {
+      MethodInfo m = typeof (TService).GetTypeInfo().GetDeclaredMethod ("_GET_TYPE_SUPPORT");
+
+      IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
+      IntPtr serviceHandle = IntPtr.Zero;
+      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_service_handle (ref serviceHandle, Handle, serviceName, typesupport, profileId);
+      Service<TRequest, TResponse> service = new Service<TRequest, TResponse> (serviceHandle, callback);
+      this.services_.Add (service);
+      return service;
+    }
+
+    public IClient<TRequest, TResponse> CreateClient<TService, TRequest, TResponse>(string serviceName, QosProfile.Profile profileId = QosProfile.Profile.Default)
+            where TRequest : IMessage, new()
+            where TResponse : IMessage, new() {
+      MethodInfo m = typeof (TService).GetTypeInfo().GetDeclaredMethod ("_GET_TYPE_SUPPORT");
+
+      IntPtr typesupport = (IntPtr) m.Invoke (null, new object[] { });
+      IntPtr clientHandle = IntPtr.Zero;
+      RCLRet ret = (RCLRet) NodeDelegates.native_rcl_create_client_handle (ref clientHandle, Handle, serviceName, typesupport, profileId);
+      Client<TRequest, TResponse> client = new Client<TRequest, TResponse> (clientHandle, Handle);
+      return client;
     }
   }
 }

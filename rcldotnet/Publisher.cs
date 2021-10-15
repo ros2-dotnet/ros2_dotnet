@@ -21,6 +21,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using ROS2.Common;
 using ROS2.Interfaces;
 using ROS2.Utils;
 
@@ -29,7 +30,7 @@ namespace ROS2 {
     internal static readonly DllLoadUtils dllLoadUtils;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate void NativeRCLPublishType (
+    internal delegate int NativeRCLPublishType (
       IntPtr publisherHandle, IntPtr messageHandle);
 
     internal static NativeRCLPublishType native_rcl_publish = null;
@@ -52,14 +53,21 @@ namespace ROS2 {
 
       public IntPtr Handle { get; }
 
-      public void Publish (T msg) {
+      public bool Publish (T msg) {
         IntPtr messageHandle = msg._CREATE_NATIVE_MESSAGE ();
 
         msg._WRITE_HANDLE (messageHandle);
 
-        PublisherDelegates.native_rcl_publish (Handle, messageHandle);
+        RCLRet ret = (RCLRet) PublisherDelegates.native_rcl_publish (Handle, messageHandle);
+        if (ret != RCLRet.Ok)
+        {  
+            // TODO: SHS: log the error
+            RCLdotnet.ResetRclError();
+        }
 
         msg._DESTROY_NATIVE_MESSAGE (messageHandle);
+
+        return ret == RCLRet.Ok;
       }
     }
 }

@@ -1,5 +1,8 @@
 ros2_dotnet
 Copyright 2016-2018 Esteve Fernandez (esteve@apache.org)
+Copyright 2021 Microsoft
 
 This product includes software developed by
 Esteve Fernandez (esteve@apache.org)
+
+Modifications and additions by Stuart Schaefer (stscha@microsoft.com)

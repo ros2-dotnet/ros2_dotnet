@@ -5,12 +5,17 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 using ROS2;
+using ROS2.Common;
 using ROS2.Utils;
 
 namespace ConsoleApplication {
   public class RCLDotnetListener {
     public static void Main (string[] args) {
-      RCLdotnet.Init ();
+      if (RCLdotnet.Init () != RCLRet.Ok)
+      {
+        Console.WriteLine("Unable to initialize RCL");
+        return;
+      }
 
       INode node = RCLdotnet.CreateNode ("listener");
 
@@ -18,6 +23,8 @@ namespace ConsoleApplication {
         "chatter", msg => Console.WriteLine ("I heard: [" + msg.Data + "]"), QosProfile.Profile.Default);
 
       RCLdotnet.Spin (node);
+
+      RCLdotnet.Shutdown ();
     }
   }
 }

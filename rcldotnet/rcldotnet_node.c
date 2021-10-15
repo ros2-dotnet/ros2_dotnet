@@ -18,11 +18,13 @@
 #include <rcl/error_handling.h>
 #include <rcl/node.h>
 #include <rcl/rcl.h>
-#include <rcl/subscription.h> // camel
+#include <rcl/subscription.h>
+#include <rcl/service.h>
 #include <rmw/rmw.h>
 #include <rmw/types.h>
 
 #include "rosidl_runtime_c/message_type_support_struct.h"
+#include "rosidl_runtime_c/service_type_support_struct.h"
 
 #include "rcldotnet_node.h"
 
@@ -72,6 +74,56 @@ int32_t native_rcl_create_subscription_handle(void **subscription_handle,
       rcl_subscription_init(subscription, node, ts, topic, &subscription_ops);
 
   *subscription_handle = (void *)subscription;
+
+  return ret;
+}
+
+int32_t native_rcl_create_service_handle(void **service_handle,
+                                              void *node_handle,
+                                              const char *topic,
+                                              void *typesupport,
+                                              int qos_profile_id) {
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+
+  rosidl_service_type_support_t *ts =
+      (rosidl_service_type_support_t *)typesupport;
+
+  rcl_service_t *service =
+      (rcl_service_t *)malloc(sizeof(rcl_service_t));
+  service->impl = NULL;
+  rcl_service_options_t service_ops =
+      rcl_service_get_default_options();
+  service_ops.qos = retrieve_qos_profile(qos_profile_id);
+
+  rcl_ret_t ret =
+      rcl_service_init(service, node, ts, topic, &service_ops);
+
+  *service_handle = (void *)service;
+
+  return ret;
+}
+
+int32_t native_rcl_create_client_handle(void **client_handle,
+                                              void *node_handle,
+                                              const char *topic,
+                                              void *typesupport,
+                                              int qos_profile_id) {
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+
+  rosidl_service_type_support_t *ts =
+      (rosidl_service_type_support_t *)typesupport;
+
+  rcl_client_t *client =
+      (rcl_client_t *)malloc(sizeof(rcl_client_t));
+  client->impl = NULL;
+  rcl_client_options_t client_ops =
+      rcl_client_get_default_options();
+  client_ops.qos = retrieve_qos_profile(qos_profile_id);
+
+  rcl_ret_t ret =
+      rcl_client_init(client, node, ts, topic, &client_ops);
+
+  *client_handle = (void *)client;
 
   return ret;
 }

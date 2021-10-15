@@ -6,7 +6,8 @@ if(MSVC)
   add_compile_options(/W3 /wd4005 /wd4996 /wd4018 -D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
+#set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
+set(CSHARP_TARGET_FRAMEWORK "netcoreapp2.0")
 
 find_package(ament_cmake_export_assemblies REQUIRED)
 
@@ -32,13 +33,18 @@ if(NOT WIN32)
 endif()
 
 set(CS_SOURCES
+  IClient.cs
   INode.cs
   IPublisher.cs
+  IService.cs
   ISubscription.cs
   ISubscriptionBase.cs
+  Client.cs
   Node.cs
   Publisher.cs
   RCLdotnet.cs
+  RCLException.cs
+  Service.cs
   Subscription.cs
   QosProfile.cs
 )
@@ -58,7 +64,7 @@ add_dotnet_library(${PROJECT_NAME}_assemblies
 install_dotnet(${PROJECT_NAME}_assemblies DESTINATION lib/${PROJECT_NAME}/dotnet)
 ament_export_assemblies_dll("lib/${PROJECT_NAME}/dotnet/${PROJECT_NAME}_assemblies.dll")
 
-set(_native_sources "rcldotnet;rcldotnet_node;rcldotnet_publisher")
+set(_native_sources "rcldotnet;rcldotnet_node;rcldotnet_publisher;rcldotnet_client")
 
 foreach(_target_name ${_native_sources})
   add_library(${_target_name} SHARED

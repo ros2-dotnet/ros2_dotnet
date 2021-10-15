@@ -29,4 +29,16 @@ int32_t RCLDOTNET_CDECL native_rcl_create_subscription_handle(void **, void *,
                                                               void *,
                                                               int);
 
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_create_service_handle(void **, void *,
+                                                              const char *,
+                                                              void *,
+                                                              int);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_create_client_handle(void **, void *,
+                                                              const char *,
+                                                              void *,
+                                                              int);
+
 #endif // RCLDOTNET_NODE_H

@@ -5,12 +5,17 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 using ROS2;
+using ROS2.Common;
 using ROS2.Utils;
 
 namespace ConsoleApplication {
   public class RCLDotnetTalker {
     public static void Main (string[] args) {
-      RCLdotnet.Init ();
+      if (RCLdotnet.Init () != RCLRet.Ok)
+      {
+        Console.WriteLine("Unable to initialize RCL");
+        return;
+      }
 
       INode node = RCLdotnet.CreateNode ("talker");
 
@@ -29,6 +34,8 @@ namespace ConsoleApplication {
         // Sleep a little bit between each message
         Thread.Sleep (1000);
       }
+
+      RCLdotnet.Shutdown ();
     }
   }
 }

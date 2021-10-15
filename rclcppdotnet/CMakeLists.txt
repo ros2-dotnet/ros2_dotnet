@@ -15,7 +15,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
+#set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
+set(CSHARP_TARGET_FRAMEWORK "netcoreapp2.0")
 
 
 # find dependencies

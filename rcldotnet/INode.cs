@@ -22,10 +22,20 @@ namespace ROS2 {
     public interface INode {
         IList<ISubscriptionBase> Subscriptions { get; }
 
+        IList<IServiceBase> Services { get; }
+
         IPublisher<T> CreatePublisher<T> (string topic,
             QosProfile.Profile profileId = QosProfile.Profile.Default) where T : IMessage;
 
         ISubscription<T> CreateSubscription<T> (string topic,
             Action<T> callback, QosProfile.Profile profileId = QosProfile.Profile.Default) where T : IMessage, new ();
+
+        IService<TRequest, TResponse> CreateService<TService, TRequest, TResponse>(string serviceName, Func<TRequest, TResponse> callback, QosProfile.Profile profileId = QosProfile.Profile.Default)
+            where TRequest : IMessage, new()
+            where TResponse : IMessage, new();
+
+        IClient<TRequest, TResponse> CreateClient<TService, TRequest, TResponse>(string serviceName, QosProfile.Profile profileId = QosProfile.Profile.Default)
+            where TRequest : IMessage, new()
+            where TResponse : IMessage, new();
     }
 }

@@ -21,10 +21,16 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_init();
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_shutdown();
+
+RCLDOTNET_EXPORT
 const char * RCLDOTNET_CDECL native_rcl_get_rmw_identifier();
 
 RCLDOTNET_EXPORT
 void RCLDOTNET_CDECL native_rcl_get_error_string(int length, char* buffer);
+
+RCLDOTNET_EXPORT
+void RCLDOTNET_CDECL native_rcl_reset_error();
 
 RCLDOTNET_EXPORT
 bool RCLDOTNET_CDECL native_rcl_ok();
@@ -52,15 +58,30 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_subscription(void *, void *);
 
 RCLDOTNET_EXPORT
-void RCLDOTNET_CDECL native_rcl_destroy_wait_set(void *);
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_service(void *, void *);
 
 RCLDOTNET_EXPORT
-int32_t RCLDOTNET_CDECL native_rcl_wait_set(void *, long);
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_client(void *, void *);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_wait(void *, long);
+
+RCLDOTNET_EXPORT
+void RCLDOTNET_CDECL native_rcl_destroy_wait_set(void *);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_take(void *, void *);
 
 RCLDOTNET_EXPORT
-int32_t RCLDOTNET_CDECL native_rcl_wait(void *, int64_t);
+int32_t RCLDOTNET_CDECL native_rcl_take_request(void *, void *, void *);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_send_response(void *, void *, void *);
+
+RCLDOTNET_EXPORT
+void RCLDOTNET_CDECL native_rcl_create_request_header(void **);
+
+RCLDOTNET_EXPORT
+void RCLDOTNET_CDECL native_rcl_free_request_header(void *);
 
 #endif // RCLDOTNET_H

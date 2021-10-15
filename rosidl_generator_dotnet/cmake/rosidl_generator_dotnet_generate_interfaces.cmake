@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
+#set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
+set(CSHARP_TARGET_FRAMEWORK "netcoreapp2.0")
 
 find_package(ament_cmake_export_assemblies REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
@@ -57,6 +58,18 @@ foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
       "${_output_path}/${_parent_folder}/${_module_name}.c"
       )
   elseif(_parent_folder STREQUAL "srv")
+    # TODO: SHS: Need to copy generated interface files to the output folders
+    list(APPEND _generated_cs_files
+      "${_output_path}/${_parent_folder}/${_module_name}.cs"
+      )
+
+    list(APPEND _generated_h_files
+      "${_output_path}/${_parent_folder}/rcldotnet_${_module_name}.h"
+      )
+
+    list(APPEND _generated_c_ts_files
+      "${_output_path}/${_parent_folder}/${_module_name}.c"
+      )   
   elseif(_parent_folder STREQUAL "action")
   else()
     message(FATAL_ERROR "Interface file with unknown parent folder: ${_idl_file}")
@@ -83,7 +96,12 @@ set(target_dependencies
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.h.em"
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.c.em"
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.cs.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/srv.h.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/srv.c.em"
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/srv.cs.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/srv.msg.h.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/srv.msg.c.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/srv.msg.cs.em"
   ${rosidl_generate_interfaces_ABS_IDL_FILES}
   ${_dependency_files})
 foreach(dep ${target_dependencies})
@@ -262,6 +280,7 @@ if(_generated_cs_files)
 endif()
 
 if(NOT rosidl_generate_interfaces_SKIP_INSTALL)
+  # TODO: SHS: This needs to copy srv's to the right place and action messages too...
   if(NOT _generated_h_files STREQUAL "")
     install(
       FILES ${_generated_h_files}

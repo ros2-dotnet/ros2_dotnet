@@ -18,6 +18,6 @@ using ROS2.Interfaces;
 namespace ROS2 {
     public interface IPublisher<T> : IDisposable
     where T : IMessage {
-        void Publish (T msg);
+        bool Publish (T msg);
     }
 }

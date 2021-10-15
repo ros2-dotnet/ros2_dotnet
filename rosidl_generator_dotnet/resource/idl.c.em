@@ -29,9 +29,16 @@ TEMPLATE(
 @#######################################################################
 @# Handle services
 @#######################################################################
-@
-@#TODO - services not implemented
-@
+@{
+from rosidl_parser.definition import Service
+}@
+@[for service in content.get_elements_of_type(Service)]@
+@{
+TEMPLATE(
+    'srv.c.em',
+    package_name=package_name, interface_path=interface_path, service=service)
+}@
+@[end for]@
 @
 @#######################################################################
 @# Handle actions
