@@ -20,7 +20,7 @@ jobs:
         python-version: '3.7.6'
 
     - name: Setup ROS2
-      uses: ros-tooling/setup-ros@0.0.20
+      uses: ros-tooling/setup-ros@0.2
 
     # Building ros2_dotnet as an overlay on top of the ROS2 binary distribution
     # presents various challenges. Instead of using the
@@ -30,7 +30,7 @@ jobs:
       run: |
         md \dev\ros2\src
         cd \dev\ros2
-        curl -sk https://raw.githubusercontent.com/ros2/ros2/eloquent/ros2.repos -o ros2.repos
+        curl -sk https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos -o ros2.repos
         vcs import src < ros2.repos
         colcon build --event-handlers console_cohesion+ console_package_list+ --merge-install --packages-up-to rcl --cmake-args -DBUILD_TESTING=OFF -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF
       shell: cmd

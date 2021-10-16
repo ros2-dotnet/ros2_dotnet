@@ -14,7 +14,7 @@ jobs:
       uses: actions/checkout@v2
 
     # https://docs.microsoft.com/en-us/dotnet/core/install/linux-package-manager-ubuntu-1804
-    - name: Install .NET SDK v2.1
+    - name: Install .NET SDK v5.0
       run: |
         wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
         sudo dpkg -i packages-microsoft-prod.deb
@@ -22,12 +22,12 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y apt-transport-https
         sudo apt-get update
-        sudo apt-get install -y dotnet-sdk-2.1
+        sudo apt-get install -y dotnet-sdk-5.0
 
     - name: Setup ROS2
-      uses: ros-tooling/setup-ros@0.0.20
+      uses: ros-tooling/setup-ros@0.2
       with:
-        required-ros-distributions: eloquent
+        required-ros-distributions: foxy
 
     - name: Configure ros2_dotnet workspace
       run: |
@@ -41,12 +41,12 @@ jobs:
 
     - name: Build ros2_dotnet source
       run: |
-        source /opt/ros/eloquent/setup.bash
+        source /opt/ros/foxy/setup.bash
         cd ~/ros2_dotnet_ws
         colcon build --event-handlers console_cohesion+ console_package_list+
 
     - name: Run tests
       run: |
-        source /opt/ros/eloquent/setup.bash
+        source /opt/ros/foxy/setup.bash
         cd ~/ros2_dotnet_ws
         colcon test --event-handlers console_cohesion+ --return-code-on-test-failure --packages-select rcldotnet
