@@ -16,7 +16,7 @@ header_guard = "{0}_H".format(msg_prefix)
     //  GCC
     #define @(msg_prefix)_EXPORT __attribute__((visibility("default")))
     #define @(msg_prefix)_IMPORT
-    #define @(msg_prefix)_CDECL __attribute__((__cdecl__))
+    #define @(msg_prefix)_CDECL 
 #else
     //  do nothing and hope for the best?
     #define @(msg_prefix)_EXPORT

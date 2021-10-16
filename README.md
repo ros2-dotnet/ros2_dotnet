@@ -1,7 +1,6 @@
-ROS2 for .NET
-=============
+# ROS2 for .NET
 
-Build status
+## Build status
 ------------
 
 | Target | Status |
@@ -10,13 +9,11 @@ Build status
 | **Windows Desktop (x64)** | ![Build (Desktop)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(Desktop)/badge.svg) |
 | **Linux** | ![Build (Desktop)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(Linux)/badge.svg) |
 
-Introduction
-------------
+## Introduction
 
 This is a collection of projects (bindings, code generator, examples and more) for writing ROS2 applications for .NET Core and .NET Standard.
 
-Features
---------
+### Features
 
 The current set of features include:
 - Generation of all builtin ROS types
@@ -24,8 +21,7 @@ The current set of features include:
 - Support for clients and services
 - Cross-platform support (Linux, Windows, Windows IoT Core, UWP)
 
-What's missing?
----------------
+### What's missing?
 
 Lots of things!
 - Unicode types
@@ -37,8 +33,7 @@ Lots of things!
 - Documentation
 - More examples (e.g. IoT, VB, UWP, HoloLens, etc.)
 
-Sounds great, how can I try this out?
--------------------------------------
+### Sounds great, how can I try this out?
 
 First of all install the standard ROS2 dependencies for your operating system
 of choice (**NOTE**: only do this if building Windows Desktop or Linux. For UWP,
@@ -61,12 +56,10 @@ core of ROS2 from source, everything through the `rcl` layer is required.)
 For running within UWP (Universal Windows Platform) applications, the entire
 core of ROS2 must be compiled for UWP compatibility.
 
-Windows (Desktop)
------------------
-Assuming you've installed ROS2 (pre-built binary packages) to the directory
-c:\dev\ros2_eloquent per the official [installation instructions](https://index.ros.org/doc/ros2/Installation/Eloquent/Windows-Install-Binary/),
-run the following from an Administrator Visual Studio 2019 Developer Command
-Prompt:
+## Windows (Desktop)
+
+Please install ROS2 using the Altnerative [installation instructions](https://docs.ros.org/en/foxy/Installation/Windows-Install-Binary.html).
+run the following from an Administrator Visual Studio 2019 Developer Command Prompt:
 
 (**NOTE**: Building as an overlay on top of *binary* distributions of ROS2 has
 presented some challenges. As of this writing, you may also need to include the
@@ -74,22 +67,23 @@ presented some challenges. As of this writing, you may also need to include the
 This is done for you below in the line preceding `colcon build`. This step
 can/should be omitted if building on top of a built-from-source ROS2 workspace)
 
-```
-call \dev\ros2_eloquent\local_setup.bat
+``` cmd
+call c:\opt\ros\foxy\x64\local_setup.bat
 md \dev\ros2_dotnet_ws\src
 cd \dev\ros2_dotnet_ws
 curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet.repos -o ros2_dotnet.repos
 vcs import \dev\ros2_dotnet_ws\src < ros2_dotnet.repos
-git clone --branch eloquent https://github.com/ros2/rosidl src\ros2\rosidl
+git clone --branch foxy https://github.com/ros2/rosidl src\ros2\rosidl
 colcon build --merge-install
 ```
 
 
-Linux
------
-Assuming ROS2 eloquent installed to the standard location, run the following commands:
-```
-source /opt/ros/eloquent/setup.bash
+## Linux
+
+Assuming ROS2 foxy installed to the standard location, run the following commands:
+``` bash
+sudo apt install python3-vcstool
+source /opt/ros/foxy/setup.bash
 mkdir -p ~/ros2_dotnet_ws/src
 cd ~/ros2_dotnet_ws
 wget https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet.repos
@@ -97,8 +91,11 @@ vcs import ~/ros2_dotnet_ws/src < ros2_dotnet.repos
 colcon build
 ```
 
-Universal Windows Platform (Win32, Win64)
-----------------------------------------------
+## Universal Windows Platform (Win32, Win64)
+### Binary Deployments
+Microsoft is supporting [Nuget Packages and Unity Package Manager packages](http://aka.ms/ros/mrtk_native) for UWP and Hololens.
+
+### Building
 We'll build this in two steps, first `ament` (the build system) and related tools
 which will run natively on the host, followed by ROS2 itself, built for UWP and
 the target architecture.
@@ -146,7 +143,6 @@ Windows
 
 ```
 call \dev\ros2_dotnet_ws\install\local_setup.bat
-
 ros2 run rcldotnet_examples rcldotnet_talker
 ```
 
@@ -155,7 +151,6 @@ Linux
 
 ```
 . ~/ros2_dotnet_ws/install/local_setup.sh
-
 ros2 run rcldotnet_examples rcldotnet_talker
 ```
 
@@ -166,7 +161,6 @@ Windows
 
 ```
 call \dev\ros2_dotnet_ws\install\local_setup.bat
-
 ros2 run rcldotnet_examples rcldotnet_listener
 ```
 

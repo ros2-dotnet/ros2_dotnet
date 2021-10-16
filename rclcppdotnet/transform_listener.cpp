@@ -25,7 +25,7 @@ void* native_construct_listener(void* buf) {
 
 void native_delete_listener(void* listener) {
 	auto casted = (tf2_ros::TransformListener*)listener;
-	delete listener;
+	delete casted;
 }
 
 void* native_construct_time(int sec, int nano) {

@@ -11,10 +11,6 @@ using ROS2.Utils;
 namespace ConsoleApplication {
   public class RCLDotnetClient {
     public static async Task Main (string[] args) {
-      while (!System.Diagnostics.Debugger.IsAttached) {
-        System.Threading.Thread.Sleep(100);
-      }
-
       if (RCLdotnet.Init () != RCLRet.Ok)
       {
         Console.WriteLine("Unable to initialize RCL");
