@@ -15,15 +15,13 @@
   <buildtool_export_depend>ament_cmake</buildtool_export_depend>
   <buildtool_export_depend>ament_cmake_export_assemblies</buildtool_export_depend>
   <buildtool_export_depend>rosidl_cmake</buildtool_export_depend>
-  <buildtool_export_depend>rosidl_generator_c</buildtool_export_depend>
   <buildtool_export_depend>dotnet_cmake_module</buildtool_export_depend>
   <buildtool_export_depend>rcldotnet_common</buildtool_export_depend>
 
-  <build_depend>rosidl_runtime_c</build_depend>
+  <build_depend>rosidl_generator_c</build_depend>
 
   <exec_depend>rmw_implementation</exec_depend>
   <exec_depend>rmw_implementation_cmake</exec_depend>
-  <exec_depend>rosidl_runtime_c</exec_depend>
   <exec_depend>rosidl_generator_c</exec_depend>
   <exec_depend>rosidl_parser</exec_depend>
 

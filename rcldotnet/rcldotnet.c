@@ -20,7 +20,7 @@
 #include <rcl/rcl.h>
 #include <rmw/rmw.h>
 
-#include "rosidl_runtime_c/message_type_support_struct.h"
+#include "rosidl_generator_c/message_type_support_struct.h"
 
 #include "rcldotnet.h"
 
