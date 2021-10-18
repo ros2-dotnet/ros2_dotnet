@@ -20,7 +20,7 @@ jobs:
         python-version: '3.7.6'
 
     - name: Setup ROS2
-      uses: ros-tooling/setup-ros@0.0.20
+      uses: ros-tooling/setup-ros@v0.2
 
     # Building ros2_dotnet as an overlay on top of the ROS2 binary distribution
     # presents various challenges. Instead of using the
