@@ -30,4 +30,4 @@ repositories:
   ros2_dotnet/ros2_dotnet:
     type: git
     url: https://github.com/ms-iot/ros2_dotnet.git
-    version: master
+    version: Foxy
