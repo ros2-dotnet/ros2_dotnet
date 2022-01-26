@@ -328,7 +328,7 @@ public class @(type_name) : global::ROS2.IRosMessage {
     }
 
 @[for constant in message.constants]@
-    public static readonly @(get_dotnet_type(constant.type)) @(constant.name) =
+    public const @(get_dotnet_type(constant.type)) @(constant.name) =
         @(constant_value_to_dotnet(constant.type, constant.value));
 @[end for]@
 
