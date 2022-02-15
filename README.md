@@ -68,11 +68,11 @@ This is done for you below in the line preceding `colcon build`. This step
 can/should be omitted if building on top of a built-from-source ROS2 workspace)
 
 ``` cmd
-call c:\opt\ros\foxy\x64\local_setup.bat
-md \dev\ros2_dotnet_ws\src
-cd \dev\ros2_dotnet_ws
+c:\opt\ros\foxy\x64\local_setup.bat
+md c:\dev\ros2_dotnet_ws\src
+cd c:\dev\ros2_dotnet_ws
 curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet.repos -o ros2_dotnet.repos
-vcs import \dev\ros2_dotnet_ws\src < ros2_dotnet.repos
+vcs import c:\dev\ros2_dotnet_ws\src < ros2_dotnet.repos
 git clone --branch foxy https://github.com/ros2/rosidl src\ros2\rosidl
 colcon build --merge-install
 ```
