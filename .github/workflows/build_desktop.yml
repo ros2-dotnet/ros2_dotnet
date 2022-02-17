@@ -1,61 +1,22 @@
 name: Build (Desktop)
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push, pull_request]
 
 jobs:
   build-desktop:
-    runs-on: windows-latest
+    runs-on: windows-2019
     env:
       VisualStudioVersion: '16.0'
 
     steps:
     - name: Checkout source
       uses: actions/checkout@v2
-
-    - uses: actions/setup-python@v2
-      with:
-        python-version: '3.7.6'
-
     - name: Setup ROS2
-      uses: ros-tooling/setup-ros@0.2
-
-    # Building ros2_dotnet as an overlay on top of the ROS2 binary distribution
-    # presents various challenges. Instead of using the
-    # 'with.required-ros-distributions' option, build a minimal set of packages
-    # (up to rcl, no testing packages) from source.
-    - name: Build ROS2
-      run: |
-        md \dev\ros2\src
-        cd \dev\ros2
-        curl -sk https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos -o ros2.repos
-        vcs import src < ros2.repos
-        colcon build --event-handlers console_cohesion+ console_package_list+ --merge-install --packages-up-to rcl --cmake-args -DBUILD_TESTING=OFF -DTHIRDPARTY=ON -DINSTALL_EXAMPLES=OFF
-      shell: cmd
-
-    - name: Configure ros2_dotnet workspace
-      run: |
-        md \dev\ros2_dotnet_ws\src
-        cd \dev\ros2_dotnet_ws
-        copy ${{github.workspace}}\ros2_dotnet.repos .
-        vcs import src < ros2_dotnet.repos
-        rd /s /q src\ros2_dotnet\ros2_dotnet
-        xcopy /e /i ${{github.workspace}} src\ros2_dotnet\ros2_dotnet
-        vcs branch
-      shell: cmd
-
-    - name: Build ros2_dotnet source
-      run: |
-        call \dev\ros2\install\setup.bat
-        cd \dev\ros2_dotnet_ws
-        colcon build --event-handlers console_cohesion+ console_package_list+ --merge-install
-      shell: cmd
-
-    - name: Run tests
-      run: |
-        call \dev\ros2\install\setup.bat
-        cd \dev\ros2_dotnet_ws
-        colcon test --event-handlers console_cohesion+ --return-code-on-test-failure --merge-install --packages-select rcldotnet
-      shell: cmd
+      uses: ros-tooling/setup-ros@master
+      with:
+        required-ros-distributions: foxy
+    - uses: ros-tooling/action-ros-ci@master
+      with:
+        package-name: rcldotnet_examples
+        target-ros2-distro: foxy
+        vcs-repo-file-url: ${{github.workspace}}/.github/workflows/ci.repos
+        extra-cmake-args: -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -Wno-dev
