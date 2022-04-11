@@ -11,7 +11,7 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v3
     - name: Setup ROS2
-      uses: ros-tooling/setup-ros@v0.3.0
+      uses: ros-tooling/setup-ros@v0.3
       with:
         required-ros-distributions: foxy
     - uses: ros-tooling/action-ros-ci@0.2.4
