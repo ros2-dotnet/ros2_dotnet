@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
     - name: Checkout source
@@ -27,7 +27,7 @@ jobs:
     - name: Setup ROS2
       uses: ros-tooling/setup-ros@v0.2
       with:
-        required-ros-distributions: eloquent
+        required-ros-distributions: foxy
 
     - name: Configure ros2_dotnet workspace
       run: |
@@ -41,12 +41,12 @@ jobs:
 
     - name: Build ros2_dotnet source
       run: |
-        source /opt/ros/eloquent/setup.bash
+        source /opt/ros/foxy/setup.bash
         cd ~/ros2_dotnet_ws
         colcon build --event-handlers console_cohesion+ console_package_list+
 
     - name: Run tests
       run: |
-        source /opt/ros/eloquent/setup.bash
+        source /opt/ros/foxy/setup.bash
         cd ~/ros2_dotnet_ws
         colcon test --event-handlers console_cohesion+ --return-code-on-test-failure --packages-select rcldotnet
