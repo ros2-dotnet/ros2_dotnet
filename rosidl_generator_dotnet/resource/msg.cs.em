@@ -24,9 +24,9 @@ public class @(type_name) : global::ROS2.IRosMessage {
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
-    public const int @(get_field_name(type_name, member.name))_Length = @(member.type.size);
+    public const int @(get_field_name(type_name, member.name))Length = @(member.type.size);
 @[    elif isinstance(member.type, AbstractSequence) and member.type.has_maximum_size()]@
-    public const int @(get_field_name(type_name, member.name))_MaxCount = @(member.type.maximum_size);
+    public const int @(get_field_name(type_name, member.name))MaxCount = @(member.type.maximum_size);
 @[    end if]@
 @[end for]@
 
