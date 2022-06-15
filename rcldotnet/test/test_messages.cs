@@ -998,7 +998,7 @@ namespace RCLdotnetTests
         {
             var defaultsMsg = new test_msgs.msg.Defaults();
 
-            Assert.Equal(true, defaultsMsg.BoolValue);
+            Assert.True(defaultsMsg.BoolValue);
             Assert.Equal(50, defaultsMsg.ByteValue);
             Assert.Equal(100, defaultsMsg.CharValue);
             Assert.Equal(1.125f, defaultsMsg.Float32Value);
