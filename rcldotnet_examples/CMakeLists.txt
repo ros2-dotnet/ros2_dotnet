@@ -23,8 +23,6 @@ set(_assemblies_dep_dlls
     ${std_srvs_ASSEMBLIES_DLL}
 )
 
-message("Included assemblies: ${_assemblies_dep_dlls}")
-
 add_dotnet_executable(rcldotnet_talker
   RCLDotnetTalker.cs
   INCLUDE_DLLS
