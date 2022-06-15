@@ -18,11 +18,19 @@
 #if defined(_MSC_VER)
     #define RCLDOTNET_EXPORT __declspec(dllexport)
     #define RCLDOTNET_IMPORT __declspec(dllimport)
-    #define RCLDOTNET_CDECL __cdecl
+    #if defined(_M_IX86)
+        #define RCLDOTNET_CDECL __cdecl
+    #else
+        #define RCLDOTNET_CDECL
+    #endif
 #elif defined(__GNUC__)
     #define RCLDOTNET_EXPORT __attribute__((visibility("default")))
     #define RCLDOTNET_IMPORT
-    #define RCLDOTNET_CDECL __attribute__((__cdecl__))
+    #if defined(__i386__)
+        #define RCLDOTNET_CDECL __attribute__((__cdecl__))
+    #else
+        #define RCLDOTNET_CDECL
+    #endif
 #else
     #define RCLDOTNET_EXPORT
     #define RCLDOTNET_IMPORT
