@@ -53,6 +53,7 @@ def generate_dotnet(generator_arguments_file, typesupport_impls):
 def escape_string(s):
     s = s.replace('\\', '\\\\')
     s = s.replace("'", "\\'")
+    s = s.replace("\"", "\\\"")
     return s
 
 
