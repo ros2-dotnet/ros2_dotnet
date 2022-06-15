@@ -46,12 +46,12 @@ namespace ROS2
     public class Subscription<T> : Subscription
         where T : IRosMessage, new()
     {
-        private readonly Action<T> callback_;
+        private readonly Action<T> _callback;
 
         internal Subscription(SafeSubscriptionHandle handle, Action<T> callback)
         {
             Handle = handle;
-            callback_ = callback;
+            _callback = callback;
         }
 
         internal override SafeSubscriptionHandle Handle { get; }
@@ -62,7 +62,7 @@ namespace ROS2
 
         internal override void TriggerCallback(IRosMessage message)
         {
-            callback_((T)message);
+            _callback((T)message);
         }
     }
 }

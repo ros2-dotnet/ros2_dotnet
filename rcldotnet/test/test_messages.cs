@@ -12,29 +12,29 @@ namespace RCLdotnetTests
         public void TestPublishString()
         {
             RCLdotnet.Init();
-            Node node_string_1 = RCLdotnet.CreateNode("test_string_1");
-            Node node_string_2 = RCLdotnet.CreateNode("test_string_2");
-            Publisher<std_msgs.msg.String> chatter_pub = node_string_1.CreatePublisher<std_msgs.msg.String>("topic_string");
+            Node nodeString1 = RCLdotnet.CreateNode("test_string_1");
+            Node nodeString2 = RCLdotnet.CreateNode("test_string_2");
+            Publisher<std_msgs.msg.String> chatterPub = nodeString1.CreatePublisher<std_msgs.msg.String>("topic_string");
 
             std_msgs.msg.String msg = new std_msgs.msg.String();
             std_msgs.msg.String msg2 = new std_msgs.msg.String();
             msg.Data = "Hello";
 
             bool received = false;
-            Subscription<std_msgs.msg.String> chatter_sub = node_string_2.CreateSubscription<std_msgs.msg.String>(
-                "topic_string", rcv_msg =>
+            Subscription<std_msgs.msg.String> chatter_sub = nodeString2.CreateSubscription<std_msgs.msg.String>(
+                "topic_string", rcvMsg =>
                 {
                     received = true;
-                    msg2 = rcv_msg;
+                    msg2 = rcvMsg;
                 }
             );
 
             while (!received)
             {
-                chatter_pub.Publish(msg);
+                chatterPub.Publish(msg);
 
-                RCLdotnet.SpinOnce(node_string_1, 500);
-                RCLdotnet.SpinOnce(node_string_2, 500);
+                RCLdotnet.SpinOnce(nodeString1, 500);
+                RCLdotnet.SpinOnce(nodeString2, 500);
             }
             Assert.Equal("Hello", msg2.Data);
         }
@@ -43,9 +43,9 @@ namespace RCLdotnetTests
         public void TestPublishBuiltins()
         {
             RCLdotnet.Init();
-            Node node_builtins_1 = RCLdotnet.CreateNode("test_builtins_1");
-            Node node_builtins_2 = RCLdotnet.CreateNode("test_builtins_2");
-            Publisher<test_msgs.msg.Builtins> chatter_pub = node_builtins_1.CreatePublisher<test_msgs.msg.Builtins>("topic_builtins");
+            Node nodeBuiltins1 = RCLdotnet.CreateNode("test_builtins_1");
+            Node nodeBuiltins2 = RCLdotnet.CreateNode("test_builtins_2");
+            Publisher<test_msgs.msg.Builtins> chatterPub = nodeBuiltins1.CreatePublisher<test_msgs.msg.Builtins>("topic_builtins");
 
             test_msgs.msg.Builtins msg = new test_msgs.msg.Builtins();
             test_msgs.msg.Builtins msg2 = new test_msgs.msg.Builtins();
@@ -55,20 +55,20 @@ namespace RCLdotnetTests
             msg.TimeValue.Nanosec = 4u;
 
             bool received = false;
-            Subscription<test_msgs.msg.Builtins> chatter_sub = node_builtins_2.CreateSubscription<test_msgs.msg.Builtins>(
-                "topic_builtins", rcv_msg =>
+            Subscription<test_msgs.msg.Builtins> chatterSub = nodeBuiltins2.CreateSubscription<test_msgs.msg.Builtins>(
+                "topic_builtins", rcvMsg =>
                 {
                     received = true;
-                    msg2 = rcv_msg;
+                    msg2 = rcvMsg;
                 }
             );
 
             while (!received)
             {
-                chatter_pub.Publish(msg);
+                chatterPub.Publish(msg);
 
-                RCLdotnet.SpinOnce(node_builtins_1, 500);
-                RCLdotnet.SpinOnce(node_builtins_2, 500);
+                RCLdotnet.SpinOnce(nodeBuiltins1, 500);
+                RCLdotnet.SpinOnce(nodeBuiltins2, 500);
             }
 
             Assert.Equal(1, msg2.DurationValue.Sec);
@@ -81,9 +81,9 @@ namespace RCLdotnetTests
         public void TestPublishArrays()
         {
             RCLdotnet.Init();
-            Node node_array_1 = RCLdotnet.CreateNode("test_arrays_1");
-            Node node_array_2 = RCLdotnet.CreateNode("test_arrays_2");
-            Publisher<test_msgs.msg.Arrays> chatter_pub = node_array_1.CreatePublisher<test_msgs.msg.Arrays>("topic_array");
+            Node nodeArray1 = RCLdotnet.CreateNode("test_arrays_1");
+            Node nodeArray2 = RCLdotnet.CreateNode("test_arrays_2");
+            Publisher<test_msgs.msg.Arrays> chatterPub = nodeArray1.CreatePublisher<test_msgs.msg.Arrays>("topic_array");
 
             test_msgs.msg.Arrays msg = new test_msgs.msg.Arrays();
             test_msgs.msg.Arrays msg2 = new test_msgs.msg.Arrays();
@@ -159,70 +159,70 @@ namespace RCLdotnetTests
             msg.StringValues[2] = "three";
 
             // basicTypesValues
-            test_msgs.msg.BasicTypes basic_type_1 = new test_msgs.msg.BasicTypes();
-            basic_type_1.BoolValue = true;
-            basic_type_1.ByteValue = 36;
-            basic_type_1.CharValue = 37;
-            basic_type_1.Float32Value = 38.1f;
-            basic_type_1.Float64Value = 39.1;
-            basic_type_1.Int8Value = 40;
-            basic_type_1.Uint8Value = 41;
-            basic_type_1.Int16Value = 42;
-            basic_type_1.Uint16Value = 43;
-            basic_type_1.Int32Value = 44;
-            basic_type_1.Uint32Value = 45;
-            basic_type_1.Int64Value = 46;
-            basic_type_1.Uint64Value = 47;
+            test_msgs.msg.BasicTypes basicType1 = new test_msgs.msg.BasicTypes();
+            basicType1.BoolValue = true;
+            basicType1.ByteValue = 36;
+            basicType1.CharValue = 37;
+            basicType1.Float32Value = 38.1f;
+            basicType1.Float64Value = 39.1;
+            basicType1.Int8Value = 40;
+            basicType1.Uint8Value = 41;
+            basicType1.Int16Value = 42;
+            basicType1.Uint16Value = 43;
+            basicType1.Int32Value = 44;
+            basicType1.Uint32Value = 45;
+            basicType1.Int64Value = 46;
+            basicType1.Uint64Value = 47;
 
-            test_msgs.msg.BasicTypes basic_type_2 = new test_msgs.msg.BasicTypes();
-            basic_type_2.BoolValue = false;
-            basic_type_2.ByteValue = 48;
-            basic_type_2.CharValue = 49;
-            basic_type_2.Float32Value = 50.1f;
-            basic_type_2.Float64Value = 51.1;
-            basic_type_2.Int8Value = 52;
-            basic_type_2.Uint8Value = 53;
-            basic_type_2.Int16Value = 54;
-            basic_type_2.Uint16Value = 55;
-            basic_type_2.Int32Value = 56;
-            basic_type_2.Uint32Value = 57;
-            basic_type_2.Int64Value = 58;
-            basic_type_2.Uint64Value = 59;
+            test_msgs.msg.BasicTypes basicType2 = new test_msgs.msg.BasicTypes();
+            basicType2.BoolValue = false;
+            basicType2.ByteValue = 48;
+            basicType2.CharValue = 49;
+            basicType2.Float32Value = 50.1f;
+            basicType2.Float64Value = 51.1;
+            basicType2.Int8Value = 52;
+            basicType2.Uint8Value = 53;
+            basicType2.Int16Value = 54;
+            basicType2.Uint16Value = 55;
+            basicType2.Int32Value = 56;
+            basicType2.Uint32Value = 57;
+            basicType2.Int64Value = 58;
+            basicType2.Uint64Value = 59;
 
-            test_msgs.msg.BasicTypes basic_type_3 = new test_msgs.msg.BasicTypes();
-            basic_type_3.BoolValue = true;
-            basic_type_3.ByteValue = 60;
-            basic_type_3.CharValue = 61;
-            basic_type_3.Float32Value = 62.1f;
-            basic_type_3.Float64Value = 63.1;
-            basic_type_3.Int8Value = 64;
-            basic_type_3.Uint8Value = 65;
-            basic_type_3.Int16Value = 66;
-            basic_type_3.Uint16Value = 67;
-            basic_type_3.Int32Value = 68;
-            basic_type_3.Uint32Value = 69;
-            basic_type_3.Int64Value = 70;
-            basic_type_3.Uint64Value = 71;
+            test_msgs.msg.BasicTypes basicType3 = new test_msgs.msg.BasicTypes();
+            basicType3.BoolValue = true;
+            basicType3.ByteValue = 60;
+            basicType3.CharValue = 61;
+            basicType3.Float32Value = 62.1f;
+            basicType3.Float64Value = 63.1;
+            basicType3.Int8Value = 64;
+            basicType3.Uint8Value = 65;
+            basicType3.Int16Value = 66;
+            basicType3.Uint16Value = 67;
+            basicType3.Int32Value = 68;
+            basicType3.Uint32Value = 69;
+            basicType3.Int64Value = 70;
+            basicType3.Uint64Value = 71;
 
-            msg.BasicTypesValues[0] = basic_type_1;
-            msg.BasicTypesValues[1] = basic_type_2;
-            msg.BasicTypesValues[2] = basic_type_3;
+            msg.BasicTypesValues[0] = basicType1;
+            msg.BasicTypesValues[1] = basicType2;
+            msg.BasicTypesValues[2] = basicType3;
 
             bool received = false;
-            Subscription<test_msgs.msg.Arrays> chatter_sub = node_array_2.CreateSubscription<test_msgs.msg.Arrays>(
-                "topic_array", rcv_msg =>
+            Subscription<test_msgs.msg.Arrays> chatterSub = nodeArray2.CreateSubscription<test_msgs.msg.Arrays>(
+                "topic_array", rcvMsg =>
                 {
                     received = true;
-                    msg2 = rcv_msg;
+                    msg2 = rcvMsg;
                 }
             );
 
             while (!received)
             {
-                chatter_pub.Publish(msg);
+                chatterPub.Publish(msg);
 
-                RCLdotnet.SpinOnce(node_array_1, 500);
-                RCLdotnet.SpinOnce(node_array_2, 500);
+                RCLdotnet.SpinOnce(nodeArray1, 500);
+                RCLdotnet.SpinOnce(nodeArray2, 500);
             }
 
             // boolValues
@@ -412,9 +412,9 @@ namespace RCLdotnetTests
         public void TestPublishUnboundedSequences()
         {
             RCLdotnet.Init();
-            Node node_array_1 = RCLdotnet.CreateNode("test_unbounded_sequences_1");
-            Node node_array_2 = RCLdotnet.CreateNode("test_unbounded_sequences_2");
-            Publisher<test_msgs.msg.UnboundedSequences> chatter_pub = node_array_1.CreatePublisher<test_msgs.msg.UnboundedSequences>("topic_unbounded_sequences");
+            Node nodeArray1 = RCLdotnet.CreateNode("test_unbounded_sequences_1");
+            Node nodeArray2 = RCLdotnet.CreateNode("test_unbounded_sequences_2");
+            Publisher<test_msgs.msg.UnboundedSequences> chatterPub = nodeArray1.CreatePublisher<test_msgs.msg.UnboundedSequences>("topic_unbounded_sequences");
 
             test_msgs.msg.UnboundedSequences msg = new test_msgs.msg.UnboundedSequences();
             test_msgs.msg.UnboundedSequences msg2 = new test_msgs.msg.UnboundedSequences();
@@ -489,70 +489,70 @@ namespace RCLdotnetTests
             msg.StringValues.Add("two");
             msg.StringValues.Add("three");
 
-            test_msgs.msg.BasicTypes basic_type_1 = new test_msgs.msg.BasicTypes();
-            basic_type_1.BoolValue = true;
-            basic_type_1.ByteValue = 36;
-            basic_type_1.CharValue = 37;
-            basic_type_1.Float32Value = 38.1f;
-            basic_type_1.Float64Value = 39.1;
-            basic_type_1.Int8Value = 40;
-            basic_type_1.Uint8Value = 41;
-            basic_type_1.Int16Value = 42;
-            basic_type_1.Uint16Value = 43;
-            basic_type_1.Int32Value = 44;
-            basic_type_1.Uint32Value = 45;
-            basic_type_1.Int64Value = 46;
-            basic_type_1.Uint64Value = 47;
+            test_msgs.msg.BasicTypes basicType1 = new test_msgs.msg.BasicTypes();
+            basicType1.BoolValue = true;
+            basicType1.ByteValue = 36;
+            basicType1.CharValue = 37;
+            basicType1.Float32Value = 38.1f;
+            basicType1.Float64Value = 39.1;
+            basicType1.Int8Value = 40;
+            basicType1.Uint8Value = 41;
+            basicType1.Int16Value = 42;
+            basicType1.Uint16Value = 43;
+            basicType1.Int32Value = 44;
+            basicType1.Uint32Value = 45;
+            basicType1.Int64Value = 46;
+            basicType1.Uint64Value = 47;
 
-            test_msgs.msg.BasicTypes basic_type_2 = new test_msgs.msg.BasicTypes();
-            basic_type_2.BoolValue = false;
-            basic_type_2.ByteValue = 48;
-            basic_type_2.CharValue = 49;
-            basic_type_2.Float32Value = 50.1f;
-            basic_type_2.Float64Value = 51.1;
-            basic_type_2.Int8Value = 52;
-            basic_type_2.Uint8Value = 53;
-            basic_type_2.Int16Value = 54;
-            basic_type_2.Uint16Value = 55;
-            basic_type_2.Int32Value = 56;
-            basic_type_2.Uint32Value = 57;
-            basic_type_2.Int64Value = 58;
-            basic_type_2.Uint64Value = 59;
+            test_msgs.msg.BasicTypes basicType2 = new test_msgs.msg.BasicTypes();
+            basicType2.BoolValue = false;
+            basicType2.ByteValue = 48;
+            basicType2.CharValue = 49;
+            basicType2.Float32Value = 50.1f;
+            basicType2.Float64Value = 51.1;
+            basicType2.Int8Value = 52;
+            basicType2.Uint8Value = 53;
+            basicType2.Int16Value = 54;
+            basicType2.Uint16Value = 55;
+            basicType2.Int32Value = 56;
+            basicType2.Uint32Value = 57;
+            basicType2.Int64Value = 58;
+            basicType2.Uint64Value = 59;
 
-            test_msgs.msg.BasicTypes basic_type_3 = new test_msgs.msg.BasicTypes();
-            basic_type_3.BoolValue = true;
-            basic_type_3.ByteValue = 60;
-            basic_type_3.CharValue = 61;
-            basic_type_3.Float32Value = 62.1f;
-            basic_type_3.Float64Value = 63.1;
-            basic_type_3.Int8Value = 64;
-            basic_type_3.Uint8Value = 65;
-            basic_type_3.Int16Value = 66;
-            basic_type_3.Uint16Value = 67;
-            basic_type_3.Int32Value = 68;
-            basic_type_3.Uint32Value = 69;
-            basic_type_3.Int64Value = 70;
-            basic_type_3.Uint64Value = 71;
+            test_msgs.msg.BasicTypes basicType3 = new test_msgs.msg.BasicTypes();
+            basicType3.BoolValue = true;
+            basicType3.ByteValue = 60;
+            basicType3.CharValue = 61;
+            basicType3.Float32Value = 62.1f;
+            basicType3.Float64Value = 63.1;
+            basicType3.Int8Value = 64;
+            basicType3.Uint8Value = 65;
+            basicType3.Int16Value = 66;
+            basicType3.Uint16Value = 67;
+            basicType3.Int32Value = 68;
+            basicType3.Uint32Value = 69;
+            basicType3.Int64Value = 70;
+            basicType3.Uint64Value = 71;
 
-            msg.BasicTypesValues.Add(basic_type_1);
-            msg.BasicTypesValues.Add(basic_type_2);
-            msg.BasicTypesValues.Add(basic_type_3);
+            msg.BasicTypesValues.Add(basicType1);
+            msg.BasicTypesValues.Add(basicType2);
+            msg.BasicTypesValues.Add(basicType3);
 
             bool received = false;
-            Subscription<test_msgs.msg.UnboundedSequences> chatter_sub = node_array_2.CreateSubscription<test_msgs.msg.UnboundedSequences>(
-                "topic_unbounded_sequences", rcv_msg =>
+            Subscription<test_msgs.msg.UnboundedSequences> chatterSub = nodeArray2.CreateSubscription<test_msgs.msg.UnboundedSequences>(
+                "topic_unbounded_sequences", rcvMsg =>
                 {
                     received = true;
-                    msg2 = rcv_msg;
+                    msg2 = rcvMsg;
                 }
             );
 
             while (!received)
             {
-                chatter_pub.Publish(msg);
+                chatterPub.Publish(msg);
 
-                RCLdotnet.SpinOnce(node_array_1, 500);
-                RCLdotnet.SpinOnce(node_array_2, 500);
+                RCLdotnet.SpinOnce(nodeArray1, 500);
+                RCLdotnet.SpinOnce(nodeArray2, 500);
             }
 
             // boolValues
@@ -687,9 +687,9 @@ namespace RCLdotnetTests
         public void TestPublishBoundedSequences()
         {
             RCLdotnet.Init();
-            Node node_array_1 = RCLdotnet.CreateNode("test_bounded_sequences_1");
-            Node node_array_2 = RCLdotnet.CreateNode("test_bounded_sequences_2");
-            Publisher<test_msgs.msg.BoundedSequences> chatter_pub = node_array_1.CreatePublisher<test_msgs.msg.BoundedSequences>("topic_bounded_sequences");
+            Node nodeBoundedSequences1 = RCLdotnet.CreateNode("test_bounded_sequences_1");
+            Node nodeBoundedSequences2 = RCLdotnet.CreateNode("test_bounded_sequences_2");
+            Publisher<test_msgs.msg.BoundedSequences> chatter_pub = nodeBoundedSequences1.CreatePublisher<test_msgs.msg.BoundedSequences>("topic_bounded_sequences");
 
             test_msgs.msg.BoundedSequences msg = new test_msgs.msg.BoundedSequences();
             test_msgs.msg.BoundedSequences msg2 = new test_msgs.msg.BoundedSequences();
@@ -764,61 +764,61 @@ namespace RCLdotnetTests
             msg.StringValues.Add("two");
             msg.StringValues.Add("three");
 
-            test_msgs.msg.BasicTypes basic_type_1 = new test_msgs.msg.BasicTypes();
-            basic_type_1.BoolValue = true;
-            basic_type_1.ByteValue = 36;
-            basic_type_1.CharValue = 37;
-            basic_type_1.Float32Value = 38.1f;
-            basic_type_1.Float64Value = 39.1;
-            basic_type_1.Int8Value = 40;
-            basic_type_1.Uint8Value = 41;
-            basic_type_1.Int16Value = 42;
-            basic_type_1.Uint16Value = 43;
-            basic_type_1.Int32Value = 44;
-            basic_type_1.Uint32Value = 45;
-            basic_type_1.Int64Value = 46;
-            basic_type_1.Uint64Value = 47;
+            test_msgs.msg.BasicTypes basicType1 = new test_msgs.msg.BasicTypes();
+            basicType1.BoolValue = true;
+            basicType1.ByteValue = 36;
+            basicType1.CharValue = 37;
+            basicType1.Float32Value = 38.1f;
+            basicType1.Float64Value = 39.1;
+            basicType1.Int8Value = 40;
+            basicType1.Uint8Value = 41;
+            basicType1.Int16Value = 42;
+            basicType1.Uint16Value = 43;
+            basicType1.Int32Value = 44;
+            basicType1.Uint32Value = 45;
+            basicType1.Int64Value = 46;
+            basicType1.Uint64Value = 47;
 
-            test_msgs.msg.BasicTypes basic_type_2 = new test_msgs.msg.BasicTypes();
-            basic_type_2.BoolValue = false;
-            basic_type_2.ByteValue = 48;
-            basic_type_2.CharValue = 49;
-            basic_type_2.Float32Value = 50.1f;
-            basic_type_2.Float64Value = 51.1;
-            basic_type_2.Int8Value = 52;
-            basic_type_2.Uint8Value = 53;
-            basic_type_2.Int16Value = 54;
-            basic_type_2.Uint16Value = 55;
-            basic_type_2.Int32Value = 56;
-            basic_type_2.Uint32Value = 57;
-            basic_type_2.Int64Value = 58;
-            basic_type_2.Uint64Value = 59;
+            test_msgs.msg.BasicTypes basicType2 = new test_msgs.msg.BasicTypes();
+            basicType2.BoolValue = false;
+            basicType2.ByteValue = 48;
+            basicType2.CharValue = 49;
+            basicType2.Float32Value = 50.1f;
+            basicType2.Float64Value = 51.1;
+            basicType2.Int8Value = 52;
+            basicType2.Uint8Value = 53;
+            basicType2.Int16Value = 54;
+            basicType2.Uint16Value = 55;
+            basicType2.Int32Value = 56;
+            basicType2.Uint32Value = 57;
+            basicType2.Int64Value = 58;
+            basicType2.Uint64Value = 59;
 
-            test_msgs.msg.BasicTypes basic_type_3 = new test_msgs.msg.BasicTypes();
-            basic_type_3.BoolValue = true;
-            basic_type_3.ByteValue = 60;
-            basic_type_3.CharValue = 61;
-            basic_type_3.Float32Value = 62.1f;
-            basic_type_3.Float64Value = 63.1;
-            basic_type_3.Int8Value = 64;
-            basic_type_3.Uint8Value = 65;
-            basic_type_3.Int16Value = 66;
-            basic_type_3.Uint16Value = 67;
-            basic_type_3.Int32Value = 68;
-            basic_type_3.Uint32Value = 69;
-            basic_type_3.Int64Value = 70;
-            basic_type_3.Uint64Value = 71;
+            test_msgs.msg.BasicTypes basicType3 = new test_msgs.msg.BasicTypes();
+            basicType3.BoolValue = true;
+            basicType3.ByteValue = 60;
+            basicType3.CharValue = 61;
+            basicType3.Float32Value = 62.1f;
+            basicType3.Float64Value = 63.1;
+            basicType3.Int8Value = 64;
+            basicType3.Uint8Value = 65;
+            basicType3.Int16Value = 66;
+            basicType3.Uint16Value = 67;
+            basicType3.Int32Value = 68;
+            basicType3.Uint32Value = 69;
+            basicType3.Int64Value = 70;
+            basicType3.Uint64Value = 71;
 
-            msg.BasicTypesValues.Add(basic_type_1);
-            msg.BasicTypesValues.Add(basic_type_2);
-            msg.BasicTypesValues.Add(basic_type_3);
+            msg.BasicTypesValues.Add(basicType1);
+            msg.BasicTypesValues.Add(basicType2);
+            msg.BasicTypesValues.Add(basicType3);
 
             bool received = false;
-            Subscription<test_msgs.msg.BoundedSequences> chatter_sub = node_array_2.CreateSubscription<test_msgs.msg.BoundedSequences>(
-                "topic_bounded_sequences", rcv_msg =>
+            Subscription<test_msgs.msg.BoundedSequences> chatterSub = nodeBoundedSequences2.CreateSubscription<test_msgs.msg.BoundedSequences>(
+                "topic_bounded_sequences", rcvMsg =>
                 {
                     received = true;
-                    msg2 = rcv_msg;
+                    msg2 = rcvMsg;
                 }
             );
 
@@ -826,8 +826,8 @@ namespace RCLdotnetTests
             {
                 chatter_pub.Publish(msg);
 
-                RCLdotnet.SpinOnce(node_array_1, 500);
-                RCLdotnet.SpinOnce(node_array_2, 500);
+                RCLdotnet.SpinOnce(nodeBoundedSequences1, 500);
+                RCLdotnet.SpinOnce(nodeBoundedSequences2, 500);
             }
 
             // boolValues

@@ -13,7 +13,7 @@ namespace ConsoleApplication
 
             Node node = RCLdotnet.CreateNode("talker");
 
-            Publisher<std_msgs.msg.String> chatter_pub = node.CreatePublisher<std_msgs.msg.String>("chatter");
+            Publisher<std_msgs.msg.String> chatterPub = node.CreatePublisher<std_msgs.msg.String>("chatter");
 
             std_msgs.msg.String msg = new std_msgs.msg.String();
 
@@ -24,7 +24,7 @@ namespace ConsoleApplication
                 msg.Data = "Hello World: " + i;
                 i++;
                 Console.WriteLine("Publishing: \"" + msg.Data + "\"");
-                chatter_pub.Publish(msg);
+                chatterPub.Publish(msg);
 
                 // Sleep a little bit between each message
                 Thread.Sleep(1000);
