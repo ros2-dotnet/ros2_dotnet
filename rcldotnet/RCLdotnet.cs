@@ -21,7 +21,7 @@ namespace ROS2
 {
     internal static class RCLdotnetDelegates
     {
-        internal static readonly DllLoadUtils dllLoadUtils;
+        internal static readonly DllLoadUtils _dllLoadUtils;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLInitType();
@@ -137,132 +137,131 @@ namespace ROS2
 
         static RCLdotnetDelegates()
         {
-            dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
-            string library_name = "rcldotnet";
-            IntPtr pDll = dllLoadUtils.LoadLibrary(library_name);
+            _dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
+            IntPtr nativeLibrary = _dllLoadUtils.LoadLibrary("rcldotnet");
 
             IntPtr native_rcl_init_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_init");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_init");
             RCLdotnetDelegates.native_rcl_init =
                 (NativeRCLInitType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_init_ptr, typeof(NativeRCLInitType));
 
             IntPtr native_rcl_get_error_string_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_get_error_string");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_get_error_string");
             RCLdotnetDelegates.native_rcl_get_error_string =
                 (NativeRCLGetErrorStringType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_get_error_string_ptr, typeof(NativeRCLGetErrorStringType));
 
             IntPtr native_rcl_reset_error_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_reset_error");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_reset_error");
             RCLdotnetDelegates.native_rcl_reset_error =
                 (NativeRCLResetErrorType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_reset_error_ptr, typeof(NativeRCLResetErrorType));
 
             IntPtr native_rcl_get_rmw_identifier_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_get_rmw_identifier");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_get_rmw_identifier");
             RCLdotnetDelegates.native_rcl_get_rmw_identifier =
                 (NativeRCLGetRMWIdentifierType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_get_rmw_identifier_ptr, typeof(NativeRCLGetRMWIdentifierType));
 
             IntPtr native_rcl_ok_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_ok");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_ok");
             RCLdotnetDelegates.native_rcl_ok =
                 (NativeRCLOkType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_ok_ptr, typeof(NativeRCLOkType));
 
             IntPtr native_rcl_create_node_handle_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_create_node_handle");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_create_node_handle");
             RCLdotnetDelegates.native_rcl_create_node_handle =
                 (NativeRCLCreateNodeHandleType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_create_node_handle_ptr, typeof(NativeRCLCreateNodeHandleType));
 
             IntPtr native_rcl_destroy_node_handle_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_destroy_node_handle");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_destroy_node_handle");
             RCLdotnetDelegates.native_rcl_destroy_node_handle =
                 (NativeRCLDestroyNodeHandleType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_destroy_node_handle_ptr, typeof(NativeRCLDestroyNodeHandleType));
 
             IntPtr native_rcl_create_wait_set_handle_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_create_wait_set_handle");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_create_wait_set_handle");
             RCLdotnetDelegates.native_rcl_create_wait_set_handle =
                 (NativeRCLCreateWaitSetHandleType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_create_wait_set_handle_ptr, typeof(NativeRCLCreateWaitSetHandleType));
 
             IntPtr native_rcl_destroy_wait_set_handle_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_destroy_wait_set_handle");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_destroy_wait_set_handle");
             RCLdotnetDelegates.native_rcl_destroy_wait_set_handle =
                 (NativeRCLDestroyWaitSetType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_destroy_wait_set_handle_ptr, typeof(NativeRCLDestroyWaitSetType));
 
             IntPtr native_rcl_wait_set_clear_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_wait_set_clear");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_wait_set_clear");
             RCLdotnetDelegates.native_rcl_wait_set_clear =
                 (NativeRCLWaitSetClearType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_wait_set_clear_ptr, typeof(NativeRCLWaitSetClearType));
 
             IntPtr native_rcl_wait_set_add_subscription_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_wait_set_add_subscription");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_wait_set_add_subscription");
             RCLdotnetDelegates.native_rcl_wait_set_add_subscription =
                 (NativeRCLWaitSetAddSubscriptionType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_wait_set_add_subscription_ptr, typeof(NativeRCLWaitSetAddSubscriptionType));
 
             IntPtr native_rcl_wait_set_add_service_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_wait_set_add_service");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_wait_set_add_service");
             RCLdotnetDelegates.native_rcl_wait_set_add_service =
                 (NativeRCLWaitSetAddServiceType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_wait_set_add_service_ptr, typeof(NativeRCLWaitSetAddServiceType));
 
             IntPtr native_rcl_wait_set_add_client_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_wait_set_add_client");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_wait_set_add_client");
             RCLdotnetDelegates.native_rcl_wait_set_add_client =
                 (NativeRCLWaitSetAddClientType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_wait_set_add_client_ptr, typeof(NativeRCLWaitSetAddClientType));
 
             IntPtr native_rcl_wait_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_wait");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_wait");
             RCLdotnetDelegates.native_rcl_wait =
                 (NativeRCLWaitType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_wait_ptr, typeof(NativeRCLWaitType));
 
             IntPtr native_rcl_take_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_take");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_take");
             RCLdotnetDelegates.native_rcl_take =
                 (NativeRCLTakeType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_take_ptr, typeof(NativeRCLTakeType));
 
             IntPtr native_rcl_create_request_id_handle_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_create_request_id_handle");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_create_request_id_handle");
             RCLdotnetDelegates.native_rcl_create_request_id_handle =
                 (NativeRCLCreateRequestIdHandleType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_create_request_id_handle_ptr, typeof(NativeRCLCreateRequestIdHandleType));
 
             IntPtr native_rcl_destroy_request_id_handle_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_destroy_request_id_handle");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_destroy_request_id_handle");
             RCLdotnetDelegates.native_rcl_destroy_request_id_handle =
                 (NativeRCLDestroyRequestIdHandleType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_destroy_request_id_handle_ptr, typeof(NativeRCLDestroyRequestIdHandleType));
 
             IntPtr native_rcl_request_id_get_sequence_number_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_request_id_get_sequence_number");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_request_id_get_sequence_number");
             RCLdotnetDelegates.native_rcl_request_id_get_sequence_number =
                 (NativeRCLRequestIdGetSequenceNumberType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_request_id_get_sequence_number_ptr, typeof(NativeRCLRequestIdGetSequenceNumberType));
 
             IntPtr native_rcl_take_request_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_take_request");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_take_request");
             RCLdotnetDelegates.native_rcl_take_request =
                 (NativeRCLTakeRequestType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_take_request_ptr, typeof(NativeRCLTakeRequestType));
 
             IntPtr native_rcl_send_response_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_send_response");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_send_response");
             RCLdotnetDelegates.native_rcl_send_response =
                 (NativeRCLSendResponseType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_send_response_ptr, typeof(NativeRCLSendResponseType));
 
             IntPtr native_rcl_take_response_ptr =
-                dllLoadUtils.GetProcAddress(pDll, "native_rcl_take_response");
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_take_response");
             RCLdotnetDelegates.native_rcl_take_response =
                 (NativeRCLTakeResponseType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_take_response_ptr, typeof(NativeRCLTakeResponseType));
@@ -316,8 +315,8 @@ namespace ROS2
         {
             var waitSetHandle = new SafeWaitSetHandle();
             RCLRet ret = RCLdotnetDelegates.native_rcl_create_wait_set_handle(
-              ref waitSetHandle, numberOfSubscriptions, numberOfGuardConditions,
-              numberOfTimers, numberOfClients, numberOfServices, numberOfEvents);
+                ref waitSetHandle, numberOfSubscriptions, numberOfGuardConditions,
+                numberOfTimers, numberOfClients, numberOfServices, numberOfEvents);
             if (ret != RCLRet.Ok)
             {
                 waitSetHandle.Dispose();
@@ -359,8 +358,8 @@ namespace ROS2
         /// <returns>True if wait set is ready, False on timeout.</returns>
         private static bool Wait(SafeWaitSetHandle waitSetHandle, long timeout)
         {
-            long ns_timeout = timeout * 1000000;
-            RCLRet ret = RCLdotnetDelegates.native_rcl_wait(waitSetHandle, ns_timeout);
+            long nsTimeout = timeout * 1000000;
+            RCLRet ret = RCLdotnetDelegates.native_rcl_wait(waitSetHandle, nsTimeout);
             if (ret == RCLRet.Ok || ret == RCLRet.Timeout)
             {
                 return ret == RCLRet.Ok;

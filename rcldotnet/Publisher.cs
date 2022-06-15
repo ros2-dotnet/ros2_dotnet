@@ -21,7 +21,7 @@ namespace ROS2
 {
     internal static class PublisherDelegates
     {
-        internal static readonly DllLoadUtils dllLoadUtils;
+        internal static readonly DllLoadUtils _dllLoadUtils;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLPublishType(
@@ -31,10 +31,10 @@ namespace ROS2
 
         static PublisherDelegates()
         {
-            dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
-            IntPtr nativelibrary = dllLoadUtils.LoadLibrary("rcldotnet_publisher");
+            _dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
+            IntPtr nativeLibrary = _dllLoadUtils.LoadLibrary("rcldotnet_publisher");
 
-            IntPtr native_rcl_publish_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_rcl_publish");
+            IntPtr native_rcl_publish_ptr = _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_publish");
             PublisherDelegates.native_rcl_publish = (NativeRCLPublishType)Marshal.GetDelegateForFunctionPointer(
                 native_rcl_publish_ptr, typeof(NativeRCLPublishType));
         }

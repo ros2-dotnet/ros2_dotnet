@@ -12,7 +12,7 @@ namespace ConsoleApplication
 
             Node node = RCLdotnet.CreateNode("listener");
 
-            Subscription<std_msgs.msg.String> chatter_sub = node.CreateSubscription<std_msgs.msg.String>(
+            Subscription<std_msgs.msg.String> chatterSub = node.CreateSubscription<std_msgs.msg.String>(
                 "chatter", msg => Console.WriteLine("I heard: [" + msg.Data + "]"));
 
             RCLdotnet.Spin(node);
