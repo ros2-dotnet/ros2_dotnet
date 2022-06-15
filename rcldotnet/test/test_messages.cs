@@ -991,5 +991,33 @@ namespace RCLdotnetTests
       var exception = Assert.Throws<Exception>(() => chatterPub.Publish(msg));
       Assert.Equal("Invalid size of bounded sequence 'StringValues'.", exception.Message);
     }
+
+    [Fact]
+    public void TestDefaults()
+    {
+      var defaultsMsg = new test_msgs.msg.Defaults();
+
+      Assert.Equal(true, defaultsMsg.BoolValue);
+      Assert.Equal(50, defaultsMsg.ByteValue);
+      Assert.Equal(100, defaultsMsg.CharValue);
+      Assert.Equal(1.125f, defaultsMsg.Float32Value);
+      Assert.Equal(1.125, defaultsMsg.Float64Value);
+      Assert.Equal(-50, defaultsMsg.Int8Value);
+      Assert.Equal(200, defaultsMsg.Uint8Value);
+      Assert.Equal(-1000, defaultsMsg.Int16Value);
+      Assert.Equal(2000, defaultsMsg.Uint16Value);
+      Assert.Equal(-30000, defaultsMsg.Int32Value);
+      Assert.True(60000 == defaultsMsg.Uint32Value);
+      Assert.Equal(-40000000, defaultsMsg.Int64Value);
+      Assert.True(50000000 == defaultsMsg.Uint64Value);
+
+      var stringsMsg = new test_msgs.msg.Strings();
+      Assert.Equal("", stringsMsg.StringValue);
+      Assert.Equal("Hello world!", stringsMsg.StringValueDefault1);
+      Assert.Equal("Hello'world!", stringsMsg.StringValueDefault2);
+      Assert.Equal("Hello\"world!", stringsMsg.StringValueDefault3);
+      Assert.Equal("Hello'world!", stringsMsg.StringValueDefault4);
+      Assert.Equal("Hello\"world!", stringsMsg.StringValueDefault5);
+    }
   }
 }

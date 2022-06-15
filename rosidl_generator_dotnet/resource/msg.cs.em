@@ -55,8 +55,15 @@ public class @(type_name) : global::ROS2.IRosMessage {
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType)]@
+@[        if member.has_annotation('default')]@
+        @(get_field_name(type_name, member.name)) = @(constant_value_to_dotnet(member.type, member.get_annotation_value('default')['value']));
+@[        end if]@
 @[    elif isinstance(member.type, AbstractString)]@
+@[        if member.has_annotation('default')]@
+        @(get_field_name(type_name, member.name)) = @(constant_value_to_dotnet(member.type, member.get_annotation_value('default')['value']));
+@[        else]@
         @(get_field_name(type_name, member.name)) = "";
+@[        end if]@
 @[    else]@
         @(get_field_name(type_name, member.name)) = new @(get_dotnet_type(member.type))();
 @[    end if]@
