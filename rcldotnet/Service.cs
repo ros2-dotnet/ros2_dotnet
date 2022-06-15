@@ -33,17 +33,17 @@ namespace ROS2
         // internal handle is disposed.
         // By relying on the GC/Finalizer of SafeHandle the handle only gets
         // Disposed if the service is not live anymore.
-        abstract internal SafeServiceHandle Handle { get; }
+        internal abstract SafeServiceHandle Handle { get; }
 
-        abstract internal IRosMessage CreateRequest();
-        
-        abstract internal SafeHandle CreateRequestHandle();
+        internal abstract IRosMessage CreateRequest();
 
-        abstract internal IRosMessage CreateResponse();
+        internal abstract SafeHandle CreateRequestHandle();
 
-        abstract internal SafeHandle CreateResponseHandle();
+        internal abstract IRosMessage CreateResponse();
 
-        abstract internal void TriggerCallback(IRosMessage request, IRosMessage response);
+        internal abstract SafeHandle CreateResponseHandle();
+
+        internal abstract void TriggerCallback(IRosMessage request, IRosMessage response);
     }
 
     public sealed class Service<TService, TRequest, TResponse> : Service
@@ -51,7 +51,7 @@ namespace ROS2
         where TRequest : IRosMessage, new()
         where TResponse : IRosMessage, new()
     {
-        private Action<TRequest, TResponse> _callback;
+        private readonly Action<TRequest, TResponse> _callback;
 
         internal Service(SafeServiceHandle handle, Action<TRequest, TResponse> callback)
         {
@@ -59,7 +59,7 @@ namespace ROS2
             _callback = callback;
         }
 
-        internal override SafeServiceHandle Handle { get; } 
+        internal override SafeServiceHandle Handle { get; }
 
         internal override IRosMessage CreateRequest() => (IRosMessage)new TRequest();
 

@@ -25,13 +25,13 @@ namespace ROS2
     {
         internal static readonly DllLoadUtils dllLoadUtils;
 
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLSendRequestType(
             SafeClientHandle clientHandle, SafeHandle requestHandle, out long seqneceNumber);
 
         internal static NativeRCLSendRequestType native_rcl_send_request = null;
 
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLServiceServerIsAvailableType(
             SafeNodeHandle nodeHandle, SafeClientHandle clientHandle, out bool isAvailable);
 
@@ -84,7 +84,7 @@ namespace ROS2
         // ros2_java uses a WeakReference here. Not sure if its needed or not.
         private readonly Node _node;
         private readonly ConcurrentDictionary<long, PendingRequest> _pendingRequests = new ConcurrentDictionary<long, PendingRequest>();
-        
+
         internal Client(SafeClientHandle handle, Node node)
         {
             Handle = handle;

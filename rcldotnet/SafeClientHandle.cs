@@ -29,7 +29,7 @@ namespace ROS2
     /// which point to a rcl_publisher_t, rcl_subscription_t or rcl_service_t.
     /// </summary>
     internal sealed class SafeClientHandle : SafeHandleZeroOrMinusOneIsInvalid
-    { 
+    {
         // Trick with parent handles taken from https://github.com/dotnet/corefx/pull/6366
         // Commit from early 2016, but still in current .NET as of september 2021:
         // https://github.com/dotnet/runtime/blob/57bfe474518ab5b7cfe6bf7424a79ce3af9d6657/src/libraries/Common/src/Interop/Windows/Advapi32/SafeKeyHandle.cs
@@ -53,7 +53,7 @@ namespace ROS2
         {
             var parent = _parent;
             _parent = null;
-            
+
             bool successfullyFreed = false;
             if (parent != null)
             {
@@ -62,7 +62,7 @@ namespace ROS2
 
                 RCLRet ret = NodeDelegates.native_rcl_destroy_client_handle(handle, parent);
                 successfullyFreed = ret == RCLRet.Ok;
-                
+
                 parent.DangerousRelease();
             }
 
