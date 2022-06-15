@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using ROS2;
 using Xunit;
 
@@ -1018,6 +1019,398 @@ namespace RCLdotnetTests
       Assert.Equal("Hello\"world!", stringsMsg.StringValueDefault3);
       Assert.Equal("Hello'world!", stringsMsg.StringValueDefault4);
       Assert.Equal("Hello\"world!", stringsMsg.StringValueDefault5);
+    }
+
+    [Fact]
+    public void TestDefaultsArrays()
+    {
+      var msg = new test_msgs.msg.Arrays();
+
+      Assert.IsType<bool[]>(msg.BoolValues);
+      Assert.Equal(new bool[3], msg.BoolValues);
+
+      Assert.IsType<byte[]>(msg.ByteValues);
+      Assert.Equal(new byte[3], msg.ByteValues);
+
+      Assert.IsType<byte[]>(msg.CharValues);
+      Assert.Equal(new byte[3], msg.CharValues);
+
+      Assert.IsType<float[]>(msg.Float32Values);
+      Assert.Equal(new float[3], msg.Float32Values);
+
+      Assert.IsType<double[]>(msg.Float64Values);
+      Assert.Equal(new double[3], msg.Float64Values);
+
+      Assert.IsType<sbyte[]>(msg.Int8Values);
+      Assert.Equal(new sbyte[3], msg.Int8Values);
+
+      Assert.IsType<byte[]>(msg.Uint8Values);
+      Assert.Equal(new byte[3], msg.Uint8Values);
+
+      Assert.IsType<short[]>(msg.Int16Values);
+      Assert.Equal(new short[3], msg.Int16Values);
+
+      Assert.IsType<ushort[]>(msg.Uint16Values);
+      Assert.Equal(new ushort[3], msg.Uint16Values);
+
+      Assert.IsType<int[]>(msg.Int32Values);
+      Assert.Equal(new int[3], msg.Int32Values);
+
+      Assert.IsType<uint[]>(msg.Uint32Values);
+      Assert.Equal(new uint[3], msg.Uint32Values);
+
+      Assert.IsType<long[]>(msg.Int64Values);
+      Assert.Equal(new long[3], msg.Int64Values);
+
+      Assert.IsType<ulong[]>(msg.Uint64Values);
+      Assert.Equal(new ulong[3], msg.Uint64Values);
+
+      Assert.IsType<string[]>(msg.StringValues);
+      Assert.Equal(
+        Enumerable.Repeat("", 3).ToArray(),
+        msg.StringValues);
+
+      Assert.IsType<test_msgs.msg.BasicTypes[]>(msg.BasicTypesValues);
+      Assert.Equal(3, msg.BasicTypesValues.Length);
+      Assert.NotNull(msg.BasicTypesValues[0]);
+      Assert.NotNull(msg.BasicTypesValues[1]);
+      Assert.NotNull(msg.BasicTypesValues[2]);
+
+      Assert.IsType<test_msgs.msg.Constants[]>(msg.ConstantsValues);
+      Assert.Equal(3, msg.ConstantsValues.Length);
+      Assert.NotNull(msg.ConstantsValues[0]);
+      Assert.NotNull(msg.ConstantsValues[1]);
+      Assert.NotNull(msg.ConstantsValues[2]);
+
+      Assert.IsType<test_msgs.msg.Defaults[]>(msg.DefaultsValues);
+      Assert.Equal(3, msg.DefaultsValues.Length);
+      Assert.NotNull(msg.DefaultsValues[0]);
+      Assert.NotNull(msg.DefaultsValues[1]);
+      Assert.NotNull(msg.DefaultsValues[2]);
+
+      Assert.IsType<bool[]>(msg.BoolValuesDefault);
+      Assert.Equal(
+        new bool[] { false, true, false },
+        msg.BoolValuesDefault);
+
+      Assert.IsType<byte[]>(msg.ByteValuesDefault);
+      Assert.Equal(
+        new byte[] { 0, 1, 255 },
+        msg.ByteValuesDefault);
+
+      Assert.IsType<byte[]>(msg.CharValuesDefault);
+      Assert.Equal(
+        new byte[] { 0, 1, 127 },
+        msg.CharValuesDefault);
+
+      Assert.IsType<float[]>(msg.Float32ValuesDefault);
+      Assert.Equal(
+        new float[] { 1.125f, 0.0f, -1.125f},
+        msg.Float32ValuesDefault);
+
+      Assert.IsType<double[]>(msg.Float64ValuesDefault);
+      Assert.Equal(
+        new double[] { 3.1415, 0.0, -3.1415 },
+        msg.Float64ValuesDefault);
+
+      Assert.IsType<sbyte[]>(msg.Int8ValuesDefault);
+      Assert.Equal(
+        new sbyte[] { 0, 127, -128 },
+        msg.Int8ValuesDefault);
+
+      Assert.IsType<byte[]>(msg.Uint8ValuesDefault);
+      Assert.Equal(
+        new byte[] { 0, 1, 255 },
+        msg.Uint8ValuesDefault);
+
+      Assert.IsType<short[]>(msg.Int16ValuesDefault);
+      Assert.Equal(
+        new short[] { 0, 32767, -32768 },
+        msg.Int16ValuesDefault);
+
+      Assert.IsType<ushort[]>(msg.Uint16ValuesDefault);
+      Assert.Equal(
+        new ushort[] { 0, 1, 65535 },
+        msg.Uint16ValuesDefault);
+
+      Assert.IsType<int[]>(msg.Int32ValuesDefault);
+      Assert.Equal(
+        new int[] { 0, 2147483647, -2147483648 },
+        msg.Int32ValuesDefault);
+
+      Assert.IsType<uint[]>(msg.Uint32ValuesDefault);
+      Assert.Equal(
+        new uint[] { 0, 1, 4294967295 },
+        msg.Uint32ValuesDefault);
+
+      Assert.IsType<long[]>(msg.Int64ValuesDefault);
+      Assert.Equal(
+        new long[] { 0, 9223372036854775807, -9223372036854775808 },
+        msg.Int64ValuesDefault);
+
+      Assert.IsType<ulong[]>(msg.Uint64ValuesDefault);
+      Assert.Equal(
+        new ulong[] { 0, 1, 18446744073709551615 },
+        msg.Uint64ValuesDefault);
+
+      Assert.IsType<string[]>(msg.StringValuesDefault);
+      Assert.Equal(
+        new string[] { "", "max value", "min value" },
+        msg.StringValuesDefault);
+    }
+
+    [Fact]
+    public void TestDefaultsUnboundedSequences()
+    {
+      var msg = new test_msgs.msg.UnboundedSequences();
+
+      Assert.IsType<List<bool>>(msg.BoolValues);
+      Assert.Equal(new List<bool>(), msg.BoolValues);
+
+      Assert.IsType<List<byte>>(msg.ByteValues);
+      Assert.Equal(new List<byte>(), msg.ByteValues);
+
+      Assert.IsType<List<byte>>(msg.CharValues);
+      Assert.Equal(new List<byte>(), msg.CharValues);
+
+      Assert.IsType<List<float>>(msg.Float32Values);
+      Assert.Equal(new List<float>(), msg.Float32Values);
+
+      Assert.IsType<List<double>>(msg.Float64Values);
+      Assert.Equal(new List<double>(), msg.Float64Values);
+
+      Assert.IsType<List<sbyte>>(msg.Int8Values);
+      Assert.Equal(new List<sbyte>(), msg.Int8Values);
+
+      Assert.IsType<List<byte>>(msg.Uint8Values);
+      Assert.Equal(new List<byte>(), msg.Uint8Values);
+
+      Assert.IsType<List<short>>(msg.Int16Values);
+      Assert.Equal(new List<short>(), msg.Int16Values);
+
+      Assert.IsType<List<ushort>>(msg.Uint16Values);
+      Assert.Equal(new List<ushort>(), msg.Uint16Values);
+
+      Assert.IsType<List<int>>(msg.Int32Values);
+      Assert.Equal(new List<int>(), msg.Int32Values);
+
+      Assert.IsType<List<uint>>(msg.Uint32Values);
+      Assert.Equal(new List<uint>(), msg.Uint32Values);
+
+      Assert.IsType<List<long>>(msg.Int64Values);
+      Assert.Equal(new List<long>(), msg.Int64Values);
+
+      Assert.IsType<List<ulong>>(msg.Uint64Values);
+      Assert.Equal(new List<ulong>(), msg.Uint64Values);
+
+      Assert.IsType<List<string>>(msg.StringValues);
+      Assert.Equal(new List<string>(), msg.StringValues);
+
+      Assert.IsType<List<test_msgs.msg.BasicTypes>>(msg.BasicTypesValues);
+      Assert.Equal(new List<test_msgs.msg.BasicTypes>(), msg.BasicTypesValues);
+
+      Assert.IsType<List<test_msgs.msg.Constants>>(msg.ConstantsValues);
+      Assert.Equal(new List<test_msgs.msg.Constants>(), msg.ConstantsValues);
+
+      Assert.IsType<List<test_msgs.msg.Defaults>>(msg.DefaultsValues);
+      Assert.Equal(new List<test_msgs.msg.Defaults>(), msg.DefaultsValues);
+
+      Assert.IsType<List<bool>>(msg.BoolValuesDefault);
+      Assert.Equal(
+        new List<bool> { false, true, false },
+        msg.BoolValuesDefault);
+
+      Assert.IsType<List<byte>>(msg.ByteValuesDefault);
+      Assert.Equal(
+        new List<byte> { 0, 1, 255 },
+        msg.ByteValuesDefault);
+
+      Assert.IsType<List<byte>>(msg.CharValuesDefault);
+      Assert.Equal(
+        new List<byte> { 0, 1, 127 },
+        msg.CharValuesDefault);
+
+      Assert.IsType<List<float>>(msg.Float32ValuesDefault);
+      Assert.Equal(
+        new List<float> { 1.125f, 0.0f, -1.125f},
+        msg.Float32ValuesDefault);
+
+      Assert.IsType<List<double>>(msg.Float64ValuesDefault);
+      Assert.Equal(
+        new List<double> { 3.1415, 0.0, -3.1415 },
+        msg.Float64ValuesDefault);
+
+      Assert.IsType<List<sbyte>>(msg.Int8ValuesDefault);
+      Assert.Equal(
+        new List<sbyte> { 0, 127, -128 },
+        msg.Int8ValuesDefault);
+
+      Assert.IsType<List<byte>>(msg.Uint8ValuesDefault);
+      Assert.Equal(
+        new List<byte> { 0, 1, 255 },
+        msg.Uint8ValuesDefault);
+
+      Assert.IsType<List<short>>(msg.Int16ValuesDefault);
+      Assert.Equal(
+        new List<short> { 0, 32767, -32768 },
+        msg.Int16ValuesDefault);
+
+      Assert.IsType<List<ushort>>(msg.Uint16ValuesDefault);
+      Assert.Equal(
+        new List<ushort> { 0, 1, 65535 },
+        msg.Uint16ValuesDefault);
+
+      Assert.IsType<List<int>>(msg.Int32ValuesDefault);
+      Assert.Equal(
+        new List<int> { 0, 2147483647, -2147483648 },
+        msg.Int32ValuesDefault);
+
+      Assert.IsType<List<uint>>(msg.Uint32ValuesDefault);
+      Assert.Equal(
+        new List<uint> { 0, 1, 4294967295 },
+        msg.Uint32ValuesDefault);
+
+      Assert.IsType<List<long>>(msg.Int64ValuesDefault);
+      Assert.Equal(
+        new List<long> { 0, 9223372036854775807, -9223372036854775808 },
+        msg.Int64ValuesDefault);
+
+      Assert.IsType<List<ulong>>(msg.Uint64ValuesDefault);
+      Assert.Equal(
+        new List<ulong> { 0, 1, 18446744073709551615 },
+        msg.Uint64ValuesDefault);
+
+      Assert.IsType<List<string>>(msg.StringValuesDefault);
+      Assert.Equal(
+        new List<string> { "", "max value", "min value" },
+        msg.StringValuesDefault);
+    }
+
+    [Fact]
+    public void TestDefaultsBoundedSequences()
+    {
+      var msg = new test_msgs.msg.BoundedSequences();
+
+      Assert.IsType<List<bool>>(msg.BoolValues);
+      Assert.Equal(new List<bool>(), msg.BoolValues);
+
+      Assert.IsType<List<byte>>(msg.ByteValues);
+      Assert.Equal(new List<byte>(), msg.ByteValues);
+
+      Assert.IsType<List<byte>>(msg.CharValues);
+      Assert.Equal(new List<byte>(), msg.CharValues);
+
+      Assert.IsType<List<float>>(msg.Float32Values);
+      Assert.Equal(new List<float>(), msg.Float32Values);
+
+      Assert.IsType<List<double>>(msg.Float64Values);
+      Assert.Equal(new List<double>(), msg.Float64Values);
+
+      Assert.IsType<List<sbyte>>(msg.Int8Values);
+      Assert.Equal(new List<sbyte>(), msg.Int8Values);
+
+      Assert.IsType<List<byte>>(msg.Uint8Values);
+      Assert.Equal(new List<byte>(), msg.Uint8Values);
+
+      Assert.IsType<List<short>>(msg.Int16Values);
+      Assert.Equal(new List<short>(), msg.Int16Values);
+
+      Assert.IsType<List<ushort>>(msg.Uint16Values);
+      Assert.Equal(new List<ushort>(), msg.Uint16Values);
+
+      Assert.IsType<List<int>>(msg.Int32Values);
+      Assert.Equal(new List<int>(), msg.Int32Values);
+
+      Assert.IsType<List<uint>>(msg.Uint32Values);
+      Assert.Equal(new List<uint>(), msg.Uint32Values);
+
+      Assert.IsType<List<long>>(msg.Int64Values);
+      Assert.Equal(new List<long>(), msg.Int64Values);
+
+      Assert.IsType<List<ulong>>(msg.Uint64Values);
+      Assert.Equal(new List<ulong>(), msg.Uint64Values);
+
+      Assert.IsType<List<string>>(msg.StringValues);
+      Assert.Equal(new List<string>(), msg.StringValues);
+
+      Assert.IsType<List<test_msgs.msg.BasicTypes>>(msg.BasicTypesValues);
+      Assert.Equal(new List<test_msgs.msg.BasicTypes>(), msg.BasicTypesValues);
+
+      Assert.IsType<List<test_msgs.msg.Constants>>(msg.ConstantsValues);
+      Assert.Equal(new List<test_msgs.msg.Constants>(), msg.ConstantsValues);
+
+      Assert.IsType<List<test_msgs.msg.Defaults>>(msg.DefaultsValues);
+      Assert.Equal(new List<test_msgs.msg.Defaults>(), msg.DefaultsValues);
+
+      Assert.IsType<List<bool>>(msg.BoolValuesDefault);
+      Assert.Equal(
+        new List<bool> { false, true, false },
+        msg.BoolValuesDefault);
+
+      Assert.IsType<List<byte>>(msg.ByteValuesDefault);
+      Assert.Equal(
+        new List<byte> { 0, 1, 255 },
+        msg.ByteValuesDefault);
+
+      Assert.IsType<List<byte>>(msg.CharValuesDefault);
+      Assert.Equal(
+        new List<byte> { 0, 1, 127 },
+        msg.CharValuesDefault);
+
+      Assert.IsType<List<float>>(msg.Float32ValuesDefault);
+      Assert.Equal(
+        new List<float> { 1.125f, 0.0f, -1.125f},
+        msg.Float32ValuesDefault);
+
+      Assert.IsType<List<double>>(msg.Float64ValuesDefault);
+      Assert.Equal(
+        new List<double> { 3.1415, 0.0, -3.1415 },
+        msg.Float64ValuesDefault);
+
+      Assert.IsType<List<sbyte>>(msg.Int8ValuesDefault);
+      Assert.Equal(
+        new List<sbyte> { 0, 127, -128 },
+        msg.Int8ValuesDefault);
+
+      Assert.IsType<List<byte>>(msg.Uint8ValuesDefault);
+      Assert.Equal(
+        new List<byte> { 0, 1, 255 },
+        msg.Uint8ValuesDefault);
+
+      Assert.IsType<List<short>>(msg.Int16ValuesDefault);
+      Assert.Equal(
+        new List<short> { 0, 32767, -32768 },
+        msg.Int16ValuesDefault);
+
+      Assert.IsType<List<ushort>>(msg.Uint16ValuesDefault);
+      Assert.Equal(
+        new List<ushort> { 0, 1, 65535 },
+        msg.Uint16ValuesDefault);
+
+      Assert.IsType<List<int>>(msg.Int32ValuesDefault);
+      Assert.Equal(
+        new List<int> { 0, 2147483647, -2147483648 },
+        msg.Int32ValuesDefault);
+
+      Assert.IsType<List<uint>>(msg.Uint32ValuesDefault);
+      Assert.Equal(
+        new List<uint> { 0, 1, 4294967295 },
+        msg.Uint32ValuesDefault);
+
+      Assert.IsType<List<long>>(msg.Int64ValuesDefault);
+      Assert.Equal(
+        new List<long> { 0, 9223372036854775807, -9223372036854775808 },
+        msg.Int64ValuesDefault);
+
+      Assert.IsType<List<ulong>>(msg.Uint64ValuesDefault);
+      Assert.Equal(
+        new List<ulong> { 0, 1, 18446744073709551615 },
+        msg.Uint64ValuesDefault);
+
+      Assert.IsType<List<string>>(msg.StringValuesDefault);
+      Assert.Equal(
+        new List<string> { "", "max value", "min value" },
+        msg.StringValuesDefault);
     }
   }
 }
