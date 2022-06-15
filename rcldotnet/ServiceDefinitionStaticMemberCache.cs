@@ -23,7 +23,7 @@ namespace ROS2
         where TRequest : IRosMessage, new()
         where TResponse : IRosMessage, new()
     {
-        private static IntPtr s_typeSupport;
+        private static readonly IntPtr s_typeSupport;
 
         static ServiceDefinitionStaticMemberCache()
         {
@@ -54,7 +54,7 @@ namespace ROS2
             {
                 throw new InvalidOperationException($"Type '{typeof(TService).FullName}' did not define a correct __GetTypeSupport mehtod.");
             }
-            
+
             return s_typeSupport;
         }
     }
