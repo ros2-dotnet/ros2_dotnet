@@ -7,12 +7,20 @@ srv_prefix = "RCLDOTNET_{0}_{1}_{2}".format(package_name, '_'.join(service.names
     //  Microsoft
     #define @(srv_prefix)_EXPORT __declspec(dllexport)
     #define @(srv_prefix)_IMPORT __declspec(dllimport)
-    #define @(srv_prefix)_CDECL __cdecl
+    #if defined(_M_IX86)
+        #define @(srv_prefix)_CDECL __cdecl
+    #else
+        #define @(srv_prefix)_CDECL
+    #endif
 #elif defined(__GNUC__)
     //  GCC
     #define @(srv_prefix)_EXPORT __attribute__((visibility("default")))
     #define @(srv_prefix)_IMPORT
-    #define @(srv_prefix)_CDECL __attribute__((__cdecl__))
+    #if defined(__i386__)
+        #define @(srv_prefix)_CDECL __attribute__((__cdecl__))
+    #else
+        #define @(srv_prefix)_CDECL
+    #endif
 #else
     //  do nothing and hope for the best?
     #define @(srv_prefix)_EXPORT
