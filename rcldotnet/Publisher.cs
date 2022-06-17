@@ -32,7 +32,7 @@ namespace ROS2
         static PublisherDelegates()
         {
             _dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
-            IntPtr nativeLibrary = _dllLoadUtils.LoadLibrary("rcldotnet_publisher");
+            IntPtr nativeLibrary = _dllLoadUtils.LoadLibrary("rcldotnet");
 
             IntPtr native_rcl_publish_ptr = _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_publish");
             PublisherDelegates.native_rcl_publish = (NativeRCLPublishType)Marshal.GetDelegateForFunctionPointer(

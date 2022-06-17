@@ -40,7 +40,7 @@ namespace ROS2
         static ClientDelegates()
         {
             _dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
-            IntPtr nativeLibrary = _dllLoadUtils.LoadLibrary("rcldotnet_client");
+            IntPtr nativeLibrary = _dllLoadUtils.LoadLibrary("rcldotnet");
 
             IntPtr native_rcl_send_request_ptr = _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_send_request");
             ClientDelegates.native_rcl_send_request = (NativeRCLSendRequestType)Marshal.GetDelegateForFunctionPointer(
