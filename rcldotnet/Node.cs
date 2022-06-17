@@ -137,12 +137,13 @@ namespace ROS2
 
     public sealed class Node
     {
-
         private readonly IList<Subscription> _subscriptions;
 
         private readonly IList<Service> _services;
 
         private readonly IList<Client> _clients;
+
+        private readonly IList<GuardCondition> _guardConditions;
 
         internal Node(SafeNodeHandle handle)
         {
@@ -150,6 +151,7 @@ namespace ROS2
             _subscriptions = new List<Subscription>();
             _services = new List<Service>();
             _clients = new List<Client>();
+            _guardConditions = new List<GuardCondition>();
         }
 
         public IList<Subscription> Subscriptions => _subscriptions;
@@ -160,6 +162,8 @@ namespace ROS2
         public IList<Service> Services => _services;
 
         public IList<Client> Clients => _clients;
+
+        public IList<GuardCondition> GuardConditions => _guardConditions;
 
         // Node does intentionaly (for now) not implement IDisposable as this
         // needs some extra consideration how the type works after its
@@ -247,6 +251,21 @@ namespace ROS2
             var client = new Client<TService, TRequest, TResponse>(clientHandle, this);
             _clients.Add(client);
             return client;
+        }
+
+        public GuardCondition CreateGuardCondition(Action callback)
+        {
+            var guardConditionHandle = new SafeGuardConditionHandle();
+            RCLRet ret = RCLdotnetDelegates.native_rcl_create_guard_condition_handle(ref guardConditionHandle);
+            if (ret != RCLRet.Ok)
+            {
+                guardConditionHandle.Dispose();
+                throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_create_guard_condition_handle)}() failed.");
+            }
+
+            var guardCondition = new GuardCondition(guardConditionHandle, callback);
+            _guardConditions.Add(guardCondition);
+            return guardCondition;
         }
     }
 }
