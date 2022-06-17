@@ -57,6 +57,18 @@ namespace ROS2
         internal static NativeRCLDestroyNodeHandleType native_rcl_destroy_node_handle = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLCreateGuardConditionHandleType(
+            ref SafeGuardConditionHandle guardConditionHandle);
+
+        internal static NativeRCLCreateGuardConditionHandleType native_rcl_create_guard_condition_handle = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLDestroyGuardConditionHandleType(
+            IntPtr guardConditionHandle);
+
+        internal static NativeRCLDestroyGuardConditionHandleType native_rcl_destroy_guard_condition_handle = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate IntPtr NativeRCLGetRMWIdentifierType();
 
         internal static NativeRCLGetRMWIdentifierType native_rcl_get_rmw_identifier = null;
@@ -95,9 +107,19 @@ namespace ROS2
         internal static NativeRCLWaitSetAddClientType native_rcl_wait_set_add_client = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLWaitSetAddGuardConditionType(SafeWaitSetHandle waitSetHandle, SafeGuardConditionHandle guardConditionHandle);
+
+        internal static NativeRCLWaitSetAddGuardConditionType native_rcl_wait_set_add_guard_condition = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLWaitType(SafeWaitSetHandle waitSetHandle, long timeout);
 
         internal static NativeRCLWaitType native_rcl_wait = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate bool NativeRCLWaitSetGuardConditionReady(SafeWaitSetHandle waitSetHandle, int index);
+
+        internal static NativeRCLWaitSetGuardConditionReady native_rcl_wait_set_guard_condition_ready = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLTakeType(SafeSubscriptionHandle subscriptionHandle, SafeHandle messageHandle);
@@ -182,6 +204,18 @@ namespace ROS2
                 (NativeRCLDestroyNodeHandleType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_destroy_node_handle_ptr, typeof(NativeRCLDestroyNodeHandleType));
 
+            IntPtr native_rcl_create_guard_condition_handle_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_create_guard_condition_handle");
+            RCLdotnetDelegates.native_rcl_create_guard_condition_handle =
+                (NativeRCLCreateGuardConditionHandleType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_create_guard_condition_handle_ptr, typeof(NativeRCLCreateGuardConditionHandleType));
+
+            IntPtr native_rcl_destroy_guard_condition_handle_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_destroy_guard_condition_handle");
+            RCLdotnetDelegates.native_rcl_destroy_guard_condition_handle =
+                (NativeRCLDestroyGuardConditionHandleType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_destroy_guard_condition_handle_ptr, typeof(NativeRCLDestroyGuardConditionHandleType));
+
             IntPtr native_rcl_create_wait_set_handle_ptr =
                 _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_create_wait_set_handle");
             RCLdotnetDelegates.native_rcl_create_wait_set_handle =
@@ -218,11 +252,23 @@ namespace ROS2
                 (NativeRCLWaitSetAddClientType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_wait_set_add_client_ptr, typeof(NativeRCLWaitSetAddClientType));
 
+            IntPtr native_rcl_wait_set_add_guard_condition_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_wait_set_add_guard_condition");
+            RCLdotnetDelegates.native_rcl_wait_set_add_guard_condition =
+                (NativeRCLWaitSetAddGuardConditionType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_wait_set_add_guard_condition_ptr, typeof(NativeRCLWaitSetAddGuardConditionType));
+
             IntPtr native_rcl_wait_ptr =
                 _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_wait");
             RCLdotnetDelegates.native_rcl_wait =
                 (NativeRCLWaitType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_wait_ptr, typeof(NativeRCLWaitType));
+
+            IntPtr native_rcl_wait_set_guard_condition_ready_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_wait_set_guard_condition_ready");
+            RCLdotnetDelegates.native_rcl_wait_set_guard_condition_ready =
+                (NativeRCLWaitSetGuardConditionReady)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_wait_set_guard_condition_ready_ptr, typeof(NativeRCLWaitSetGuardConditionReady));
 
             IntPtr native_rcl_take_ptr =
                 _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_take");
@@ -348,6 +394,12 @@ namespace ROS2
         {
             RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_add_client(waitSetHandle, clientHandle);
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_wait_set_add_client)}() failed.");
+        }
+
+        private static void WaitSetAddGuardCondition(SafeWaitSetHandle waitSetHandle, SafeGuardConditionHandle guardConditionHandle)
+        {
+            RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_add_guard_condition(waitSetHandle, guardConditionHandle);
+            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_wait_set_add_guard_condition)}() failed.");
         }
 
         /// <summary>
@@ -531,7 +583,7 @@ namespace ROS2
         public static void SpinOnce(Node node, long timeout)
         {
             int numberOfSubscriptions = node.Subscriptions.Count;
-            int numberOfGuardConditions = 0;
+            int numberOfGuardConditions = node.GuardConditions.Count;
             int numberOfTimers = 0;
             int numberOfClients = node.Clients.Count;
             int numberOfServices = node.Services.Count;
@@ -577,50 +629,66 @@ namespace ROS2
                     WaitSetAddClient(waitSetHandle, client.Handle);
                 }
 
+                foreach (var guardCondition in node.GuardConditions)
+                {
+                    WaitSetAddGuardCondition(waitSetHandle, guardCondition.Handle);
+                }
+
                 bool ready = Wait(waitSetHandle, timeout);
                 if (!ready)
                 {
                     return; // timeout
                 }
-            }
 
-            foreach (Subscription subscription in node.Subscriptions)
-            {
-                IRosMessage message = subscription.CreateMessage();
-                bool result = Take(subscription, message);
-                if (result)
+                foreach (Subscription subscription in node.Subscriptions)
                 {
-                    subscription.TriggerCallback(message);
-                }
-            }
-
-            // requestIdHandle gets reused for each element in the loop.
-            using (SafeRequestIdHandle requestIdHandle = CreateRequestId())
-            {
-                foreach (var service in node.Services)
-                {
-                    var request = service.CreateRequest();
-                    var response = service.CreateResponse();
-
-                    var result = TakeRequest(service, requestIdHandle, request);
+                    IRosMessage message = subscription.CreateMessage();
+                    bool result = Take(subscription, message);
                     if (result)
                     {
-                        service.TriggerCallback(request, response);
-
-                        SendResponse(service, requestIdHandle, response);
+                        subscription.TriggerCallback(message);
                     }
                 }
 
-                foreach (var client in node.Clients)
+                // requestIdHandle gets reused for each element in the loop.
+                using (SafeRequestIdHandle requestIdHandle = CreateRequestId())
                 {
-                    var response = client.CreateResponse();
-
-                    var result = TakeResponse(client, requestIdHandle, response);
-                    if (result)
+                    foreach (var service in node.Services)
                     {
-                        var sequenceNumber = RCLdotnetDelegates.native_rcl_request_id_get_sequence_number(requestIdHandle);
-                        client.HandleResponse(sequenceNumber, response);
+                        var request = service.CreateRequest();
+                        var response = service.CreateResponse();
+
+                        var result = TakeRequest(service, requestIdHandle, request);
+                        if (result)
+                        {
+                            service.TriggerCallback(request, response);
+
+                            SendResponse(service, requestIdHandle, response);
+                        }
                     }
+
+                    foreach (var client in node.Clients)
+                    {
+                        var response = client.CreateResponse();
+
+                        var result = TakeResponse(client, requestIdHandle, response);
+                        if (result)
+                        {
+                            var sequenceNumber = RCLdotnetDelegates.native_rcl_request_id_get_sequence_number(requestIdHandle);
+                            client.HandleResponse(sequenceNumber, response);
+                        }
+                    }
+                }
+
+                int index = 0;
+                foreach (GuardCondition guardCondition in node.GuardConditions)
+                {
+                    if (RCLdotnetDelegates.native_rcl_wait_set_guard_condition_ready(waitSetHandle, index))
+                    {
+                        guardCondition.TriggerCallback();
+                    }
+
+                    index++;
                 }
             }
         }

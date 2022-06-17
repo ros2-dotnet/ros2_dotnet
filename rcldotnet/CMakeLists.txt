@@ -29,6 +29,7 @@ set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
 
 set(CS_SOURCES
   Client.cs
+  GuardCondition.cs
   MessageStaticMemberCache.cs
   Node.cs
   Publisher.cs
@@ -36,6 +37,7 @@ set(CS_SOURCES
   RCLExceptionHelper.cs
   RCLRet.cs
   SafeClientHandle.cs
+  SafeGuardConditionHandle.cs
   SafeNodeHandle.cs
   SafePublisherHandle.cs
   SafeRequestIdHandle.cs
@@ -64,6 +66,7 @@ ament_export_assemblies_dll("lib/${PROJECT_NAME}/dotnet/${PROJECT_NAME}_assembli
 
 add_library(${PROJECT_NAME}_native SHARED
   rcldotnet_client.c
+  rcldotnet_guard_condition.c
   rcldotnet_node.c
   rcldotnet_publisher.c
   rcldotnet.c
@@ -108,6 +111,7 @@ if(BUILD_TESTING)
 
   add_dotnet_test(test_messages
     ${CS_SOURCES}
+    test/test_guard_conditions.cs
     test/test_messages.cs
     test/test_services.cs
     INCLUDE_DLLS
