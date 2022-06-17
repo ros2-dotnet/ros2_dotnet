@@ -75,7 +75,7 @@ namespace ROS2
         static NodeDelegates()
         {
             _dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
-            IntPtr nativeLibrary = _dllLoadUtils.LoadLibrary("rcldotnet_node");
+            IntPtr nativeLibrary = _dllLoadUtils.LoadLibrary("rcldotnet");
 
             IntPtr native_rcl_create_publisher_handle_ptr = _dllLoadUtils.GetProcAddress(
                 nativeLibrary, "native_rcl_create_publisher_handle");

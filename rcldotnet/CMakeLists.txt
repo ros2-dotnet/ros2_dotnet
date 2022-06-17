@@ -62,29 +62,27 @@ add_dotnet_library(${PROJECT_NAME}_assemblies
 install_dotnet(${PROJECT_NAME}_assemblies DESTINATION lib/${PROJECT_NAME}/dotnet)
 ament_export_assemblies_dll("lib/${PROJECT_NAME}/dotnet/${PROJECT_NAME}_assemblies.dll")
 
-set(_native_sources "rcldotnet;rcldotnet_node;rcldotnet_publisher;rcldotnet_client")
+add_library(${PROJECT_NAME}_native SHARED
+  rcldotnet_client.c
+  rcldotnet_node.c
+  rcldotnet_publisher.c
+  rcldotnet.c
+)
 
-foreach(_target_name ${_native_sources})
-  add_library(${_target_name} SHARED
-    ${_target_name}.c
-  )
-  set_target_properties(${_target_name}
-    PROPERTIES
-    OUTPUT_NAME ${_target_name}_native)
-  ament_target_dependencies(${_target_name}
-    "builtin_interfaces"
-    "rcl"
-    "rosidl_generator_c"
-    "rosidl_typesupport_c"
-  )
-  ament_export_libraries(${_target_name}_native)
+ament_target_dependencies(${PROJECT_NAME}_native
+  "builtin_interfaces"
+  "rcl"
+  "rosidl_generator_c"
+  "rosidl_typesupport_c"
+)
 
-  install(TARGETS ${_target_name}
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-  )
-endforeach()
+ament_export_libraries(${PROJECT_NAME}_native)
+
+install(TARGETS ${PROJECT_NAME}_native
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin
+)
 
 ament_export_dependencies(ament_cmake)
 ament_export_dependencies(builtin_interfaces)
