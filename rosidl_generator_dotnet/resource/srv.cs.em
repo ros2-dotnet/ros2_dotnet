@@ -1,6 +1,7 @@
 @{
 from rosidl_generator_dotnet import get_field_name
 from rosidl_generator_dotnet import get_dotnet_type
+from rosidl_generator_dotnet import get_dotnet_type_for_message
 from rosidl_generator_dotnet import get_builtin_dotnet_type
 from rosidl_generator_dotnet import constant_value_to_dotnet
 
@@ -14,8 +15,10 @@ from rosidl_parser.definition import BasicType
 from rosidl_parser.definition import NamespacedType
 
 type_name = service.namespaced_type.name
-request_type_name = service.request_message.structure.namespaced_type.name
-response_type_name = service.response_message.structure.namespaced_type.name
+
+request_type_name = get_dotnet_type_for_message(service.request_message)
+response_type_name = get_dotnet_type_for_message(service.response_message)
+
 srv_typename = '%s__%s' % ('__'.join(service.namespaced_type.namespaces), type_name)
 }
 namespace @('.'.join(service.namespaced_type.namespaces))
@@ -27,7 +30,9 @@ namespace @('.'.join(service.namespaced_type.namespaces))
 @# static abstract interface members are currently in preview, so maybe we could use the feature in the future.
 @# (if hey add support to derive from static only interfaces in static classes)
 @# Another option is to not use generics for passing the typesupport, but lets try this until we hit some wall.
-    public sealed class @(type_name) : global::ROS2.IRosServiceDefinition<@(request_type_name), @(response_type_name)>
+    public sealed class @(type_name) : global::ROS2.IRosServiceDefinition<
+        global::@(request_type_name),
+        global::@(response_type_name)>
     {
         private static readonly DllLoadUtils dllLoadUtils;
 

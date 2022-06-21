@@ -23,5 +23,20 @@ namespace ROS2
         // must be implemented on deriving types, gets called via reflection
         // (static abstract interface members are not supported yet.)
         // public static abstract IntPtr __GetTypeSupport();
+
+        // public static abstract IRosActionSendGoalRequest<TGoal> __CreateSendGoalRequest();
+        // public static abstract SafeHandle __CreateSendGoalRequestHandle();
+
+        // public static abstract IRosActionSendGoalResponse __CreateSendGoalResponse();
+        // public static abstract SafeHandle __CreateSendGoalResponseHandle();
+
+        // public static abstract IRosActionGetResultRequest __CreateGetResultRequest();
+        // public static abstract SafeHandle __CreateGetResultRequestHandle();
+
+        // public static abstract IRosActionGetResultResponse<TResult> __CreateGetResultResponse();
+        // public static abstract SafeHandle __CreateGetResultResponseHandle();
+
+        // public static abstract IRosActionFeedbackMessage<TFeedback> __CreateFeedbackMessage();
+        // public static abstract SafeHandle __CreateFeedbackMessageHandle();
     }
 }
