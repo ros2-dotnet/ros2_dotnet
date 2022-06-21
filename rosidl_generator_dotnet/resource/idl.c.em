@@ -87,5 +87,74 @@ TEMPLATE(
 @# Handle actions
 @#######################################################################
 @
-@#TODO - actions not implemented
+@{
+from rosidl_parser.definition import Action
+}@
+@[for action in content.get_elements_of_type(Action)]@
+@{
+TEMPLATE(
+    'msg.c.em',
+    package_name=package_name, interface_path=interface_path, message=action.goal)
+}@
+
+@{
+TEMPLATE(
+    'msg.c.em',
+    package_name=package_name, interface_path=interface_path, message=action.result)
+}@
+
+@{
+TEMPLATE(
+    'msg.c.em',
+    package_name=package_name, interface_path=interface_path, message=action.feedback)
+}@
+
+@{
+TEMPLATE(
+    'msg.c.em',
+    package_name=package_name, interface_path=interface_path, message=action.send_goal_service.request_message)
+}@
+
+@{
+TEMPLATE(
+    'msg.c.em',
+    package_name=package_name, interface_path=interface_path, message=action.send_goal_service.response_message)
+}@
+
+@{
+TEMPLATE(
+    'srv.c.em',
+    package_name=package_name, interface_path=interface_path, service=action.send_goal_service)
+}@
+
+@{
+TEMPLATE(
+    'msg.c.em',
+    package_name=package_name, interface_path=interface_path, message=action.get_result_service.request_message)
+}@
+
+@{
+TEMPLATE(
+    'msg.c.em',
+    package_name=package_name, interface_path=interface_path, message=action.get_result_service.response_message)
+}@
+
+@{
+TEMPLATE(
+    'srv.c.em',
+    package_name=package_name, interface_path=interface_path, service=action.get_result_service)
+}@
+
+@{
+TEMPLATE(
+    'msg.c.em',
+    package_name=package_name, interface_path=interface_path, message=action.feedback_message)
+}@
+
+@{
+TEMPLATE(
+    'action.c.em',
+    package_name=package_name, interface_path=interface_path, action=action)
+}@
+@[end for]@
 @
