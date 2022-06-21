@@ -10,6 +10,7 @@ find_package(DotNETExtra REQUIRED)
 
 set(CS_SOURCES
   DllLoadUtils.cs
+  IRosActionDefinition.cs
   IRosMessage.cs
   IRosServiceDefinition.cs
 )
