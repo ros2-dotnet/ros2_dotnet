@@ -24,6 +24,8 @@ namespace ROS2
         internal ActionClient()
         {
         }
+
+        public abstract bool ServerIsReady();
     }
 
     public sealed class ActionClient<TAction, TGoal, TResult, TFeedback> : ActionClient
@@ -37,7 +39,7 @@ namespace ROS2
         {
         }
 
-        public bool ServiceIsReady()
+        public override bool ServerIsReady()
         {
             throw new NotImplementedException();
         }
