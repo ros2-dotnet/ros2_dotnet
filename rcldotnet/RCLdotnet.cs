@@ -117,6 +117,21 @@ namespace ROS2
         internal static NativeRCLWaitType native_rcl_wait = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate bool NativeRCLWaitSetSubscriptionReady(SafeWaitSetHandle waitSetHandle, int index);
+
+        internal static NativeRCLWaitSetSubscriptionReady native_rcl_wait_set_subscription_ready = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate bool NativeRCLWaitSetClientReady(SafeWaitSetHandle waitSetHandle, int index);
+
+        internal static NativeRCLWaitSetClientReady native_rcl_wait_set_client_ready = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate bool NativeRCLWaitSetServiceReady(SafeWaitSetHandle waitSetHandle, int index);
+
+        internal static NativeRCLWaitSetServiceReady native_rcl_wait_set_service_ready = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate bool NativeRCLWaitSetGuardConditionReady(SafeWaitSetHandle waitSetHandle, int index);
 
         internal static NativeRCLWaitSetGuardConditionReady native_rcl_wait_set_guard_condition_ready = null;
@@ -263,6 +278,24 @@ namespace ROS2
             RCLdotnetDelegates.native_rcl_wait =
                 (NativeRCLWaitType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_wait_ptr, typeof(NativeRCLWaitType));
+
+            IntPtr native_rcl_wait_set_subscription_ready_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_wait_set_subscription_ready");
+            RCLdotnetDelegates.native_rcl_wait_set_subscription_ready =
+                (NativeRCLWaitSetSubscriptionReady)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_wait_set_subscription_ready_ptr, typeof(NativeRCLWaitSetSubscriptionReady));
+
+            IntPtr native_rcl_wait_set_client_ready_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_wait_set_client_ready");
+            RCLdotnetDelegates.native_rcl_wait_set_client_ready =
+                (NativeRCLWaitSetClientReady)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_wait_set_client_ready_ptr, typeof(NativeRCLWaitSetClientReady));
+
+            IntPtr native_rcl_wait_set_service_ready_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_wait_set_service_ready");
+            RCLdotnetDelegates.native_rcl_wait_set_service_ready =
+                (NativeRCLWaitSetServiceReady)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_wait_set_service_ready_ptr, typeof(NativeRCLWaitSetServiceReady));
 
             IntPtr native_rcl_wait_set_guard_condition_ready_ptr =
                 _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_wait_set_guard_condition_ready");
@@ -640,55 +673,73 @@ namespace ROS2
                     return; // timeout
                 }
 
+                int subscriptionIndex = 0;
                 foreach (Subscription subscription in node.Subscriptions)
                 {
-                    IRosMessage message = subscription.CreateMessage();
-                    bool result = Take(subscription, message);
-                    if (result)
+                    if (RCLdotnetDelegates.native_rcl_wait_set_subscription_ready(waitSetHandle, subscriptionIndex))
                     {
-                        subscription.TriggerCallback(message);
+                        IRosMessage message = subscription.CreateMessage();
+                        bool result = Take(subscription, message);
+                        if (result)
+                        {
+                            subscription.TriggerCallback(message);
+                        }
                     }
+
+                    subscriptionIndex++;
                 }
 
                 // requestIdHandle gets reused for each element in the loop.
                 using (SafeRequestIdHandle requestIdHandle = CreateRequestId())
                 {
+                    int serviceIndex = 0;
                     foreach (var service in node.Services)
                     {
-                        var request = service.CreateRequest();
-                        var response = service.CreateResponse();
-
-                        var result = TakeRequest(service, requestIdHandle, request);
-                        if (result)
+                        if (RCLdotnetDelegates.native_rcl_wait_set_service_ready(waitSetHandle, serviceIndex))
                         {
-                            service.TriggerCallback(request, response);
+                            var request = service.CreateRequest();
+                            var response = service.CreateResponse();
 
-                            SendResponse(service, requestIdHandle, response);
+                            var result = TakeRequest(service, requestIdHandle, request);
+                            if (result)
+                            {
+                                service.TriggerCallback(request, response);
+
+                                SendResponse(service, requestIdHandle, response);
+                            }
                         }
+
+                        serviceIndex++;
                     }
 
+                    int clientIndex = 0;
                     foreach (var client in node.Clients)
                     {
-                        var response = client.CreateResponse();
-
-                        var result = TakeResponse(client, requestIdHandle, response);
-                        if (result)
+                        if (RCLdotnetDelegates.native_rcl_wait_set_client_ready(waitSetHandle, clientIndex))
                         {
-                            var sequenceNumber = RCLdotnetDelegates.native_rcl_request_id_get_sequence_number(requestIdHandle);
-                            client.HandleResponse(sequenceNumber, response);
+                            var response = client.CreateResponse();
+
+                            var result = TakeResponse(client, requestIdHandle, response);
+                            if (result)
+                            {
+                                var sequenceNumber = RCLdotnetDelegates.native_rcl_request_id_get_sequence_number(requestIdHandle);
+                                client.HandleResponse(sequenceNumber, response);
+                            }
                         }
+
+                        clientIndex++;
                     }
                 }
 
-                int index = 0;
+                int guardConditionIndex = 0;
                 foreach (GuardCondition guardCondition in node.GuardConditions)
                 {
-                    if (RCLdotnetDelegates.native_rcl_wait_set_guard_condition_ready(waitSetHandle, index))
+                    if (RCLdotnetDelegates.native_rcl_wait_set_guard_condition_ready(waitSetHandle, guardConditionIndex))
                     {
                         guardCondition.TriggerCallback();
                     }
 
-                    index++;
+                    guardConditionIndex++;
                 }
             }
         }

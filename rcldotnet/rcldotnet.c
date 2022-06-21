@@ -178,6 +178,39 @@ int32_t native_rcl_wait(void *wait_set_handle, int64_t timeout) {
   return ret;
 }
 
+bool native_rcl_wait_set_subscription_ready(void *wait_set_handle, int32_t index) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+
+  if (index >= wait_set->size_of_subscriptions)
+  {
+    return false;
+  }
+
+  return wait_set->subscriptions[index] != NULL;
+}
+
+bool native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+
+  if (index >= wait_set->size_of_clients)
+  {
+    return false;
+  }
+
+  return wait_set->clients[index] != NULL;
+}
+
+bool native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+
+  if (index >= wait_set->size_of_services)
+  {
+    return false;
+  }
+
+  return wait_set->services[index] != NULL;
+}
+
 bool native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t index) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
 
