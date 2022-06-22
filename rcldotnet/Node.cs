@@ -267,5 +267,14 @@ namespace ROS2
             _guardConditions.Add(guardCondition);
             return guardCondition;
         }
+
+        public ActionClient<TAction, TGoal, TResult, TFeedback> CreateActionClient<TAction, TGoal, TResult, TFeedback>(string actionName)
+            where TAction : IRosActionDefinition<TGoal, TResult, TFeedback>
+            where TGoal : IRosMessage, new()
+            where TResult : IRosMessage, new()
+            where TFeedback : IRosMessage, new()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

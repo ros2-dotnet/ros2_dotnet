@@ -28,7 +28,10 @@ endif()
 set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
 
 set(CS_SOURCES
+  ActionClient.cs
+  ActionClientGoalHandle.cs
   ActionDefinitionStaticMemberCache.cs
+  ActionGoalStatus.cs
   Client.cs
   GuardCondition.cs
   MessageStaticMemberCache.cs
