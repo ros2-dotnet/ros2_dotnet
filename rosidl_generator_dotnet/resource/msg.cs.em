@@ -388,6 +388,25 @@ public class @(type_name) : global::ROS2.IRosMessage@(additional_interfaces_str)
 @[    end if]@
 @[end for]@
 
+@[if action_interface is not None and (
+    action_interface.startswith("global::ROS2.IRosActionSendGoalRequest") or
+    action_interface.startswith("global::ROS2.IRosActionGetResultRequest") or
+    action_interface.startswith("global::ROS2.IRosActionFeedbackMessage")
+)]@
+    global::ROS2.IRosMessage @(action_interface).GoalIdAsRosMessage
+    {
+        get => GoalId;
+        set => GoalId = (global::unique_identifier_msgs.msg.UUID)value;
+    }
+@[end if]@
+@[if action_interface is not None and action_interface.startswith("global::ROS2.IRosActionSendGoalResponse")]@
+    global::ROS2.IRosMessage @(action_interface).StampAsRosMessage
+    {
+        get => Stamp;
+        set => Stamp = (global::builtin_interfaces.msg.Time)value;
+    }
+@[end if]@
+
     private sealed class Safe@(type_name)Handle : global::System.Runtime.InteropServices.SafeHandle
     {
         public Safe@(type_name)Handle() : base(global::System.IntPtr.Zero, true) { }

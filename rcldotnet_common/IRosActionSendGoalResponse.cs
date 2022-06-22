@@ -21,5 +21,9 @@ namespace ROS2
 
         // NOTICE: cyclic reference, see `IRosActionSendGoalRequest<TGoal>`
         // builtin_interfaces.msg.Time Stamp { get; set; }
+
+        // This will be implemented explicitly so it doesn't collide with fields
+        // of the same name.
+        IRosMessage StampAsRosMessage { get; set; }
     }
 }
