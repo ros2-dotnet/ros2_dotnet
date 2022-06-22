@@ -19,5 +19,9 @@ namespace ROS2
     {
         // NOTICE: cyclic reference, see `IRosActionSendGoalRequest<TGoal>`
         // unique_identifier_msgs.msg.UUID GoalId { get; set; }
+
+        // This will be implemented explicitly so it doesn't collide with fields
+        // of the same name.
+        IRosMessage GoalIdAsRosMessage { get; set; }
     }
 }
