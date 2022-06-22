@@ -35,7 +35,14 @@ namespace ROS2
         // - Or provide property `IRosMessage GoalIdRosMessage { get; set; }`
         //   and cast to the concrete type on usage.
         //
+        // The later one was chosen as it gives the most control over object
+        // references and avoids using of reflection.
+        //
         // unique_identifier_msgs.msg.UUID GoalId { get; set; }
+
+        // This will be implemented explicitly so it doesn't collide with fields
+        // of the same name.
+        IRosMessage GoalIdAsRosMessage { get; set; }
 
         TGoal Goal { get; set; }
     }
