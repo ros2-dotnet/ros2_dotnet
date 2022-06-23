@@ -34,6 +34,7 @@ set(CS_SOURCES
   ActionGoalStatus.cs
   Client.cs
   GuardCondition.cs
+  GuidExtensions.cs
   MessageStaticMemberCache.cs
   Node.cs
   Publisher.cs
