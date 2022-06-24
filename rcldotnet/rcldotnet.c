@@ -18,6 +18,7 @@
 #include <rcl/error_handling.h>
 #include <rcl/node.h>
 #include <rcl/rcl.h>
+#include <rcl_action/rcl_action.h>
 #include <rmw/rmw.h>
 
 #include "rosidl_runtime_c/message_type_support_struct.h"
@@ -174,6 +175,47 @@ int32_t native_rcl_wait_set_add_guard_condition(void *wait_set_handle, void *gua
   return ret;
 }
 
+int32_t native_rcl_action_client_wait_set_get_num_entries(
+    void *action_client_handle,
+    int32_t *num_subscriptions,
+    int32_t *num_guard_conditions,
+    int32_t *num_timers,
+    int32_t *num_clients,
+    int32_t *num_services)
+{
+    rcl_action_client_t *action_client = (rcl_action_client_t *)action_client_handle;
+
+    size_t num_subscriptions_as_size_t;
+    size_t num_guard_conditions_as_size_t;
+    size_t num_timers_as_size_t;
+    size_t num_clients_as_size_t;
+    size_t num_services_as_size_t;
+
+    rcl_ret_t ret = rcl_action_client_wait_set_get_num_entities(
+        action_client,
+        &num_subscriptions_as_size_t,
+        &num_guard_conditions_as_size_t,
+        &num_timers_as_size_t,
+        &num_clients_as_size_t,
+        &num_services_as_size_t);
+
+    *num_subscriptions = (int32_t)num_subscriptions_as_size_t;
+    *num_guard_conditions = (int32_t)num_guard_conditions_as_size_t;
+    *num_timers = (int32_t)num_timers_as_size_t;
+    *num_clients = (int32_t)num_clients_as_size_t;
+    *num_services = (int32_t)num_services_as_size_t;
+
+    return ret;
+}
+
+int32_t native_rcl_action_wait_set_add_action_client(void *wait_set_handle, void *action_client_handle) {
+    rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+    rcl_action_client_t *action_client = (rcl_action_client_t *)action_client_handle;
+    rcl_ret_t ret = rcl_action_wait_set_add_action_client(wait_set, action_client, NULL, NULL);
+
+    return ret;
+}
+
 int32_t native_rcl_wait(void *wait_set_handle, int64_t timeout) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
   rcl_ret_t ret = rcl_wait(wait_set, timeout);
@@ -229,6 +271,30 @@ int32_t native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t
   return result ? 1 : 0;
 }
 
+int32_t native_rcl_action_client_wait_set_get_entities_ready(
+    void *wait_set_handle,
+    void *action_client_handle,
+    bool *is_feedback_ready,
+    bool *is_status_ready,
+    bool *is_goal_response_ready,
+    bool *is_cancel_response_ready,
+    bool *is_result_response_ready)
+{
+    rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+    rcl_action_client_t *action_client = (rcl_action_client_t *)action_client_handle;
+
+    rcl_ret_t ret = rcl_action_client_wait_set_get_entities_ready(
+        wait_set,
+        action_client,
+        is_feedback_ready,
+        is_status_ready,
+        is_goal_response_ready,
+        is_cancel_response_ready,
+        is_result_response_ready);
+
+    return ret;
+}
+
 int32_t native_rcl_take(void *subscription_handle, void *message_handle) {
   rcl_subscription_t * subscription = (rcl_subscription_t *)subscription_handle;
 
@@ -275,6 +341,44 @@ int32_t native_rcl_take_response(void *client_handle, void *request_header_handl
   rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
 
   rcl_ret_t ret = rcl_take_response(client, request_header, response_handle);
+  return ret;
+}
+
+int32_t native_rcl_action_take_feedback(void *action_client_handle, void *feedback_message_handle) {
+  rcl_action_client_t * action_client = (rcl_action_client_t *)action_client_handle;
+
+  rcl_ret_t ret = rcl_action_take_feedback(action_client, feedback_message_handle);
+  return ret;
+}
+
+int32_t native_rcl_action_take_status(void *action_client_handle, void *status_message_handle) {
+  rcl_action_client_t * action_client = (rcl_action_client_t *)action_client_handle;
+
+  rcl_ret_t ret = rcl_action_take_status(action_client, status_message_handle);
+  return ret;
+}
+
+int32_t native_rcl_action_take_goal_response(void *action_client_handle, void *request_header_handle, void *goal_response_handle) {
+  rcl_action_client_t * action_client = (rcl_action_client_t *)action_client_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_action_take_goal_response(action_client, request_header, goal_response_handle);
+  return ret;
+}
+
+int32_t native_rcl_action_take_cancel_response(void *action_client_handle, void *request_header_handle, void *cancel_response_handle) {
+  rcl_action_client_t * action_client = (rcl_action_client_t *)action_client_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_action_take_cancel_response(action_client, request_header, cancel_response_handle);
+  return ret;
+}
+
+int32_t native_rcl_action_take_result_response(void *action_client_handle, void *request_header_handle, void *result_response_handle) {
+  rcl_action_client_t * action_client = (rcl_action_client_t *)action_client_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_action_take_result_response(action_client, request_header, result_response_handle);
   return ret;
 }
 

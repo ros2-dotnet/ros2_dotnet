@@ -72,6 +72,18 @@ namespace ROS2
 
         internal static NativeRCLDestroyClientHandleType native_rcl_destroy_client_handle = null;
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionCreateClientHandleType(
+            ref SafeActionClientHandle actionClientHandle, SafeNodeHandle nodeHandle, [MarshalAs(UnmanagedType.LPStr)] string actionName, IntPtr typesupportHandle);
+
+        internal static NativeRCLActionCreateClientHandleType native_rcl_action_create_client_handle = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionDestroyClientHandleType(
+            IntPtr actionClientHandle, SafeNodeHandle nodeHandle);
+
+        internal static NativeRCLActionDestroyClientHandleType native_rcl_action_destroy_client_handle = null;
+
         static NodeDelegates()
         {
             _dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
@@ -132,6 +144,20 @@ namespace ROS2
             NodeDelegates.native_rcl_destroy_client_handle =
                 (NativeRCLDestroyClientHandleType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_destroy_client_handle_ptr, typeof(NativeRCLDestroyClientHandleType));
+
+            IntPtr native_rcl_action_create_client_handle_ptr = _dllLoadUtils.GetProcAddress(
+                nativeLibrary, "native_rcl_action_create_client_handle");
+
+            NodeDelegates.native_rcl_action_create_client_handle =
+                (NativeRCLActionCreateClientHandleType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_create_client_handle_ptr, typeof(NativeRCLActionCreateClientHandleType));
+
+            IntPtr native_rcl_action_destroy_client_handle_ptr = _dllLoadUtils.GetProcAddress(
+                nativeLibrary, "native_rcl_action_destroy_client_handle");
+
+            NodeDelegates.native_rcl_action_destroy_client_handle =
+                (NativeRCLActionDestroyClientHandleType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_destroy_client_handle_ptr, typeof(NativeRCLActionDestroyClientHandleType));
         }
     }
 
@@ -145,6 +171,8 @@ namespace ROS2
 
         private readonly IList<GuardCondition> _guardConditions;
 
+        private readonly IList<ActionClient> _actionClients;
+
         internal Node(SafeNodeHandle handle)
         {
             Handle = handle;
@@ -152,6 +180,7 @@ namespace ROS2
             _services = new List<Service>();
             _clients = new List<Client>();
             _guardConditions = new List<GuardCondition>();
+            _actionClients = new List<ActionClient>();
         }
 
         public IList<Subscription> Subscriptions => _subscriptions;
@@ -164,6 +193,8 @@ namespace ROS2
         public IList<Client> Clients => _clients;
 
         public IList<GuardCondition> GuardConditions => _guardConditions;
+
+        public IList<ActionClient> ActionClients => _actionClients;
 
         // Node does intentionaly (for now) not implement IDisposable as this
         // needs some extra consideration how the type works after its
@@ -306,7 +337,21 @@ namespace ROS2
             where TResult : IRosMessage, new()
             where TFeedback : IRosMessage, new()
         {
-            throw new NotImplementedException();
+            IntPtr typeSupport = ActionDefinitionStaticMemberCache<TAction, TGoal, TResult, TFeedback>.GetTypeSupport();
+
+            var actionClientHandle = new SafeActionClientHandle();
+            RCLRet ret = NodeDelegates.native_rcl_action_create_client_handle(ref actionClientHandle, Handle, actionName, typeSupport);
+            actionClientHandle.SetParent(Handle);
+            if (ret != RCLRet.Ok)
+            {
+                actionClientHandle.Dispose();
+                throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_action_create_client_handle)}() failed.");
+            }
+
+            // TODO: (sh) Add actionName to ActionClient.
+            var actionClient = new ActionClient<TAction, TGoal, TResult, TFeedback>(actionClientHandle, this);
+            _actionClients.Add(actionClient);
+            return actionClient;
         }
     }
 }

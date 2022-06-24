@@ -73,6 +73,18 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_guard_condition_handle(void *wait_set_handle, void *guard_condition_handle);
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_client_wait_set_get_num_entries(
+    void *action_client_handle,
+    int32_t *num_subscriptions,
+    int32_t *num_guard_conditions,
+    int32_t *num_timers,
+    int32_t *num_clients,
+    int32_t *num_services);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_wait_set_add_action_client(void *wait_set_handle, void *action_client_handle);
+
+RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait(void *, int64_t);
 
 RCLDOTNET_EXPORT
@@ -86,6 +98,16 @@ int32_t RCLDOTNET_CDECL native_rcl_wait_set_service_ready(void *wait_set_handle,
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t index);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_client_wait_set_get_entities_ready(
+    void *wait_set_handle,
+    void *action_client_handle,
+    bool *is_feedback_ready,
+    bool *is_status_ready,
+    bool *is_goal_response_ready,
+    bool *is_cancel_response_ready,
+    bool *is_result_response_ready);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_take(void *, void *);
@@ -107,6 +129,21 @@ int32_t RCLDOTNET_CDECL native_rcl_send_response(void *service_handle, void *req
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_take_response(void *client_handle, void *request_header_handle, void *response_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_take_feedback(void *action_client_handle, void *feedback_message_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_take_status(void *action_client_handle, void *status_message_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_take_goal_response(void *action_client_handle, void *request_header_handle, void *goal_response_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_take_cancel_response(void *action_client_handle, void *request_header_handle, void *cancel_response_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_take_result_response(void *action_client_handle, void *request_header_handle, void *result_response_handle);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_create_qos_profile_handle(void **qos_profile_handle);
