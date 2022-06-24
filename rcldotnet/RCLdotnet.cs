@@ -15,6 +15,8 @@
 
 using System;
 using System.Runtime.InteropServices;
+using action_msgs.msg;
+using action_msgs.srv;
 using ROS2.Utils;
 
 namespace ROS2
@@ -171,6 +173,56 @@ namespace ROS2
         internal delegate RCLRet NativeRCLTakeResponseType(SafeClientHandle clientHandle, SafeRequestIdHandle requestHeaderHandle, SafeHandle responseHandle);
 
         internal static NativeRCLTakeResponseType native_rcl_take_response = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionClientWaitSetGetNumEntriesType(
+            SafeActionClientHandle actionClientHandle, out int numSubscriptions, out int numGuardConditions, out int numTimers, out int numClients, out int numServices);
+
+        internal static NativeRCLActionClientWaitSetGetNumEntriesType native_rcl_action_client_wait_set_get_num_entries = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionWaitSetAddActionClientType(
+            SafeWaitSetHandle waitSetHandle, SafeActionClientHandle actionClientHandle);
+
+        internal static NativeRCLActionWaitSetAddActionClientType native_rcl_action_wait_set_add_action_client = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionClientWaitSetGetEntitiesReadyType(
+            SafeWaitSetHandle waitSetHandle, SafeActionClientHandle actionClientHandle, out bool isFeedbackReady, out bool isStatusReady, out bool isGoalResponseReady, out bool isCancelResponseReady, out bool isResultResponseReady);
+
+        internal static NativeRCLActionClientWaitSetGetEntitiesReadyType native_rcl_action_client_wait_set_get_entities_ready = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionTakeFeedbackType(
+            SafeActionClientHandle actionClientHandle, SafeHandle feedbackMessageHandle);
+
+        internal static NativeRCLActionTakeFeedbackType native_rcl_action_take_feedback = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionTakeStatusType(
+            SafeActionClientHandle actionClientHandle, SafeHandle statusMessageHandle);
+
+        internal static NativeRCLActionTakeStatusType native_rcl_action_take_status = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionTakeGoalResponseType(
+            SafeActionClientHandle actionClientHandle, SafeRequestIdHandle requestHeaderHandle, SafeHandle goalResponseHandle);
+
+        internal static NativeRCLActionTakeGoalResponseType native_rcl_action_take_goal_response = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionTakeCancelResponseType(
+            SafeActionClientHandle actionClientHandle, SafeRequestIdHandle requestHeaderHandle, SafeHandle cancelResponseHandle);
+
+        internal static NativeRCLActionTakeCancelResponseType native_rcl_action_take_cancel_response = null;
+
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionTakeResultResponseType(
+            SafeActionClientHandle actionClientHandle, SafeRequestIdHandle requestHeaderHandle, SafeHandle resultResponseHandle);
+
+        internal static NativeRCLActionTakeResultResponseType native_rcl_action_take_result_response = null;
+
 
         static RCLdotnetDelegates()
         {
@@ -344,6 +396,55 @@ namespace ROS2
             RCLdotnetDelegates.native_rcl_take_response =
                 (NativeRCLTakeResponseType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_take_response_ptr, typeof(NativeRCLTakeResponseType));
+
+            IntPtr native_rcl_action_client_wait_set_get_num_entries_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_client_wait_set_get_num_entries");
+            RCLdotnetDelegates.native_rcl_action_client_wait_set_get_num_entries =
+                (NativeRCLActionClientWaitSetGetNumEntriesType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_client_wait_set_get_num_entries_ptr, typeof(NativeRCLActionClientWaitSetGetNumEntriesType));
+
+            IntPtr native_rcl_action_wait_set_add_action_client_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_wait_set_add_action_client");
+            RCLdotnetDelegates.native_rcl_action_wait_set_add_action_client =
+                (NativeRCLActionWaitSetAddActionClientType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_wait_set_add_action_client_ptr, typeof(NativeRCLActionWaitSetAddActionClientType));
+
+            IntPtr native_rcl_action_client_wait_set_get_entities_ready_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_client_wait_set_get_entities_ready");
+            RCLdotnetDelegates.native_rcl_action_client_wait_set_get_entities_ready =
+                (NativeRCLActionClientWaitSetGetEntitiesReadyType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_client_wait_set_get_entities_ready_ptr, typeof(NativeRCLActionClientWaitSetGetEntitiesReadyType));
+
+            IntPtr native_rcl_action_take_feedback_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_take_feedback");
+            RCLdotnetDelegates.native_rcl_action_take_feedback
+                = (NativeRCLActionTakeFeedbackType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_take_feedback_ptr, typeof(NativeRCLActionTakeFeedbackType));
+
+            IntPtr native_rcl_action_take_status_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_take_status");
+            RCLdotnetDelegates.native_rcl_action_take_status =
+                (NativeRCLActionTakeStatusType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_take_status_ptr, typeof(NativeRCLActionTakeStatusType));
+
+            IntPtr native_rcl_action_take_goal_response_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_take_goal_response");
+            RCLdotnetDelegates.native_rcl_action_take_goal_response =
+                (NativeRCLActionTakeGoalResponseType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_take_goal_response_ptr, typeof(NativeRCLActionTakeGoalResponseType));
+
+            IntPtr native_rcl_action_take_cancel_response_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_take_cancel_response");
+            RCLdotnetDelegates.native_rcl_action_take_cancel_response =
+                (NativeRCLActionTakeCancelResponseType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_take_cancel_response_ptr, typeof(NativeRCLActionTakeCancelResponseType));
+
+            IntPtr native_rcl_action_take_result_response_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_take_result_response");
+            RCLdotnetDelegates.native_rcl_action_take_result_response =
+                (NativeRCLActionTakeResultResponseType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_take_result_response_ptr, typeof(NativeRCLActionTakeResultResponseType));
+
         }
     }
 
@@ -433,6 +534,12 @@ namespace ROS2
         {
             RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_add_guard_condition(waitSetHandle, guardConditionHandle);
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_wait_set_add_guard_condition)}() failed.");
+        }
+
+        private static void WaitSetAddActionClient(SafeWaitSetHandle waitSetHandle, SafeActionClientHandle actionClientHandle)
+        {
+            RCLRet ret = RCLdotnetDelegates.native_rcl_action_wait_set_add_action_client(waitSetHandle, actionClientHandle);
+            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_wait_set_add_action_client)}() failed.");
         }
 
         /// <summary>
@@ -582,6 +689,196 @@ namespace ROS2
             }
         }
 
+        private static bool TakeFeedbackMessage(ActionClient actionClient, IRosMessage feedbackMessage)
+        {
+            using (var feedbackMessageHandle = actionClient.CreateFeedbackMessageHandle())
+            {
+                RCLRet ret = RCLdotnetDelegates.native_rcl_action_take_feedback(actionClient.Handle, feedbackMessageHandle);
+                switch (ret)
+                {
+                    case RCLRet.Ok:
+                        bool mustRelease = false;
+                        try
+                        {
+                            // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
+                            // handled in generated code across multiple assemblies.
+                            // Array and collection indexing would need to create SafeHandles everywhere.
+                            // It's not worth it, especially considering the extra allocations for SafeHandles in
+                            // arrays or collections that don't really represent their own native resource.
+                            feedbackMessageHandle.DangerousAddRef(ref mustRelease);
+                            feedbackMessage.__ReadFromHandle(feedbackMessageHandle.DangerousGetHandle());
+                        }
+                        finally
+                        {
+                            if (mustRelease)
+                            {
+                                feedbackMessageHandle.DangerousRelease();
+                            }
+                        }
+
+                        return true;
+
+                    case RCLRet.SubscriptionTakeFailed:
+                        return false;
+
+                    default:
+                        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_take_feedback)}() failed.");
+                }
+            }
+        }
+
+        private static bool TakeStatusMessage(ActionClient actionClient, IRosMessage statusMessage)
+        {
+            using (var statusMessageHandle = GoalStatusArray.__CreateMessageHandle())
+            {
+                RCLRet ret = RCLdotnetDelegates.native_rcl_action_take_status(actionClient.Handle, statusMessageHandle);
+                switch (ret)
+                {
+                    case RCLRet.Ok:
+                        bool mustRelease = false;
+                        try
+                        {
+                            // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
+                            // handled in generated code across multiple assemblies.
+                            // Array and collection indexing would need to create SafeHandles everywhere.
+                            // It's not worth it, especially considering the extra allocations for SafeHandles in
+                            // arrays or collections that don't really represent their own native resource.
+                            statusMessageHandle.DangerousAddRef(ref mustRelease);
+                            statusMessage.__ReadFromHandle(statusMessageHandle.DangerousGetHandle());
+                        }
+                        finally
+                        {
+                            if (mustRelease)
+                            {
+                                statusMessageHandle.DangerousRelease();
+                            }
+                        }
+
+                        return true;
+
+                    case RCLRet.SubscriptionTakeFailed:
+                        return false;
+
+                    default:
+                        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_take_status)}() failed.");
+                }
+            }
+        }
+
+        private static bool TakeGoalResponse(ActionClient actionClient, SafeRequestIdHandle requestHeaderHandle, IRosMessage goalResponse)
+        {
+            using (var goalResponseHandle = actionClient.CreateSendGoalResponseHandle())
+            {
+                RCLRet ret = RCLdotnetDelegates.native_rcl_action_take_goal_response(actionClient.Handle, requestHeaderHandle, goalResponseHandle);
+                switch (ret)
+                {
+                    case RCLRet.Ok:
+                        bool mustRelease = false;
+                        try
+                        {
+                            // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
+                            // handled in generated code across multiple assemblies.
+                            // Array and collection indexing would need to create SafeHandles everywhere.
+                            // It's not worth it, especially considering the extra allocations for SafeHandles in
+                            // arrays or collections that don't really represent their own native resource.
+                            goalResponseHandle.DangerousAddRef(ref mustRelease);
+                            goalResponse.__ReadFromHandle(goalResponseHandle.DangerousGetHandle());
+                        }
+                        finally
+                        {
+                            if (mustRelease)
+                            {
+                                goalResponseHandle.DangerousRelease();
+                            }
+                        }
+
+                        return true;
+
+                    case RCLRet.ClientTakeFailed:
+                        return false;
+
+                    default:
+                        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_take_goal_response)}() failed.");
+                }
+            }
+        }
+
+        private static bool TakeCancelResponse(ActionClient actionClient, SafeRequestIdHandle requestHeaderHandle, IRosMessage cancelResponse)
+        {
+            using (var cancelResponseHandle = CancelGoal_Response.__CreateMessageHandle())
+            {
+                RCLRet ret = RCLdotnetDelegates.native_rcl_action_take_cancel_response(actionClient.Handle, requestHeaderHandle, cancelResponseHandle);
+                switch (ret)
+                {
+                    case RCLRet.Ok:
+                        bool mustRelease = false;
+                        try
+                        {
+                            // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
+                            // handled in generated code across multiple assemblies.
+                            // Array and collection indexing would need to create SafeHandles everywhere.
+                            // It's not worth it, especially considering the extra allocations for SafeHandles in
+                            // arrays or collections that don't really represent their own native resource.
+                            cancelResponseHandle.DangerousAddRef(ref mustRelease);
+                            cancelResponse.__ReadFromHandle(cancelResponseHandle.DangerousGetHandle());
+                        }
+                        finally
+                        {
+                            if (mustRelease)
+                            {
+                                cancelResponseHandle.DangerousRelease();
+                            }
+                        }
+
+                        return true;
+
+                    case RCLRet.ClientTakeFailed:
+                        return false;
+
+                    default:
+                        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_take_cancel_response)}() failed.");
+                }
+            }
+        }
+
+        private static bool TakeResultResponse(ActionClient actionClient, SafeRequestIdHandle requestHeaderHandle, IRosMessage resultResponse)
+        {
+            using (var resultResponseHandle = actionClient.CreateGetResultResponseHandle())
+            {
+                RCLRet ret = RCLdotnetDelegates.native_rcl_action_take_result_response(actionClient.Handle, requestHeaderHandle, resultResponseHandle);
+                switch (ret)
+                {
+                    case RCLRet.Ok:
+                        bool mustRelease = false;
+                        try
+                        {
+                            // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
+                            // handled in generated code across multiple assemblies.
+                            // Array and collection indexing would need to create SafeHandles everywhere.
+                            // It's not worth it, especially considering the extra allocations for SafeHandles in
+                            // arrays or collections that don't really represent their own native resource.
+                            resultResponseHandle.DangerousAddRef(ref mustRelease);
+                            resultResponse.__ReadFromHandle(resultResponseHandle.DangerousGetHandle());
+                        }
+                        finally
+                        {
+                            if (mustRelease)
+                            {
+                                resultResponseHandle.DangerousRelease();
+                            }
+                        }
+
+                        return true;
+
+                    case RCLRet.ClientTakeFailed:
+                        return false;
+
+                    default:
+                        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_take_result_response)}() failed.");
+                }
+            }
+        }
+
         private static void SendResponse(Service service, SafeRequestIdHandle requestHeaderHandle, IRosMessage response)
         {
             using (var responseHandle = service.CreateResponseHandle())
@@ -621,6 +918,25 @@ namespace ROS2
             int numberOfClients = node.Clients.Count;
             int numberOfServices = node.Services.Count;
             int numberOfEvents = 0;
+
+            foreach (var actionClient in node.ActionClients)
+            {
+                RCLRet ret = RCLdotnetDelegates.native_rcl_action_client_wait_set_get_num_entries(
+                    actionClient.Handle,
+                    out int acNumberOfSubscriptions,
+                    out int acNumberOfGuardConditions,
+                    out int acNumberOfTimers,
+                    out int acNumberOfClients,
+                    out int acNumberOfServices);
+
+                RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_client_wait_set_get_num_entries)}() failed.");
+
+                numberOfSubscriptions += acNumberOfSubscriptions;
+                numberOfGuardConditions += acNumberOfGuardConditions;
+                numberOfTimers += acNumberOfTimers;
+                numberOfClients += acNumberOfClients;
+                numberOfServices += acNumberOfServices;
+            }
 
             bool waitSetEmpty = numberOfSubscriptions == 0
                 && numberOfGuardConditions == 0
@@ -665,6 +981,11 @@ namespace ROS2
                 foreach (var guardCondition in node.GuardConditions)
                 {
                     WaitSetAddGuardCondition(waitSetHandle, guardCondition.Handle);
+                }
+
+                foreach (var actionClient in node.ActionClients)
+                {
+                    WaitSetAddActionClient(waitSetHandle, actionClient.Handle);
                 }
 
                 bool ready = Wait(waitSetHandle, timeout);
@@ -728,6 +1049,78 @@ namespace ROS2
                         }
 
                         clientIndex++;
+                    }
+
+                    foreach (var actionClient in node.ActionClients)
+                    {
+                        RCLRet ret = RCLdotnetDelegates.native_rcl_action_client_wait_set_get_entities_ready(
+                            waitSetHandle,
+                            actionClient.Handle,
+                            out bool isFeedbackReady,
+                            out bool isStatusReady,
+                            out bool isGoalResponseReady,
+                            out bool isCancelResponseReady,
+                            out bool isResultResponseReady);
+
+                        RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_client_wait_set_get_entities_ready)}() failed.");
+
+                        if (isFeedbackReady)
+                        {
+                            var feedbackMessage = actionClient.CreateFeedbackMessage();
+
+                            var result = TakeFeedbackMessage(actionClient, feedbackMessage);
+                            if (result)
+                            {
+                                actionClient.HandleFeedbackMessage(feedbackMessage);
+                            }
+                        }
+
+                        if (isStatusReady)
+                        {
+                            var statusMessage = new GoalStatusArray();
+
+                            var result = TakeStatusMessage(actionClient, statusMessage);
+                            if (result)
+                            {
+                                actionClient.HandleStatusMessage(statusMessage);
+                            }
+                        }
+
+                        if (isGoalResponseReady)
+                        {
+                            var goalResponse = actionClient.CreateSendGoalResponse();
+
+                            var result = TakeGoalResponse(actionClient, requestIdHandle, goalResponse);
+                            if (result)
+                            {
+                                var sequenceNumber = RCLdotnetDelegates.native_rcl_request_id_get_sequence_number(requestIdHandle);
+                                actionClient.HandleGoalResponse(sequenceNumber, goalResponse);
+                            }
+                        }
+
+                        if (isCancelResponseReady)
+                        {
+                            var cancelResponse = new CancelGoal_Response();
+
+                            var result = TakeCancelResponse(actionClient, requestIdHandle, cancelResponse);
+                            if (result)
+                            {
+                                var sequenceNumber = RCLdotnetDelegates.native_rcl_request_id_get_sequence_number(requestIdHandle);
+                                actionClient.HandleCancelResponse(sequenceNumber, cancelResponse);
+                            }
+                        }
+
+                        if (isResultResponseReady)
+                        {
+                            var resultResponse = actionClient.CreateGetResultResponse();
+
+                            var result = TakeResultResponse(actionClient, requestIdHandle, resultResponse);
+                            if (result)
+                            {
+                                var sequenceNumber = RCLdotnetDelegates.native_rcl_request_id_get_sequence_number(requestIdHandle);
+                                actionClient.HandleResultResponse(sequenceNumber, resultResponse);
+                            }
+                        }
                     }
                 }
 
