@@ -19,9 +19,17 @@
 
   <build_depend>rmw_implementation_cmake</build_depend>
   <build_depend>rcl</build_depend>
+  <build_depend>rcl_actions</build_depend>
   <build_depend>rmw</build_depend>
+  <build_depend>action_msgs</build_depend>
+  <build_depend>builtin_interfaces</build_depend>
+  <build_depend>unique_identifier_msgs</build_depend>
 
   <exec_depend>rcl</exec_depend>
+  <exec_depend>rcl_actions</exec_depend>
+  <exec_depend>action_msgs</exec_depend>
+  <exec_depend>builtin_interfaces</exec_depend>
+  <exec_depend>unique_identifier_msgs</exec_depend>
 
   <test_depend>std_msgs</test_depend>
   <test_depend>test_msgs</test_depend>

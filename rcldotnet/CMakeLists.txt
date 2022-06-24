@@ -6,7 +6,11 @@ find_package(ament_cmake_export_assemblies REQUIRED)
 
 find_package(ament_cmake REQUIRED)
 find_package(rcl REQUIRED)
+find_package(rcl_action REQUIRED)
+find_package(action_msgs REQUIRED)
 find_package(rcl_interfaces REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+find_package(unique_identifier_msgs REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rmw_implementation REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
@@ -41,6 +45,7 @@ set(CS_SOURCES
   RCLdotnet.cs
   RCLExceptionHelper.cs
   RCLRet.cs
+  SafeActionClientHandle.cs
   SafeClientHandle.cs
   SafeGuardConditionHandle.cs
   SafeNodeHandle.cs
@@ -55,21 +60,26 @@ set(CS_SOURCES
 )
 
 find_package(rcldotnet_common REQUIRED)
-foreach(_assembly_dep ${rcldotnet_common_ASSEMBLIES_DLL})
-  list(APPEND _assembly_deps_dll "${_assembly_dep}")
-endforeach()
+
+set(_assemblies_dep_dlls
+  ${action_msgs_ASSEMBLIES_DLL}
+  ${builtin_interfaces_ASSEMBLIES_DLL}
+  ${rcldotnet_common_ASSEMBLIES_DLL}
+  ${unique_identifier_msgs_ASSEMBLIES_DLL}
+)
 
 add_dotnet_library(${PROJECT_NAME}_assemblies
   SOURCES
   ${CS_SOURCES}
   INCLUDE_DLLS
-  ${_assembly_deps_dll}
+  ${_assemblies_dep_dlls}
 )
 
 install_dotnet(${PROJECT_NAME}_assemblies DESTINATION lib/${PROJECT_NAME}/dotnet)
 ament_export_assemblies_dll("lib/${PROJECT_NAME}/dotnet/${PROJECT_NAME}_assemblies.dll")
 
 add_library(${PROJECT_NAME}_native SHARED
+  rcldotnet_action_client.c
   rcldotnet_client.c
   rcldotnet_guard_condition.c
   rcldotnet_node.c
@@ -78,8 +88,11 @@ add_library(${PROJECT_NAME}_native SHARED
 )
 
 ament_target_dependencies(${PROJECT_NAME}_native
+  "action_msgs"
   "builtin_interfaces"
+  "unique_identifier_msgs"
   "rcl"
+  "rcl_action"
   "rosidl_generator_c"
   "rosidl_typesupport_c"
 )
@@ -107,11 +120,9 @@ if(BUILD_TESTING)
 
   ament_lint_auto_find_test_dependencies()
 
-  set(_assemblies_dep_dlls
-      ${rcldotnet_common_ASSEMBLIES_DLL}
+  set(_test_assemblies_dep_dlls
       ${std_msgs_ASSEMBLIES_DLL}
       ${test_msgs_ASSEMBLIES_DLL}
-      ${builtin_interfaces_ASSEMBLIES_DLL}
   )
 
   add_dotnet_test(test_messages
@@ -121,6 +132,7 @@ if(BUILD_TESTING)
     test/test_services.cs
     INCLUDE_DLLS
     ${_assemblies_dep_dlls}
+    ${_test_assemblies_dep_dlls}
     INCLUDE_REFERENCES
     "Microsoft.NET.Test.Sdk=15.9.0"
     "xunit=2.4.1"

@@ -14,6 +14,7 @@
  */
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using builtin_interfaces.msg;
 
@@ -32,7 +33,7 @@ namespace ROS2
 
         public abstract Time Stamp { get; }
 
-        public abstract ActionGoalStatus Status { get; }
+        public abstract ActionGoalStatus Status { get; internal set; }
     }
 
     public sealed class ActionClientGoalHandle<TAction, TGoal, TResult, TFeedback> : ActionClientGoalHandle
@@ -41,9 +42,23 @@ namespace ROS2
         where TResult : IRosMessage, new()
         where TFeedback : IRosMessage, new()
     {
+        private readonly ActionClient<TAction, TGoal, TResult, TFeedback> _actionClient;
+
+        private TaskCompletionSource<TResult> _resultTaskCompletionSource;
+
         // No public constructor.
-        internal ActionClientGoalHandle()
+        internal ActionClientGoalHandle(
+            ActionClient<TAction, TGoal, TResult, TFeedback> actionClient,
+            Guid goalId,
+            bool accepted,
+            Time stamp,
+            Action<TFeedback> feedbackCallback)
         {
+            GoalId = goalId;
+            Accepted = accepted;
+            Stamp = stamp;
+            FeedbackCallback = feedbackCallback;
+            _actionClient = actionClient;
         }
 
         public override Guid GoalId { get; }
@@ -52,16 +67,33 @@ namespace ROS2
 
         public override Time Stamp { get; }
 
-        public override ActionGoalStatus Status { get; }
+        public override ActionGoalStatus Status { get; internal set; }
 
+        internal Action<TFeedback> FeedbackCallback { get; }
+
+        // TODO: (sh) should we return the CancelGoal_Response? Wrap it in type with dotnet enum/Guid?
         public Task CancelGoalAsync()
         {
-            throw new NotImplementedException();
+            return _actionClient.CancelGoalAsync(this);
         }
 
         public Task<TResult> GetResultAsync()
         {
-            throw new NotImplementedException();
+            // Fast case to avoid allocation and calling Interlocked.CompareExchange.
+            if (_resultTaskCompletionSource != null)
+            {
+                return _resultTaskCompletionSource.Task;
+            }
+
+            var resultTaskCompletionSource = new TaskCompletionSource<TResult>();
+
+            if (Interlocked.CompareExchange(ref _resultTaskCompletionSource, resultTaskCompletionSource, null) != null)
+            {
+                // Some other thread was first.
+                return _resultTaskCompletionSource.Task;
+            }
+
+            return _actionClient.GetResultAsync(this, resultTaskCompletionSource);
         }
     }
 }
