@@ -36,6 +36,8 @@ set(CS_SOURCES
   ActionClientGoalHandle.cs
   ActionDefinitionStaticMemberCache.cs
   ActionGoalStatus.cs
+  ActionServer.cs
+  ActionServerGoalHandle.cs
   Client.cs
   GuardCondition.cs
   GuidExtensions.cs
