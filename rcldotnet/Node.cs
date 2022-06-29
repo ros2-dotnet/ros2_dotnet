@@ -321,5 +321,24 @@ namespace ROS2
             _actionClients.Add(actionClient);
             return actionClient;
         }
+
+        // TODO: (sh) Make acceptedCallback an async callback? Add as overload? (`Func<GoalHandle, Task>`)
+        // TODO: (sh) Make acceptedCallback an async callback which returns the `TResult` (`Func<GoalHandle, Task<TResult>>`)?
+        //      Add as overload?
+        //      In that case this would be more or less an `executeCallback` from `rclpy`.
+        public ActionServer<TAction, TGoal, TResult, TFeedback> CreateActionServer<TAction, TGoal, TResult, TFeedback>(
+            string actionName,
+            Action<ActionServerGoalHandle<TAction, TGoal, TResult, TFeedback>> acceptedCallback,
+            // This has an additional `goalId` parameter compared to `rclpy`.
+            Func<Guid, TGoal, GoalResponse> goalCallback = null,
+            Func<ActionServerGoalHandle<TAction, TGoal, TResult, TFeedback>, CancelResponse> cancelCallback = null
+        )
+            where TAction : IRosActionDefinition<TGoal, TResult, TFeedback>
+            where TGoal : IRosMessage, new()
+            where TResult : IRosMessage, new()
+            where TFeedback : IRosMessage, new()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
