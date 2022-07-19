@@ -48,6 +48,8 @@ set(CS_SOURCES
   RCLExceptionHelper.cs
   RCLRet.cs
   SafeActionClientHandle.cs
+  SafeActionGoalHandle.cs
+  SafeActionServerHandle.cs
   SafeClientHandle.cs
   SafeGuardConditionHandle.cs
   SafeNodeHandle.cs

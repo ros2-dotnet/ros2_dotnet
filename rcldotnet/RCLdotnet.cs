@@ -193,6 +193,24 @@ namespace ROS2
         internal static NativeRCLActionClientWaitSetGetEntitiesReadyType native_rcl_action_client_wait_set_get_entities_ready = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionServerWaitSetGetNumEntriesType(
+                SafeActionServerHandle actionServerHandle, out int numSubscriptions, out int numGuardConditions, out int numTimers, out int numClients, out int numServices);
+
+        internal static NativeRCLActionServerWaitSetGetNumEntriesType native_rcl_action_server_wait_set_get_num_entries = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionWaitSetAddActionServerType(
+                SafeWaitSetHandle waitSetHandle, SafeActionServerHandle actionServerHandle);
+
+        internal static NativeRCLActionWaitSetAddActionServerType native_rcl_action_wait_set_add_action_server = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionServerWaitSetGetEntitiesReadyType(
+                SafeWaitSetHandle waitSetHandle, SafeActionServerHandle actionServerHandle, out bool isGoalRequestReady, out bool isCancelRequestReady, out bool isResultRequestReady, out bool isGoalExpired);
+
+        internal static NativeRCLActionServerWaitSetGetEntitiesReadyType native_rcl_action_server_wait_set_get_entities_ready = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLActionTakeFeedbackType(
             SafeActionClientHandle actionClientHandle, SafeHandle feedbackMessageHandle);
 
@@ -223,6 +241,90 @@ namespace ROS2
 
         internal static NativeRCLActionTakeResultResponseType native_rcl_action_take_result_response = null;
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionTakeGoalRequestType(
+            SafeActionServerHandle actionServerHandle, SafeRequestIdHandle requestHeaderHandle, SafeHandle goalRequestHandle);
+
+        internal static NativeRCLActionTakeGoalRequestType native_rcl_action_take_goal_request = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionSendGoalResponseType(
+            SafeActionServerHandle actionServerHandle, SafeRequestIdHandle requestHeaderHandle, SafeHandle gaolResponseHandle);
+
+        internal static NativeRCLActionSendGoalResponseType native_rcl_action_send_goal_response = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionAcceptNewGoalType(
+            ref SafeActionGoalHandle actionGoalHandleHandle, SafeActionServerHandle actionServerHandle, SafeHandle goalInfoHandle);
+
+        internal static NativeRCLActionAcceptNewGoalType native_rcl_action_accept_new_goal = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionDestroyGoalHandleType(IntPtr actionGoalHandleHandle);
+
+        internal static NativeRCLActionDestroyGoalHandleType native_rcl_action_destroy_goal_handle = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionUpdateGoalStateType(
+            SafeActionGoalHandle actionGoalHandleHandle, ActionGoalEvent goalEvent);
+
+        internal static NativeRCLActionUpdateGoalStateType native_rcl_action_update_goal_state = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionPublishStatusType(SafeActionServerHandle actionServerHandle);
+        internal static NativeRCLActionPublishStatusType native_rcl_action_publish_status = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionPublishFeedbackType(SafeActionServerHandle actionServerHandle, SafeHandle feedbackMessageHandle);
+        internal static NativeRCLActionPublishFeedbackType native_rcl_action_publish_feedback = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionTakeCancelRequestType(
+            SafeActionServerHandle actionServerHandle, SafeRequestIdHandle requestHeaderHandle, SafeHandle cancelRequestHandle);
+
+        internal static NativeRCLActionTakeCancelRequestType native_rcl_action_take_cancel_request = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionProcessCancelRequestType(
+            SafeActionServerHandle actionServerHandle, SafeHandle cancelRequestHandle, SafeHandle cancelResponseHandle);
+
+        internal static NativeRCLActionProcessCancelRequestType native_rcl_action_process_cancel_request = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionSendCancelResponseType(
+            SafeActionServerHandle actionServerHandle, SafeRequestIdHandle requestHeaderHandle, SafeHandle cancelResponseHandle);
+
+        internal static NativeRCLActionSendCancelResponseType native_rcl_action_send_cancel_response = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionTakeResultRequestType(
+            SafeActionServerHandle actionServerHandle, SafeRequestIdHandle requestHeaderHandle, SafeHandle resultRequestHandle);
+
+        internal static NativeRCLActionTakeResultRequestType native_rcl_action_take_result_request = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionSendResultResponseType(
+            SafeActionServerHandle actionServerHandle, SafeRequestIdHandle requestHeaderHandle, SafeHandle resultResponseHandle);
+
+        internal static NativeRCLActionSendResultResponseType native_rcl_action_send_result_response = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionNotifyGoalDoneType(SafeActionServerHandle actionServerHandle);
+        internal static NativeRCLActionNotifyGoalDoneType native_rcl_action_notify_goal_done = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionExpireGoalsType(
+            SafeActionServerHandle actionServerHandle, SafeHandle goalInfoHandle, out int numExpired);
+
+        internal static NativeRCLActionExpireGoalsType native_rcl_action_expire_goals = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate bool NativeRCLActionGoalHandleIsActiveType(SafeActionGoalHandle actionGoalHandleHandle);
+        internal static NativeRCLActionGoalHandleIsActiveType native_rcl_action_goal_handle_is_active = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionGoalHandleGetStatusType(SafeActionGoalHandle actionGoalHandleHandle, out byte status);
+        internal static NativeRCLActionGoalHandleGetStatusType native_rcl_action_goal_handle_get_status = null;
 
         static RCLdotnetDelegates()
         {
@@ -415,6 +517,24 @@ namespace ROS2
                 (NativeRCLActionClientWaitSetGetEntitiesReadyType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_action_client_wait_set_get_entities_ready_ptr, typeof(NativeRCLActionClientWaitSetGetEntitiesReadyType));
 
+            IntPtr native_rcl_action_server_wait_set_get_num_entries_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_server_wait_set_get_num_entries");
+            RCLdotnetDelegates.native_rcl_action_server_wait_set_get_num_entries =
+                (NativeRCLActionServerWaitSetGetNumEntriesType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_server_wait_set_get_num_entries_ptr, typeof(NativeRCLActionServerWaitSetGetNumEntriesType));
+
+            IntPtr native_rcl_action_wait_set_add_action_server_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_wait_set_add_action_server");
+            RCLdotnetDelegates.native_rcl_action_wait_set_add_action_server =
+                (NativeRCLActionWaitSetAddActionServerType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_wait_set_add_action_server_ptr, typeof(NativeRCLActionWaitSetAddActionServerType));
+
+            IntPtr native_rcl_action_server_wait_set_get_entities_ready_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_server_wait_set_get_entities_ready");
+            RCLdotnetDelegates.native_rcl_action_server_wait_set_get_entities_ready =
+                (NativeRCLActionServerWaitSetGetEntitiesReadyType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_server_wait_set_get_entities_ready_ptr, typeof(NativeRCLActionServerWaitSetGetEntitiesReadyType));
+
             IntPtr native_rcl_action_take_feedback_ptr =
                 _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_take_feedback");
             RCLdotnetDelegates.native_rcl_action_take_feedback
@@ -445,6 +565,101 @@ namespace ROS2
                 (NativeRCLActionTakeResultResponseType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_action_take_result_response_ptr, typeof(NativeRCLActionTakeResultResponseType));
 
+            IntPtr native_rcl_action_take_goal_request_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_take_goal_request");
+            RCLdotnetDelegates.native_rcl_action_take_goal_request =
+                (NativeRCLActionTakeGoalRequestType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_take_goal_request_ptr, typeof(NativeRCLActionTakeGoalRequestType));
+
+            IntPtr native_rcl_action_send_goal_response_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_send_goal_response");
+            RCLdotnetDelegates.native_rcl_action_send_goal_response =
+                (NativeRCLActionSendGoalResponseType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_send_goal_response_ptr, typeof(NativeRCLActionSendGoalResponseType));
+
+            IntPtr native_rcl_action_accept_new_goal_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_accept_new_goal");
+            RCLdotnetDelegates.native_rcl_action_accept_new_goal =
+                (NativeRCLActionAcceptNewGoalType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_accept_new_goal_ptr, typeof(NativeRCLActionAcceptNewGoalType));
+
+            IntPtr native_rcl_action_destroy_goal_handle_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_destroy_goal_handle");
+            RCLdotnetDelegates.native_rcl_action_destroy_goal_handle =
+                (NativeRCLActionDestroyGoalHandleType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_destroy_goal_handle_ptr, typeof(NativeRCLActionDestroyGoalHandleType));
+
+            IntPtr native_rcl_action_update_goal_state_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_update_goal_state");
+            RCLdotnetDelegates.native_rcl_action_update_goal_state =
+                (NativeRCLActionUpdateGoalStateType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_update_goal_state_ptr, typeof(NativeRCLActionUpdateGoalStateType));
+
+            IntPtr native_rcl_action_publish_status_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_publish_status");
+            RCLdotnetDelegates.native_rcl_action_publish_status =
+                (NativeRCLActionPublishStatusType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_publish_status_ptr, typeof(NativeRCLActionPublishStatusType));
+
+            IntPtr native_rcl_action_publish_feedback_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_publish_feedback");
+            RCLdotnetDelegates.native_rcl_action_publish_feedback =
+                (NativeRCLActionPublishFeedbackType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_publish_feedback_ptr, typeof(NativeRCLActionPublishFeedbackType));
+
+            IntPtr native_rcl_action_take_cancel_request_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_take_cancel_request");
+            RCLdotnetDelegates.native_rcl_action_take_cancel_request =
+                (NativeRCLActionTakeCancelRequestType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_take_cancel_request_ptr, typeof(NativeRCLActionTakeCancelRequestType));
+
+            IntPtr native_rcl_action_process_cancel_request_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_process_cancel_request");
+            RCLdotnetDelegates.native_rcl_action_process_cancel_request =
+                (NativeRCLActionProcessCancelRequestType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_process_cancel_request_ptr, typeof(NativeRCLActionProcessCancelRequestType));
+
+            IntPtr native_rcl_action_send_cancel_response_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_send_cancel_response");
+            RCLdotnetDelegates.native_rcl_action_send_cancel_response =
+                (NativeRCLActionSendCancelResponseType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_send_cancel_response_ptr, typeof(NativeRCLActionSendCancelResponseType));
+
+            IntPtr native_rcl_action_take_result_request_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_take_result_request");
+            RCLdotnetDelegates.native_rcl_action_take_result_request =
+                (NativeRCLActionTakeResultRequestType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_take_result_request_ptr, typeof(NativeRCLActionTakeResultRequestType));
+
+            IntPtr native_rcl_action_send_result_response_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_send_result_response");
+            RCLdotnetDelegates.native_rcl_action_send_result_response =
+                (NativeRCLActionSendResultResponseType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_send_result_response_ptr, typeof(NativeRCLActionSendResultResponseType));
+
+            IntPtr native_rcl_action_notify_goal_done_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_notify_goal_done");
+            RCLdotnetDelegates.native_rcl_action_notify_goal_done =
+                (NativeRCLActionNotifyGoalDoneType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_notify_goal_done_ptr, typeof(NativeRCLActionNotifyGoalDoneType));
+
+            IntPtr native_rcl_action_expire_goals_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_expire_goals");
+            RCLdotnetDelegates.native_rcl_action_expire_goals =
+                (NativeRCLActionExpireGoalsType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_expire_goals_ptr, typeof(NativeRCLActionExpireGoalsType));
+
+            IntPtr native_rcl_action_goal_handle_is_active_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_goal_handle_is_active");
+            RCLdotnetDelegates.native_rcl_action_goal_handle_is_active =
+                (NativeRCLActionGoalHandleIsActiveType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_goal_handle_is_active_ptr, typeof(NativeRCLActionGoalHandleIsActiveType));
+
+            IntPtr native_rcl_action_goal_handle_get_status_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_goal_handle_get_status");
+            RCLdotnetDelegates.native_rcl_action_goal_handle_get_status =
+                (NativeRCLActionGoalHandleGetStatusType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_goal_handle_get_status_ptr, typeof(NativeRCLActionGoalHandleGetStatusType));
         }
     }
 
@@ -540,6 +755,12 @@ namespace ROS2
         {
             RCLRet ret = RCLdotnetDelegates.native_rcl_action_wait_set_add_action_client(waitSetHandle, actionClientHandle);
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_wait_set_add_action_client)}() failed.");
+        }
+
+        private static void WaitSetAddActionServer(SafeWaitSetHandle waitSetHandle, SafeActionServerHandle actionServerHandle)
+        {
+            RCLRet ret = RCLdotnetDelegates.native_rcl_action_wait_set_add_action_server(waitSetHandle, actionServerHandle);
+            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_wait_set_add_action_server)}() failed.");
         }
 
         /// <summary>
@@ -746,6 +967,66 @@ namespace ROS2
             }
         }
 
+        private static bool TakeGoalRequest(ActionServer actionServer, SafeRequestIdHandle requestHeaderHandle, IRosMessage goalRequest)
+        {
+            using (var goalRequestHandle = actionServer.CreateSendGoalRequestHandle())
+            {
+                RCLRet ret = RCLdotnetDelegates.native_rcl_action_take_goal_request(actionServer.Handle, requestHeaderHandle, goalRequestHandle);
+                switch (ret)
+                {
+                    case RCLRet.Ok:
+                        ReadFromMessageHandle(goalRequest, goalRequestHandle);
+                        return true;
+
+                    case RCLRet.ServiceTakeFailed:
+                        return false;
+
+                    default:
+                        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_take_goal_request)}() failed.");
+                }
+            }
+        }
+
+        private static bool TakeCancelRequest(ActionServer actionServer, SafeRequestIdHandle requestHeaderHandle, IRosMessage cancelRequest)
+        {
+            using (var cancelRequestHandle = CancelGoal_Request.__CreateMessageHandle())
+            {
+                RCLRet ret = RCLdotnetDelegates.native_rcl_action_take_cancel_request(actionServer.Handle, requestHeaderHandle, cancelRequestHandle);
+                switch (ret)
+                {
+                    case RCLRet.Ok:
+                        ReadFromMessageHandle(cancelRequest, cancelRequestHandle);
+                        return true;
+
+                    case RCLRet.ServiceTakeFailed:
+                        return false;
+
+                    default:
+                        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_take_cancel_request)}() failed.");
+                }
+            }
+        }
+
+        private static bool TakeResultRequest(ActionServer actionServer, SafeRequestIdHandle requestHeaderHandle, IRosMessage resultRequest)
+        {
+            using (var resultRequestHandle = actionServer.CreateGetResultRequestHandle())
+            {
+                RCLRet ret = RCLdotnetDelegates.native_rcl_action_take_result_request(actionServer.Handle, requestHeaderHandle, resultRequestHandle);
+                switch (ret)
+                {
+                    case RCLRet.Ok:
+                        ReadFromMessageHandle(resultRequest, resultRequestHandle);
+                        return true;
+
+                    case RCLRet.ServiceTakeFailed:
+                        return false;
+
+                    default:
+                        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_take_result_request)}() failed.");
+                }
+            }
+        }
+
         public static void SpinOnce(Node node, long timeout)
         {
             int numberOfSubscriptions = node.Subscriptions.Count;
@@ -772,6 +1053,25 @@ namespace ROS2
                 numberOfTimers += acNumberOfTimers;
                 numberOfClients += acNumberOfClients;
                 numberOfServices += acNumberOfServices;
+            }
+
+            foreach (var actionServer in node.ActionServers)
+            {
+                RCLRet ret = RCLdotnetDelegates.native_rcl_action_server_wait_set_get_num_entries(
+                    actionServer.Handle,
+                    out int asNumberOfSubscriptions,
+                    out int asNumberOfGuardConditions,
+                    out int asNumberOfTimers,
+                    out int asNumberOfClients,
+                    out int asNumberOfServices);
+
+                RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_server_wait_set_get_num_entries)}() failed.");
+
+                numberOfSubscriptions += asNumberOfSubscriptions;
+                numberOfGuardConditions += asNumberOfGuardConditions;
+                numberOfTimers += asNumberOfTimers;
+                numberOfClients += asNumberOfClients;
+                numberOfServices += asNumberOfServices;
             }
 
             bool waitSetEmpty = numberOfSubscriptions == 0
@@ -822,6 +1122,11 @@ namespace ROS2
                 foreach (var actionClient in node.ActionClients)
                 {
                     WaitSetAddActionClient(waitSetHandle, actionClient.Handle);
+                }
+
+                foreach (var actionServer in node.ActionServers)
+                {
+                    WaitSetAddActionServer(waitSetHandle, actionServer.Handle);
                 }
 
                 bool ready = Wait(waitSetHandle, timeout);
@@ -956,6 +1261,61 @@ namespace ROS2
                                 var sequenceNumber = RCLdotnetDelegates.native_rcl_request_id_get_sequence_number(requestIdHandle);
                                 actionClient.HandleResultResponse(sequenceNumber, resultResponse);
                             }
+                        }
+                    }
+
+                    foreach (var actionServer in node.ActionServers)
+                    {
+                        RCLRet ret = RCLdotnetDelegates.native_rcl_action_server_wait_set_get_entities_ready(
+                            waitSetHandle,
+                            actionServer.Handle,
+                            out bool isGoalRequestReady,
+                            out bool isCancelRequestReady,
+                            out bool isResultRequestReady,
+                            out bool isGoalExpired);
+
+                        RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_server_wait_set_get_entities_ready)}() failed.");
+
+                        if (isGoalRequestReady)
+                        {
+                            var goalRequest = actionServer.CreateSendGoalRequest();
+
+                            var result = TakeGoalRequest(actionServer, requestIdHandle, goalRequest);
+                            if (result)
+                            {
+                                actionServer.HandleGoalRequest(requestIdHandle, goalRequest);
+                            }
+                        }
+
+                        if (isCancelRequestReady)
+                        {
+                            var cancelRequest = new CancelGoal_Request();
+
+                            var result = TakeCancelRequest(actionServer, requestIdHandle, cancelRequest);
+                            if (result)
+                            {
+                                actionServer.HandleCancelRequest(requestIdHandle, cancelRequest);
+                            }
+                        }
+
+                        if (isResultRequestReady)
+                        {
+                            var resultRequest = actionServer.CreateGetResultRequest();
+
+                            // We can't reuse requestIdHandle here as it is needed later when the result is ready.
+                            // Create a new one for each GetResultRequest.
+                            SafeRequestIdHandle resultRequestIdHandle = CreateRequestId();
+
+                            var result = TakeResultRequest(actionServer, resultRequestIdHandle, resultRequest);
+                            if (result)
+                            {
+                                actionServer.HandleResultRequest(resultRequestIdHandle, resultRequest);
+                            }
+                        }
+
+                        if (isGoalExpired)
+                        {
+                            actionServer.HandleGoalExpired();
                         }
                     }
                 }
