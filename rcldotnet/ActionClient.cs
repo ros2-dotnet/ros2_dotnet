@@ -183,24 +183,7 @@ namespace ROS2
 
             using (var goalRequestHandle = ActionDefinitionStaticMemberCache<TAction, TGoal, TResult, TFeedback>.CreateSendGoalRequestHandle())
             {
-                bool mustRelease = false;
-                try
-                {
-                    // Using SafeHandles for __WriteToHandle() is very tedious as this needs to be
-                    // handled in generated code across multiple assemblies.
-                    // Array and collection indexing would need to create SafeHandles everywhere.
-                    // It's not worth it, especially considering the extra allocations for SafeHandles in
-                    // arrays or collections that don't really represent their own native resource.
-                    goalRequestHandle.DangerousAddRef(ref mustRelease);
-                    goalRequest.__WriteToHandle(goalRequestHandle.DangerousGetHandle());
-                }
-                finally
-                {
-                    if (mustRelease)
-                    {
-                        goalRequestHandle.DangerousRelease();
-                    }
-                }
+                RCLdotnet.WriteToMessageHandle(goalRequest, goalRequestHandle);
 
                 RCLRet ret = ActionClientDelegates.native_rcl_action_send_goal_request(Handle, goalRequestHandle, out sequenceNumber);
                 RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ActionClientDelegates.native_rcl_action_send_goal_request)}() failed.");
@@ -230,24 +213,7 @@ namespace ROS2
 
             using (var cancelRequestHandle = CancelGoal_Request.__CreateMessageHandle())
             {
-                bool mustRelease = false;
-                try
-                {
-                    // Using SafeHandles for __WriteToHandle() is very tedious as this needs to be
-                    // handled in generated code across multiple assemblies.
-                    // Array and collection indexing would need to create SafeHandles everywhere.
-                    // It's not worth it, especially considering the extra allocations for SafeHandles in
-                    // arrays or collections that don't really represent their own native resource.
-                    cancelRequestHandle.DangerousAddRef(ref mustRelease);
-                    cancelRequest.__WriteToHandle(cancelRequestHandle.DangerousGetHandle());
-                }
-                finally
-                {
-                    if (mustRelease)
-                    {
-                        cancelRequestHandle.DangerousRelease();
-                    }
-                }
+                RCLdotnet.WriteToMessageHandle(cancelRequest, cancelRequestHandle);
 
                 RCLRet ret = ActionClientDelegates.native_rcl_action_send_cancel_request(Handle, cancelRequestHandle, out sequenceNumber);
                 RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ActionClientDelegates.native_rcl_action_send_cancel_request)}() failed.");
@@ -276,24 +242,7 @@ namespace ROS2
 
                 using (var resultRequestHandle = ActionDefinitionStaticMemberCache<TAction, TGoal, TResult, TFeedback>.CreateGetResultRequestHandle())
                 {
-                    bool mustRelease = false;
-                    try
-                    {
-                        // Using SafeHandles for __WriteToHandle() is very tedious as this needs to be
-                        // handled in generated code across multiple assemblies.
-                        // Array and collection indexing would need to create SafeHandles everywhere.
-                        // It's not worth it, especially considering the extra allocations for SafeHandles in
-                        // arrays or collections that don't really represent their own native resource.
-                        resultRequestHandle.DangerousAddRef(ref mustRelease);
-                        resultRequest.__WriteToHandle(resultRequestHandle.DangerousGetHandle());
-                    }
-                    finally
-                    {
-                        if (mustRelease)
-                        {
-                            resultRequestHandle.DangerousRelease();
-                        }
-                    }
+                    RCLdotnet.WriteToMessageHandle(resultRequest, resultRequestHandle);
 
                     RCLRet ret = ActionClientDelegates.native_rcl_action_send_result_request(Handle, resultRequestHandle, out sequenceNumber);
                     RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ActionClientDelegates.native_rcl_action_send_result_request)}() failed.");

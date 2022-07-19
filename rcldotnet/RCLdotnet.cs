@@ -583,25 +583,7 @@ namespace ROS2
                 switch (ret)
                 {
                     case RCLRet.Ok:
-                        bool mustRelease = false;
-                        try
-                        {
-                            // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
-                            // handled in generated code across multiple assemblies.
-                            // Array and collection indexing would need to create SafeHandles everywere.
-                            // It's not worth it, especialy considering the extra allocations for SafeHandles in
-                            // arrays or collections that don't realy represent their own native recource.
-                            messageHandle.DangerousAddRef(ref mustRelease);
-                            message.__ReadFromHandle(messageHandle.DangerousGetHandle());
-                        }
-                        finally
-                        {
-                            if (mustRelease)
-                            {
-                                messageHandle.DangerousRelease();
-                            }
-                        }
-
+                        ReadFromMessageHandle(message, messageHandle);
                         return true;
 
                     case RCLRet.SubscriptionTakeFailed:
@@ -621,25 +603,7 @@ namespace ROS2
                 switch (ret)
                 {
                     case RCLRet.Ok:
-                        bool mustRelease = false;
-                        try
-                        {
-                            // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
-                            // handled in generated code across multiple assemblies.
-                            // Array and collection indexing would need to create SafeHandles everywere.
-                            // It's not worth it, especialy considering the extra allocations for SafeHandles in
-                            // arrays or collections that don't realy represent their own native recource.
-                            requestHandle.DangerousAddRef(ref mustRelease);
-                            request.__ReadFromHandle(requestHandle.DangerousGetHandle());
-                        }
-                        finally
-                        {
-                            if (mustRelease)
-                            {
-                                requestHandle.DangerousRelease();
-                            }
-                        }
-
+                        ReadFromMessageHandle(request, requestHandle);
                         return true;
 
                     case RCLRet.ServiceTakeFailed:
@@ -659,25 +623,7 @@ namespace ROS2
                 switch (ret)
                 {
                     case RCLRet.Ok:
-                        bool mustRelease = false;
-                        try
-                        {
-                            // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
-                            // handled in generated code across multiple assemblies.
-                            // Array and collection indexing would need to create SafeHandles everywere.
-                            // It's not worth it, especialy considering the extra allocations for SafeHandles in
-                            // arrays or collections that don't realy represent their own native recource.
-                            responseHandle.DangerousAddRef(ref mustRelease);
-                            response.__ReadFromHandle(responseHandle.DangerousGetHandle());
-                        }
-                        finally
-                        {
-                            if (mustRelease)
-                            {
-                                responseHandle.DangerousRelease();
-                            }
-                        }
-
+                        ReadFromMessageHandle(response, responseHandle);
                         return true;
 
                     case RCLRet.ClientTakeFailed:
@@ -697,25 +643,7 @@ namespace ROS2
                 switch (ret)
                 {
                     case RCLRet.Ok:
-                        bool mustRelease = false;
-                        try
-                        {
-                            // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
-                            // handled in generated code across multiple assemblies.
-                            // Array and collection indexing would need to create SafeHandles everywhere.
-                            // It's not worth it, especially considering the extra allocations for SafeHandles in
-                            // arrays or collections that don't really represent their own native resource.
-                            feedbackMessageHandle.DangerousAddRef(ref mustRelease);
-                            feedbackMessage.__ReadFromHandle(feedbackMessageHandle.DangerousGetHandle());
-                        }
-                        finally
-                        {
-                            if (mustRelease)
-                            {
-                                feedbackMessageHandle.DangerousRelease();
-                            }
-                        }
-
+                        ReadFromMessageHandle(feedbackMessage, feedbackMessageHandle);
                         return true;
 
                     case RCLRet.SubscriptionTakeFailed:
@@ -735,25 +663,7 @@ namespace ROS2
                 switch (ret)
                 {
                     case RCLRet.Ok:
-                        bool mustRelease = false;
-                        try
-                        {
-                            // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
-                            // handled in generated code across multiple assemblies.
-                            // Array and collection indexing would need to create SafeHandles everywhere.
-                            // It's not worth it, especially considering the extra allocations for SafeHandles in
-                            // arrays or collections that don't really represent their own native resource.
-                            statusMessageHandle.DangerousAddRef(ref mustRelease);
-                            statusMessage.__ReadFromHandle(statusMessageHandle.DangerousGetHandle());
-                        }
-                        finally
-                        {
-                            if (mustRelease)
-                            {
-                                statusMessageHandle.DangerousRelease();
-                            }
-                        }
-
+                        ReadFromMessageHandle(statusMessage, statusMessageHandle);
                         return true;
 
                     case RCLRet.SubscriptionTakeFailed:
@@ -773,25 +683,7 @@ namespace ROS2
                 switch (ret)
                 {
                     case RCLRet.Ok:
-                        bool mustRelease = false;
-                        try
-                        {
-                            // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
-                            // handled in generated code across multiple assemblies.
-                            // Array and collection indexing would need to create SafeHandles everywhere.
-                            // It's not worth it, especially considering the extra allocations for SafeHandles in
-                            // arrays or collections that don't really represent their own native resource.
-                            goalResponseHandle.DangerousAddRef(ref mustRelease);
-                            goalResponse.__ReadFromHandle(goalResponseHandle.DangerousGetHandle());
-                        }
-                        finally
-                        {
-                            if (mustRelease)
-                            {
-                                goalResponseHandle.DangerousRelease();
-                            }
-                        }
-
+                        ReadFromMessageHandle(goalResponse, goalResponseHandle);
                         return true;
 
                     case RCLRet.ClientTakeFailed:
@@ -811,25 +703,7 @@ namespace ROS2
                 switch (ret)
                 {
                     case RCLRet.Ok:
-                        bool mustRelease = false;
-                        try
-                        {
-                            // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
-                            // handled in generated code across multiple assemblies.
-                            // Array and collection indexing would need to create SafeHandles everywhere.
-                            // It's not worth it, especially considering the extra allocations for SafeHandles in
-                            // arrays or collections that don't really represent their own native resource.
-                            cancelResponseHandle.DangerousAddRef(ref mustRelease);
-                            cancelResponse.__ReadFromHandle(cancelResponseHandle.DangerousGetHandle());
-                        }
-                        finally
-                        {
-                            if (mustRelease)
-                            {
-                                cancelResponseHandle.DangerousRelease();
-                            }
-                        }
-
+                        ReadFromMessageHandle(cancelResponse, cancelResponseHandle);
                         return true;
 
                     case RCLRet.ClientTakeFailed:
@@ -849,25 +723,7 @@ namespace ROS2
                 switch (ret)
                 {
                     case RCLRet.Ok:
-                        bool mustRelease = false;
-                        try
-                        {
-                            // Using SafeHandles for __ReadFromHandle() is very tedious as this needs to be
-                            // handled in generated code across multiple assemblies.
-                            // Array and collection indexing would need to create SafeHandles everywhere.
-                            // It's not worth it, especially considering the extra allocations for SafeHandles in
-                            // arrays or collections that don't really represent their own native resource.
-                            resultResponseHandle.DangerousAddRef(ref mustRelease);
-                            resultResponse.__ReadFromHandle(resultResponseHandle.DangerousGetHandle());
-                        }
-                        finally
-                        {
-                            if (mustRelease)
-                            {
-                                resultResponseHandle.DangerousRelease();
-                            }
-                        }
-
+                        ReadFromMessageHandle(resultResponse, resultResponseHandle);
                         return true;
 
                     case RCLRet.ClientTakeFailed:
@@ -883,30 +739,10 @@ namespace ROS2
         {
             using (var responseHandle = service.CreateResponseHandle())
             {
-                bool mustRelease = false;
-                try
-                {
-                    // Using SafeHandles for __WriteToHandle() is very tedious as this needs to be
-                    // handled in generated code across multiple assemblies.
-                    // Array and collection indexing would need to create SafeHandles everywere.
-                    // It's not worth it, especialy considering the extra allocations for SafeHandles in
-                    // arrays or collections that don't realy represent their own native recource.
-                    responseHandle.DangerousAddRef(ref mustRelease);
-                    response.__WriteToHandle(responseHandle.DangerousGetHandle());
-                }
-                finally
-                {
-                    if (mustRelease)
-                    {
-                        responseHandle.DangerousRelease();
-                    }
-                }
+                WriteToMessageHandle(response, responseHandle);
 
                 RCLRet ret = RCLdotnetDelegates.native_rcl_send_response(service.Handle, requestHeaderHandle, responseHandle);
-                if (ret != RCLRet.Ok)
-                {
-                    throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_send_response)}() failed.");
-                }
+                RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_send_response)}() failed.");
             }
         }
 
@@ -1155,6 +991,54 @@ namespace ROS2
             IntPtr ptr = RCLdotnetDelegates.native_rcl_get_rmw_identifier();
             string rmw_identifier = Marshal.PtrToStringAnsi(ptr);
             return rmw_identifier;
+        }
+
+        internal static void ReadFromMessageHandle(IRosMessage message, SafeHandle messageHandle)
+        {
+            bool mustRelease = false;
+            try
+            {
+                // Using SafeHandles for __ReadFromHandle() is very tedious as
+                // this needs to be handled in generated code across multiple
+                // assemblies. Array and collection indexing would need to
+                // create SafeHandles everywhere. It's not worth it, especially
+                // considering the extra allocations for SafeHandles in arrays
+                // or collections that don't really represent their own native
+                // resource.
+                messageHandle.DangerousAddRef(ref mustRelease);
+                message.__ReadFromHandle(messageHandle.DangerousGetHandle());
+            }
+            finally
+            {
+                if (mustRelease)
+                {
+                    messageHandle.DangerousRelease();
+                }
+            }
+        }
+
+        internal static void WriteToMessageHandle(IRosMessage message, SafeHandle messageHandle)
+        {
+            bool mustRelease = false;
+            try
+            {
+                // Using SafeHandles for __WriteToHandle() is very tedious as
+                // this needs to be handled in generated code across multiple
+                // assemblies. Array and collection indexing would need to
+                // create SafeHandles everywhere. It's not worth it, especially
+                // considering the extra allocations for SafeHandles in arrays
+                // or collections that don't really represent their own native
+                // resource.
+                messageHandle.DangerousAddRef(ref mustRelease);
+                message.__WriteToHandle(messageHandle.DangerousGetHandle());
+            }
+            finally
+            {
+                if (mustRelease)
+                {
+                    messageHandle.DangerousRelease();
+                }
+            }
         }
     }
 }
