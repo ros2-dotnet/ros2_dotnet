@@ -14,6 +14,9 @@
  */
 
 using System;
+using System.Threading.Tasks;
+using action_msgs.msg;
+using unique_identifier_msgs.msg;
 
 namespace ROS2
 {
@@ -46,12 +49,11 @@ namespace ROS2
 
         public abstract ActionGoalStatus Status { get; }
 
+        internal abstract SafeActionGoalHandle Handle { get; }
+
         // In `rclpy` this calls the `executeCallback` after setting the state to executing.
         // In `rclcpp` this does not call the `executeCallback` (as there is none) but sets the state for the explicit `AcceptAndDefer` `GoalResponse`.
-        public void Execute()
-        {
-            throw new NotImplementedException();
-        }
+        public abstract void Execute();
     }
 
     public sealed class ActionServerGoalHandle<TAction, TGoal, TResult, TFeedback> : ActionServerGoalHandle
@@ -60,26 +62,79 @@ namespace ROS2
         where TResult : IRosMessage, new()
         where TFeedback : IRosMessage, new()
     {
+        private readonly ActionServer<TAction, TGoal, TResult, TFeedback> _actionServer;
+
         // No public constructor.
-        internal ActionServerGoalHandle()
+        internal ActionServerGoalHandle(
+            SafeActionGoalHandle handle,
+            ActionServer<TAction, TGoal, TResult, TFeedback> actionServer,
+            Guid goalId,
+            TGoal goal)
         {
+            Handle = handle;
+            _actionServer = actionServer;
+            Goal = goal;
+            GoalId = goalId;
+            ResultTaskCompletionSource = new TaskCompletionSource<IRosActionGetResultResponse<TResult>>();
         }
 
         // `rclpy` uses the name `Request`, but the name from `rclcpp` `Goal` fits better.
         public TGoal Goal { get; }
 
-        public override Guid GoalId => throw new NotImplementedException();
+        public override Guid GoalId { get; }
 
-        public override bool IsActive => throw new NotImplementedException();
+        public override bool IsActive
+        {
+            get
+            {
+                bool isActive = RCLdotnetDelegates.native_rcl_action_goal_handle_is_active(Handle);
+                return isActive;
+            }
+        }
 
-        public override bool IsCanceling => throw new NotImplementedException();
+        public override bool IsCanceling => Status == ActionGoalStatus.Canceling;
 
-        public override bool IsExecuting => throw new NotImplementedException();
+        public override bool IsExecuting => Status == ActionGoalStatus.Executing;
 
-        public override ActionGoalStatus Status => throw new NotImplementedException();
+        public override ActionGoalStatus Status
+        {
+            get
+            {
+                RCLRet ret = RCLdotnetDelegates.native_rcl_action_goal_handle_get_status(Handle, out byte status);
 
-        public void PublishFeedback(TFeedback feedback) => throw new NotImplementedException();
+                // In .NET properties should not throw exceptions. Should this
+                // be converted to a method for this reason? -> No as the rcl
+                // methods only do argument null checks for values which
+                // rcldotnet should ensure that they are not null.
+                RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_goal_handle_get_status)}() failed.");
 
+                return (ActionGoalStatus)status;
+            }
+        }
+
+        internal override SafeActionGoalHandle Handle { get; }
+
+        internal TaskCompletionSource<IRosActionGetResultResponse<TResult>> ResultTaskCompletionSource { get; }
+
+        internal Task<IRosActionGetResultResponse<TResult>> ResultTask => ResultTaskCompletionSource.Task;
+
+        public override void Execute()
+        {
+            UpdateGoalState(ActionGoalEvent.Execute);
+
+            _actionServer.PublishStatus();
+        }
+
+        public void PublishFeedback(TFeedback feedback)
+        {
+            IRosActionFeedbackMessage<TFeedback> feedbackMessage =
+                ActionDefinitionStaticMemberCache<TAction, TGoal, TResult, TFeedback>.CreateFeedbackMessage();
+
+            var goalId = (UUID)feedbackMessage.GoalIdAsRosMessage;
+            goalId.Uuid = GoalId.ToUuidByteArray();
+            feedbackMessage.Feedback = feedback;
+            _actionServer.PublishFeedbackMessage(feedbackMessage);
+        }
 
         // TODO: (sh) Decide which (or both?) of these methods should be exposed.
         // // "rclpy style"
@@ -90,17 +145,38 @@ namespace ROS2
         // "rclcpp style"
         public void Succeed(TResult result)
         {
-            throw new NotImplementedException();
+            UpdateGoalState(ActionGoalEvent.Succeed);
+
+            var response = _actionServer.CreateGetResultResponse();
+            response.Status = GoalStatus.STATUS_SUCCEEDED;
+            response.Result = result;
+            _actionServer.HandleTerminalState(this, response);
         }
 
         public void Abort(TResult result)
         {
-            throw new NotImplementedException();
+            UpdateGoalState(ActionGoalEvent.Abort);
+
+            var response = _actionServer.CreateGetResultResponse();
+            response.Status = GoalStatus.STATUS_ABORTED;
+            response.Result = result;
+            _actionServer.HandleTerminalState(this, response);
         }
 
         public void Canceled(TResult result)
         {
-            throw new NotImplementedException();
+            UpdateGoalState(ActionGoalEvent.Canceled);
+
+            var response = _actionServer.CreateGetResultResponse();
+            response.Status = GoalStatus.STATUS_CANCELED;
+            response.Result = result;
+            _actionServer.HandleTerminalState(this, response);
+        }
+
+        private void UpdateGoalState(ActionGoalEvent actionGoalEvent)
+        {
+            RCLRet ret = RCLdotnetDelegates.native_rcl_action_update_goal_state(Handle, actionGoalEvent);
+            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_update_goal_state)}() failed.");
         }
     }
 }
