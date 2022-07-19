@@ -60,7 +60,7 @@ namespace ROS2
         public void Trigger()
         {
             RCLRet ret = GuardConditionDelegates.native_rcl_trigger_guard_condition(Handle);
-            RCLExceptionHelper.CheckReturnValue(ret);
+            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(GuardConditionDelegates.native_rcl_trigger_guard_condition)}() failed.");
         }
 
         internal void TriggerCallback()
