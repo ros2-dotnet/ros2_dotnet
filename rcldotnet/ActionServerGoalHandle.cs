@@ -26,9 +26,23 @@ namespace ROS2
 
         public abstract Guid GoalId { get; }
 
+        /// <summary>
+        /// Indicate if goal is pending or executing.
+        /// </summary>
+        /// <value>False if goal has reached a terminal state.</value>
         public abstract bool IsActive { get; }
 
-        public abstract bool IsCancelRequested { get; }
+        /// <summary>
+        /// Indicate if client has requested this goal be cancelled.
+        /// </summary>
+        /// <value>True if a cancellation request has been accepted for this goal.</value>
+        public abstract bool IsCanceling { get; }
+
+        /// <summary>
+        /// Indicate if goal is executing.
+        /// </summary>
+        /// <value>True only if the goal is in an executing state.</value>
+        public abstract bool IsExecuting { get; }
 
         public abstract ActionGoalStatus Status { get; }
 
@@ -58,7 +72,9 @@ namespace ROS2
 
         public override bool IsActive => throw new NotImplementedException();
 
-        public override bool IsCancelRequested => throw new NotImplementedException();
+        public override bool IsCanceling => throw new NotImplementedException();
+
+        public override bool IsExecuting => throw new NotImplementedException();
 
         public override ActionGoalStatus Status => throw new NotImplementedException();
 
