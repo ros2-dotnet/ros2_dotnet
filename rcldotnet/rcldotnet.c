@@ -26,6 +26,7 @@
 #include "rcldotnet.h"
 
 static rcl_context_t context;
+static rcl_clock_t clock;
 
 int32_t native_rcl_init() {
   // TODO(esteve): parse args
@@ -39,7 +40,16 @@ int32_t native_rcl_init() {
   }
   const char ** arg_values = NULL;
   ret = rcl_init(num_args, arg_values, &init_options, &context);
+  if (ret != RCL_RET_OK) {
+    return ret;
+  }
+
+  ret = rcl_clock_init(RCL_STEADY_TIME, &clock, &allocator);
   return ret;
+}
+
+rcl_clock_t *native_rcl_get_default_clock() {
+  return &clock;
 }
 
 const char *native_rcl_get_rmw_identifier() {
@@ -213,6 +223,47 @@ int32_t native_rcl_action_wait_set_add_action_client(void *wait_set_handle, void
     return ret;
 }
 
+int32_t native_rcl_action_server_wait_set_get_num_entries(
+    void *action_server_handle,
+    int32_t *num_subscriptions,
+    int32_t *num_guard_conditions,
+    int32_t *num_timers,
+    int32_t *num_clients,
+    int32_t *num_services)
+{
+    rcl_action_server_t *action_server = (rcl_action_server_t *)action_server_handle;
+
+    size_t num_subscriptions_as_size_t;
+    size_t num_guard_conditions_as_size_t;
+    size_t num_timers_as_size_t;
+    size_t num_clients_as_size_t;
+    size_t num_services_as_size_t;
+
+    rcl_ret_t ret = rcl_action_server_wait_set_get_num_entities(
+        action_server,
+        &num_subscriptions_as_size_t,
+        &num_guard_conditions_as_size_t,
+        &num_timers_as_size_t,
+        &num_clients_as_size_t,
+        &num_services_as_size_t);
+
+    *num_subscriptions = (int32_t)num_subscriptions_as_size_t;
+    *num_guard_conditions = (int32_t)num_guard_conditions_as_size_t;
+    *num_timers = (int32_t)num_timers_as_size_t;
+    *num_clients = (int32_t)num_clients_as_size_t;
+    *num_services = (int32_t)num_services_as_size_t;
+
+    return ret;
+}
+
+int32_t native_rcl_action_wait_set_add_action_server(void *wait_set_handle, void *action_server_handle) {
+    rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+    rcl_action_server_t *action_server = (rcl_action_server_t *)action_server_handle;
+    rcl_ret_t ret = rcl_action_wait_set_add_action_server(wait_set, action_server, NULL);
+
+    return ret;
+}
+
 int32_t native_rcl_wait(void *wait_set_handle, int64_t timeout) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
   rcl_ret_t ret = rcl_wait(wait_set, timeout);
@@ -284,6 +335,28 @@ int32_t native_rcl_action_client_wait_set_get_entities_ready(
         is_goal_response_ready,
         is_cancel_response_ready,
         is_result_response_ready);
+
+    return ret;
+}
+
+int32_t native_rcl_action_server_wait_set_get_entities_ready(
+    void *wait_set_handle,
+    void *action_server_handle,
+    bool *is_goal_request_ready,
+    bool *is_cancel_request_ready,
+    bool *is_result_request_ready,
+    bool *is_goal_expired)
+{
+    rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+    rcl_action_server_t *action_server = (rcl_action_server_t *)action_server_handle;
+
+    rcl_ret_t ret = rcl_action_server_wait_set_get_entities_ready(
+        wait_set,
+        action_server,
+        is_goal_request_ready,
+        is_cancel_request_ready,
+        is_result_request_ready,
+        is_goal_expired);
 
     return ret;
 }
@@ -372,5 +445,201 @@ int32_t native_rcl_action_take_result_response(void *action_client_handle, void 
   rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
 
   rcl_ret_t ret = rcl_action_take_result_response(action_client, request_header, result_response_handle);
+  return ret;
+}
+
+int32_t native_rcl_action_take_goal_request(void *action_server_handle, void *request_header_handle, void *goal_request_handle) {
+  rcl_action_server_t * action_server = (rcl_action_server_t *)action_server_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_action_take_goal_request(action_server, request_header, goal_request_handle);
+  return ret;
+}
+
+int32_t native_rcl_action_send_goal_response(void *action_server_handle, void *request_header_handle, void *goal_response_handle) {
+  rcl_action_server_t * action_server = (rcl_action_server_t *)action_server_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_action_send_goal_response(action_server, request_header, goal_response_handle);
+  return ret;
+}
+
+int32_t native_rcl_action_accept_new_goal(void **action_goal_handle_handle, void *action_server_handle, void *goal_info_handle) {
+  rcl_action_server_t * action_server = (rcl_action_server_t *)action_server_handle;
+  rcl_action_goal_info_t * goal_info = (rcl_action_goal_info_t *)goal_info_handle;
+
+  rcl_action_goal_handle_t *action_goal_handle =
+    (rcl_action_goal_handle_t *)malloc(sizeof(rcl_action_goal_handle_t));
+
+  *action_goal_handle = rcl_action_get_zero_initialized_goal_handle();
+
+  rcl_action_goal_handle_t *rcl_action_goal_handle = rcl_action_accept_new_goal(action_server, goal_info);
+  rcl_ret_t ret;
+  if (rcl_action_goal_handle == NULL)
+  {
+    ret = RCL_RET_ERROR;
+  }
+  else
+  {
+    // Copy out goal handle since action server storage disappears when it is fini'd.
+    *action_goal_handle = *rcl_action_goal_handle;
+
+    // Get the goal_info from the goal_handle to return the stamp back to native code.
+    ret = rcl_action_goal_handle_get_info(action_goal_handle, goal_info);
+  }
+
+  *action_goal_handle_handle = (void *)action_goal_handle;
+
+  return ret;
+}
+
+int32_t native_rcl_action_destroy_goal_handle(void *action_goal_handle) {
+  rcl_action_goal_handle_t *goal_handle = (rcl_action_goal_handle_t *)action_goal_handle;
+
+  rcl_ret_t ret = rcl_action_goal_handle_fini(goal_handle);
+  free(goal_handle);
+
+  return ret;
+}
+
+int32_t native_rcl_action_update_goal_state(void *action_goal_handle_handle, int32_t goal_event) {
+  rcl_action_goal_handle_t *goal_handle = (rcl_action_goal_handle_t *)action_goal_handle_handle;
+
+  rcl_ret_t ret = rcl_action_update_goal_state(goal_handle, (rcl_action_goal_event_t)goal_event);
+  return ret;
+}
+
+int32_t native_rcl_action_publish_status(void *action_server_handle) {
+  rcl_action_server_t * action_server = (rcl_action_server_t *)action_server_handle;
+
+  rcl_action_goal_status_array_t status_message =
+    rcl_action_get_zero_initialized_goal_status_array();
+
+  rcl_ret_t ret = rcl_action_get_goal_status_array(action_server, &status_message);
+  if (RCL_RET_OK != ret) {
+    return ret;
+  }
+
+  ret = rcl_action_publish_status(action_server, &status_message);
+
+  rcl_ret_t cleanup_ret;
+  cleanup_ret = rcl_action_goal_status_array_fini(&status_message);
+  if (cleanup_ret != RCL_RET_OK)
+  {
+    // If we got two unexpected errors, return the earlier error.
+    if (ret == RCL_RET_OK) {
+      // Error message already set.
+      ret = cleanup_ret;
+    }
+  }
+
+  return ret;
+}
+
+int32_t native_rcl_action_publish_feedback(void *action_server_handle, void *feedback_message_handle) {
+  rcl_action_server_t * action_server = (rcl_action_server_t *)action_server_handle;
+
+  rcl_ret_t ret = rcl_action_publish_feedback(action_server, feedback_message_handle);
+  return ret;
+}
+
+int32_t native_rcl_action_take_cancel_request(void *action_server_handle, void *request_header_handle, void *cancel_request_handle) {
+  rcl_action_server_t * action_server = (rcl_action_server_t *)action_server_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_action_take_cancel_request(action_server, request_header, cancel_request_handle);
+  return ret;
+}
+
+int32_t native_rcl_action_process_cancel_request(void *action_server_handle, void *cancel_request_handle, void *cancel_response_handle) {
+  rcl_action_server_t * action_server = (rcl_action_server_t *)action_server_handle;
+
+  // the rcl_action_cancel_request_t is a direct typedef to
+  // action_msgs__srv__CancelGoal_Request
+
+  // rcl_action_cancel_response_t is a wrapper struct around
+  // action_msgs__srv__CancelGoal_Response with an additional allocator field.
+  // -> Don't cast in this case!
+
+  rcl_action_cancel_response_t tmp_cancel_response = rcl_action_get_zero_initialized_cancel_response();
+
+  rcl_ret_t ret = rcl_action_process_cancel_request(action_server, cancel_request_handle, &tmp_cancel_response);
+
+  // TODO: (sh) would be better to copy the list over element by element?
+
+  // HACK: Don't deallocate but instead move reference to data into incoming cancel_response_handle.
+  // rcl_action_cancel_response_fini(&cancel_response);
+  action_msgs__srv__CancelGoal_Response * cancel_response = (action_msgs__srv__CancelGoal_Response *)cancel_response_handle;
+  *cancel_response = tmp_cancel_response.msg;
+
+  // HACK: as rcl_action_cancel_response_init doesn't fill in capacity...
+  cancel_response->goals_canceling.capacity = cancel_response->goals_canceling.size;
+
+  return ret;
+}
+
+int32_t native_rcl_action_send_cancel_response(void *action_server_handle, void *request_header_handle, void *cancel_response_handle) {
+  rcl_action_server_t * action_server = (rcl_action_server_t *)action_server_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_action_send_cancel_response(action_server, request_header, cancel_response_handle);
+  return ret;
+}
+
+int32_t native_rcl_action_take_result_request(void *action_server_handle, void *request_header_handle, void *result_request_handle) {
+  rcl_action_server_t * action_server = (rcl_action_server_t *)action_server_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_action_take_result_request(action_server, request_header, result_request_handle);
+  return ret;
+}
+
+int32_t native_rcl_action_send_result_response(void *action_server_handle, void *request_header_handle, void *result_response_handle) {
+  rcl_action_server_t * action_server = (rcl_action_server_t *)action_server_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_action_send_result_response(action_server, request_header, result_response_handle);
+  return ret;
+}
+
+int32_t native_rcl_action_notify_goal_done(void *action_server_handle) {
+  rcl_action_server_t * action_server = (rcl_action_server_t *)action_server_handle;
+
+  rcl_ret_t ret = rcl_action_notify_goal_done(action_server);
+  return ret;
+}
+
+int32_t native_rcl_action_expire_goals(void *action_server_handle, void *goal_info_handle, int32_t *num_expired)
+{
+  rcl_action_server_t * action_server = (rcl_action_server_t *)action_server_handle;
+
+  size_t num_expired_as_size_t;
+
+  // Only provide one goal_info to the underlying function.
+  // rclcpp does the same as only one goal is expected to expire at the same time.
+  // The out parameter num_expired can be used with a loop to expire all goals.
+  // This does also help to avoid implementing a new SafeHandle and accessor methods for a list of `GoalHandle`s.
+  rcl_ret_t ret = rcl_action_expire_goals(action_server, goal_info_handle, 1, &num_expired_as_size_t);
+
+  *num_expired = (int32_t)num_expired_as_size_t;
+
+  return ret;
+}
+
+bool native_rcl_action_goal_handle_is_active(void *action_goal_handle_handle) {
+  rcl_action_goal_handle_t *goal_handle = (rcl_action_goal_handle_t *)action_goal_handle_handle;
+
+  return rcl_action_goal_handle_is_active(goal_handle);
+}
+
+int32_t native_rcl_action_goal_handle_get_status(void *action_goal_handle_handle, int8_t *status) {
+  rcl_action_goal_handle_t *goal_handle = (rcl_action_goal_handle_t *)action_goal_handle_handle;
+
+  rcl_action_goal_state_t status_as_rcl_type;
+
+  rcl_ret_t ret = rcl_action_goal_handle_get_status(goal_handle, &status_as_rcl_type);
+
+  *status = (int8_t)status_as_rcl_type;
+
   return ret;
 }

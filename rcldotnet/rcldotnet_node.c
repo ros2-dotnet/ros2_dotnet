@@ -24,6 +24,7 @@
 
 #include "rosidl_runtime_c/message_type_support_struct.h"
 
+#include "rcldotnet.h"
 #include "rcldotnet_node.h"
 
 int32_t native_rcl_create_publisher_handle(void **publisher_handle,
@@ -185,6 +186,41 @@ int32_t native_rcl_action_destroy_client_handle(void *action_client_handle, void
 
   rcl_ret_t ret = rcl_action_client_fini(action_client, node);
   free(action_client);
+
+  return ret;
+}
+
+int32_t native_rcl_action_create_server_handle(void **action_server_handle,
+                                               void *node_handle,
+                                               const char *action_name,
+                                               void *typesupport) {
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+
+  rosidl_action_type_support_t *ts =
+    (rosidl_action_type_support_t *)typesupport;
+
+  rcl_action_server_t *action_server =
+    (rcl_action_server_t *)malloc(sizeof(rcl_action_server_t));
+  *action_server = rcl_action_get_zero_initialized_server();
+  rcl_action_server_options_t action_server_ops =
+    rcl_action_server_get_default_options();
+
+  rcl_clock_t *clock = native_rcl_get_default_clock();
+
+  rcl_ret_t ret =
+    rcl_action_server_init(action_server, node, clock, ts, action_name, &action_server_ops);
+
+  *action_server_handle = (void *)action_server;
+
+  return ret;
+}
+
+int32_t native_rcl_action_destroy_server_handle(void *action_server_handle, void *node_handle) {
+  rcl_action_server_t *action_server = (rcl_action_server_t *)action_server_handle;
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+
+  rcl_ret_t ret = rcl_action_server_fini(action_server, node);
+  free(action_server);
 
   return ret;
 }

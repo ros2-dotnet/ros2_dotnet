@@ -20,6 +20,8 @@
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_init();
 
+rcl_clock_t *native_rcl_get_default_clock();
+
 RCLDOTNET_EXPORT
 const char * RCLDOTNET_CDECL native_rcl_get_rmw_identifier();
 
@@ -85,6 +87,18 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_action_wait_set_add_action_client(void *wait_set_handle, void *action_client_handle);
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_server_wait_set_get_num_entries(
+    void *action_server_handle,
+    int32_t *num_subscriptions,
+    int32_t *num_guard_conditions,
+    int32_t *num_timers,
+    int32_t *num_clients,
+    int32_t *num_services);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_wait_set_add_action_server(void *wait_set_handle, void *action_server_handle);
+
+RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait(void *, int64_t);
 
 RCLDOTNET_EXPORT
@@ -108,6 +122,15 @@ int32_t RCLDOTNET_CDECL native_rcl_action_client_wait_set_get_entities_ready(
     bool *is_goal_response_ready,
     bool *is_cancel_response_ready,
     bool *is_result_response_ready);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_server_wait_set_get_entities_ready(
+    void *wait_set_handle,
+    void *action_server_handle,
+    bool *is_goal_request_ready,
+    bool *is_cancel_request_ready,
+    bool *is_result_request_ready,
+    bool *is_goal_expired);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_take(void *, void *);
@@ -144,5 +167,53 @@ int32_t RCLDOTNET_CDECL native_rcl_action_take_cancel_response(void *action_clie
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_action_take_result_response(void *action_client_handle, void *request_header_handle, void *result_response_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_take_goal_request(void *action_server_handle, void *request_header_handle, void *goal_request_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_send_goal_response(void *action_server_handle, void *request_header_handle, void *goal_response_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_accept_new_goal(void **action_goal_handle_handle, void *action_server_handle, void *goal_info_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_destroy_goal_handle(void *action_goal_handle_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_update_goal_state(void *action_goal_handle_handle, int32_t goal_event);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_publish_status(void *action_server_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_publish_feedback(void *action_server_handle, void *feedback_message_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_take_cancel_request(void *action_server_handle, void *request_header_handle, void *cancel_request_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_process_cancel_request(void *action_server_handle, void *cancel_request_handle, void *cancel_response_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_send_cancel_response(void *action_server_handle, void *request_header_handle, void *cancel_response_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_take_result_request(void *action_server_handle, void *request_header_handle, void *result_request_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_send_result_response(void *action_server_handle, void *request_header_handle, void *result_response_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_notify_goal_done(void *action_server_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_expire_goals(void *action_server_handle, void *goal_info_handle, int32_t *num_expired);
+
+RCLDOTNET_EXPORT
+bool RCLDOTNET_CDECL native_rcl_action_goal_handle_is_active(void *action_goal_handle_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_action_goal_handle_get_status(void *action_goal_handle_handle, int8_t *status);
 
 #endif // RCLDOTNET_H
