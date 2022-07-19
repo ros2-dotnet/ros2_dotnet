@@ -13,18 +13,22 @@
   <buildtool_depend>rcldotnet_common</buildtool_depend>
   <buildtool_export_depend>rosidl_cmake</buildtool_export_depend>
 
+  <build_depend>builtin_interfaces</build_depend>
   <build_depend>example_interfaces</build_depend>
   <build_depend>rcldotnet</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>std_srvs</build_depend>
   <build_depend>sensor_msgs</build_depend>
+  <build_depend>test_msgs</build_depend>
 
   <exec_depend>rcldotnet_common</exec_depend>
+  <exec_depend>builtin_interfaces</exec_depend>
   <exec_depend>example_interfaces</exec_depend>
   <exec_depend>rcldotnet</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>std_srvs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>test_msgs</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
