@@ -313,12 +313,12 @@ namespace ROS2
 
         internal override void HandleStatusMessage(GoalStatusArray statusMessage)
         {
-            foreach (var statusMessage1 in statusMessage.StatusList)
+            foreach (var statusMessageEntry in statusMessage.StatusList)
             {
-                var goalId = statusMessage1.GoalInfo.GoalId.ToGuid();
+                var goalId = statusMessageEntry.GoalInfo.GoalId.ToGuid();
                 if (_goalHandles.TryGetValue(goalId, out var goalHandle))
                 {
-                    var status = statusMessage1.Status;
+                    var status = statusMessageEntry.Status;
                     goalHandle.Status = ConvertGoalStatus(status);
 
                     // rclpy does this, rclcpp does not.
