@@ -87,10 +87,11 @@ namespace ROS2
 
             var resultTaskCompletionSource = new TaskCompletionSource<TResult>();
 
-            if (Interlocked.CompareExchange(ref _resultTaskCompletionSource, resultTaskCompletionSource, null) != null)
+            var oldResultTcs = Interlocked.CompareExchange(ref _resultTaskCompletionSource, resultTaskCompletionSource, null);
+            if (oldResultTcs != null)
             {
                 // Some other thread was first.
-                return _resultTaskCompletionSource.Task;
+                return oldResultTcs.Task;
             }
 
             return _actionClient.GetResultAsync(this, resultTaskCompletionSource);
