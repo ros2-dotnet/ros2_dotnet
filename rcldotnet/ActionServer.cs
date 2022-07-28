@@ -451,8 +451,8 @@ namespace ROS2
             ActionServerGoalHandle<TAction, TGoal, TResult, TFeedback> actionServerGoalHandle,
             IRosActionGetResultResponse<TResult> response)
         {
-            actionServerGoalHandle.ResultTaskCompletionSource.SetResult(response);
             PublishStatus();
+            actionServerGoalHandle.ResultTaskCompletionSource.SetResult(response);
 
             RCLRet ret = RCLdotnetDelegates.native_rcl_action_notify_goal_done(Handle);
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_notify_goal_done)}() failed.");
