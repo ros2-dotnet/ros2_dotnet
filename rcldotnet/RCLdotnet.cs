@@ -1205,17 +1205,24 @@ namespace ROS2
 
                         RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_client_wait_set_get_entities_ready)}() failed.");
 
-                        if (isFeedbackReady)
+                        // Check isGoalResponseReady so that a new goalHandle is
+                        // already created if the status or feedback for the new
+                        // goal is received.
+                        if (isGoalResponseReady)
                         {
-                            var feedbackMessage = actionClient.CreateFeedbackMessage();
+                            var goalResponse = actionClient.CreateSendGoalResponse();
 
-                            var result = TakeFeedbackMessage(actionClient, feedbackMessage);
+                            var result = TakeGoalResponse(actionClient, requestIdHandle, goalResponse);
                             if (result)
                             {
-                                actionClient.HandleFeedbackMessage(feedbackMessage);
+                                var sequenceNumber = RCLdotnetDelegates.native_rcl_request_id_get_sequence_number(requestIdHandle);
+                                actionClient.HandleGoalResponse(sequenceNumber, goalResponse);
                             }
                         }
 
+                        // Check isStatusReady before isFeedbackReady so that
+                        // the feedback callback already has the newest status
+                        // information if updates are received at the same time.
                         if (isStatusReady)
                         {
                             var statusMessage = new GoalStatusArray();
@@ -1227,15 +1234,14 @@ namespace ROS2
                             }
                         }
 
-                        if (isGoalResponseReady)
+                        if (isFeedbackReady)
                         {
-                            var goalResponse = actionClient.CreateSendGoalResponse();
+                            var feedbackMessage = actionClient.CreateFeedbackMessage();
 
-                            var result = TakeGoalResponse(actionClient, requestIdHandle, goalResponse);
+                            var result = TakeFeedbackMessage(actionClient, feedbackMessage);
                             if (result)
                             {
-                                var sequenceNumber = RCLdotnetDelegates.native_rcl_request_id_get_sequence_number(requestIdHandle);
-                                actionClient.HandleGoalResponse(sequenceNumber, goalResponse);
+                                actionClient.HandleFeedbackMessage(feedbackMessage);
                             }
                         }
 
