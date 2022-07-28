@@ -911,6 +911,7 @@ namespace ROS2
                         return true;
 
                     case RCLRet.SubscriptionTakeFailed:
+                    case RCLRet.ActionClientTakeFailed:
                         return false;
 
                     default:
@@ -931,6 +932,7 @@ namespace ROS2
                         return true;
 
                     case RCLRet.SubscriptionTakeFailed:
+                    case RCLRet.ActionClientTakeFailed:
                         return false;
 
                     default:
@@ -951,6 +953,7 @@ namespace ROS2
                         return true;
 
                     case RCLRet.ClientTakeFailed:
+                    case RCLRet.ActionClientTakeFailed:
                         return false;
 
                     default:
@@ -971,6 +974,7 @@ namespace ROS2
                         return true;
 
                     case RCLRet.ClientTakeFailed:
+                    case RCLRet.ActionClientTakeFailed:
                         return false;
 
                     default:
@@ -991,6 +995,7 @@ namespace ROS2
                         return true;
 
                     case RCLRet.ClientTakeFailed:
+                    case RCLRet.ActionClientTakeFailed:
                         return false;
 
                     default:
@@ -1022,6 +1027,7 @@ namespace ROS2
                         return true;
 
                     case RCLRet.ServiceTakeFailed:
+                    case RCLRet.ActionServerTakeFailed:
                         return false;
 
                     default:
@@ -1042,6 +1048,7 @@ namespace ROS2
                         return true;
 
                     case RCLRet.ServiceTakeFailed:
+                    case RCLRet.ActionServerTakeFailed:
                         return false;
 
                     default:
@@ -1062,6 +1069,7 @@ namespace ROS2
                         return true;
 
                     case RCLRet.ServiceTakeFailed:
+                    case RCLRet.ActionServerTakeFailed:
                         return false;
 
                     default:

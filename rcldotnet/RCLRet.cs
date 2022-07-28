@@ -50,6 +50,8 @@ namespace ROS2
         InvalidParamRule = 1010,
         InvalidLogLevelRule = 1020,
         EventInvalid = 2000,
-        EventTakeFailed = 2001
+        EventTakeFailed = 2001,
+        ActionClientTakeFailed = 2103,
+        ActionServerTakeFailed = 2201,
     }
 }
