@@ -68,7 +68,10 @@ void native_rcl_reset_error(void) {
   rcl_reset_error();
 }
 
-bool native_rcl_ok() { return rcl_context_is_valid(&context); }
+int32_t native_rcl_ok() {
+  bool result = rcl_context_is_valid(&context);
+  return result ? 1 : 0;
+}
 
 int32_t native_rcl_create_node_handle(void **node_handle, const char *name, const char *namespace) {
   rcl_node_t *node = (rcl_node_t *)malloc(sizeof(rcl_node_t));
@@ -271,7 +274,7 @@ int32_t native_rcl_wait(void *wait_set_handle, int64_t timeout) {
   return ret;
 }
 
-bool native_rcl_wait_set_subscription_ready(void *wait_set_handle, int32_t index) {
+int32_t native_rcl_wait_set_subscription_ready(void *wait_set_handle, int32_t index) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
 
   if (index >= wait_set->size_of_subscriptions)
@@ -279,10 +282,11 @@ bool native_rcl_wait_set_subscription_ready(void *wait_set_handle, int32_t index
     return false;
   }
 
-  return wait_set->subscriptions[index] != NULL;
+  bool result = wait_set->subscriptions[index] != NULL;
+  return result ? 1 : 0;
 }
 
-bool native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index) {
+int32_t native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
 
   if (index >= wait_set->size_of_clients)
@@ -290,10 +294,11 @@ bool native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index) {
     return false;
   }
 
-  return wait_set->clients[index] != NULL;
+  bool result = wait_set->clients[index] != NULL;
+  return result ? 1 : 0;
 }
 
-bool native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index) {
+int32_t native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
 
   if (index >= wait_set->size_of_services)
@@ -301,10 +306,11 @@ bool native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index) {
     return false;
   }
 
-  return wait_set->services[index] != NULL;
+  bool result = wait_set->services[index] != NULL;
+  return result ? 1 : 0;
 }
 
-bool native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t index) {
+int32_t native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t index) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
 
   if (index >= wait_set->size_of_guard_conditions)
@@ -312,29 +318,42 @@ bool native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t in
     return false;
   }
 
-  return wait_set->guard_conditions[index] != NULL;
+  bool result = wait_set->guard_conditions[index] != NULL;
+  return result ? 1 : 0;
 }
 
 int32_t native_rcl_action_client_wait_set_get_entities_ready(
     void *wait_set_handle,
     void *action_client_handle,
-    bool *is_feedback_ready,
-    bool *is_status_ready,
-    bool *is_goal_response_ready,
-    bool *is_cancel_response_ready,
-    bool *is_result_response_ready)
+    int32_t *is_feedback_ready,
+    int32_t *is_status_ready,
+    int32_t *is_goal_response_ready,
+    int32_t *is_cancel_response_ready,
+    int32_t *is_result_response_ready)
 {
     rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
     rcl_action_client_t *action_client = (rcl_action_client_t *)action_client_handle;
 
+    bool is_feedback_ready_as_bool;
+    bool is_status_ready_as_bool;
+    bool is_goal_response_ready_as_bool;
+    bool is_cancel_response_ready_as_bool;
+    bool is_result_response_ready_as_bool;
+
     rcl_ret_t ret = rcl_action_client_wait_set_get_entities_ready(
         wait_set,
         action_client,
-        is_feedback_ready,
-        is_status_ready,
-        is_goal_response_ready,
-        is_cancel_response_ready,
-        is_result_response_ready);
+        &is_feedback_ready_as_bool,
+        &is_status_ready_as_bool,
+        &is_goal_response_ready_as_bool,
+        &is_cancel_response_ready_as_bool,
+        &is_result_response_ready_as_bool);
+
+    *is_feedback_ready = is_feedback_ready_as_bool ? 1 : 0;
+    *is_status_ready = is_status_ready_as_bool ? 1 : 0;
+    *is_goal_response_ready = is_goal_response_ready_as_bool ? 1 : 0;
+    *is_cancel_response_ready = is_cancel_response_ready_as_bool ? 1 : 0;
+    *is_result_response_ready = is_result_response_ready_as_bool ? 1 : 0;
 
     return ret;
 }
@@ -342,21 +361,31 @@ int32_t native_rcl_action_client_wait_set_get_entities_ready(
 int32_t native_rcl_action_server_wait_set_get_entities_ready(
     void *wait_set_handle,
     void *action_server_handle,
-    bool *is_goal_request_ready,
-    bool *is_cancel_request_ready,
-    bool *is_result_request_ready,
-    bool *is_goal_expired)
+    int32_t *is_goal_request_ready,
+    int32_t *is_cancel_request_ready,
+    int32_t *is_result_request_ready,
+    int32_t *is_goal_expired)
 {
     rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
     rcl_action_server_t *action_server = (rcl_action_server_t *)action_server_handle;
 
+    bool is_goal_request_ready_as_bool;
+    bool is_cancel_request_ready_as_bool;
+    bool is_result_request_ready_as_bool;
+    bool is_goal_expired_as_bool;
+
     rcl_ret_t ret = rcl_action_server_wait_set_get_entities_ready(
         wait_set,
         action_server,
-        is_goal_request_ready,
-        is_cancel_request_ready,
-        is_result_request_ready,
-        is_goal_expired);
+        &is_goal_request_ready_as_bool,
+        &is_cancel_request_ready_as_bool,
+        &is_result_request_ready_as_bool,
+        &is_goal_expired_as_bool);
+
+    *is_goal_request_ready = is_goal_request_ready_as_bool ? 1 : 0;
+    *is_cancel_request_ready = is_cancel_request_ready_as_bool ? 1 : 0;
+    *is_result_request_ready = is_result_request_ready_as_bool ? 1 : 0;
+    *is_goal_expired = is_goal_expired_as_bool ? 1 : 0;
 
     return ret;
 }
@@ -626,10 +655,11 @@ int32_t native_rcl_action_expire_goals(void *action_server_handle, void *goal_in
   return ret;
 }
 
-bool native_rcl_action_goal_handle_is_active(void *action_goal_handle_handle) {
+int32_t native_rcl_action_goal_handle_is_active(void *action_goal_handle_handle) {
   rcl_action_goal_handle_t *goal_handle = (rcl_action_goal_handle_t *)action_goal_handle_handle;
 
-  return rcl_action_goal_handle_is_active(goal_handle);
+  bool result = rcl_action_goal_handle_is_active(goal_handle);
+  return result ? 1 : 0;
 }
 
 int32_t native_rcl_action_goal_handle_get_status(void *action_goal_handle_handle, int8_t *status) {

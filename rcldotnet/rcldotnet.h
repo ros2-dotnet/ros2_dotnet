@@ -32,7 +32,7 @@ RCLDOTNET_EXPORT
 void RCLDOTNET_CDECL native_rcl_reset_error(void);
 
 RCLDOTNET_EXPORT
-bool RCLDOTNET_CDECL native_rcl_ok();
+int32_t RCLDOTNET_CDECL native_rcl_ok();
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_create_node_handle(void **, const char *, const char *);
@@ -102,35 +102,35 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait(void *, int64_t);
 
 RCLDOTNET_EXPORT
-bool RCLDOTNET_CDECL native_rcl_wait_set_subscription_ready(void *wait_set_handle, int32_t index);
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_subscription_ready(void *wait_set_handle, int32_t index);
 
 RCLDOTNET_EXPORT
-bool RCLDOTNET_CDECL native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index);
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index);
 
 RCLDOTNET_EXPORT
-bool RCLDOTNET_CDECL native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index);
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index);
 
 RCLDOTNET_EXPORT
-bool RCLDOTNET_CDECL native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t index);
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t index);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_action_client_wait_set_get_entities_ready(
     void *wait_set_handle,
     void *action_client_handle,
-    bool *is_feedback_ready,
-    bool *is_status_ready,
-    bool *is_goal_response_ready,
-    bool *is_cancel_response_ready,
-    bool *is_result_response_ready);
+    int32_t *is_feedback_ready,
+    int32_t *is_status_ready,
+    int32_t *is_goal_response_ready,
+    int32_t *is_cancel_response_ready,
+    int32_t *is_result_response_ready);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_action_server_wait_set_get_entities_ready(
     void *wait_set_handle,
     void *action_server_handle,
-    bool *is_goal_request_ready,
-    bool *is_cancel_request_ready,
-    bool *is_result_request_ready,
-    bool *is_goal_expired);
+    int32_t *is_goal_request_ready,
+    int32_t *is_cancel_request_ready,
+    int32_t *is_result_request_ready,
+    int32_t *is_goal_expired);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_take(void *, void *);
@@ -211,7 +211,7 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_action_expire_goals(void *action_server_handle, void *goal_info_handle, int32_t *num_expired);
 
 RCLDOTNET_EXPORT
-bool RCLDOTNET_CDECL native_rcl_action_goal_handle_is_active(void *action_goal_handle_handle);
+int32_t RCLDOTNET_CDECL native_rcl_action_goal_handle_is_active(void *action_goal_handle_handle);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_action_goal_handle_get_status(void *action_goal_handle_handle, int8_t *status);

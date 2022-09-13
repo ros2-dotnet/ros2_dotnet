@@ -49,7 +49,7 @@ namespace ROS2
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLActionServerIsAvailableType(
-            SafeNodeHandle nodeHandle, SafeActionClientHandle clientHandle, out bool isAvailable);
+            SafeNodeHandle nodeHandle, SafeActionClientHandle clientHandle, out int isAvailable);
 
         internal static NativeRCLActionServerIsAvailableType native_rcl_action_server_is_available = null;
 
@@ -156,10 +156,10 @@ namespace ROS2
 
         public override bool ServerIsReady()
         {
-            RCLRet ret = ActionClientDelegates.native_rcl_action_server_is_available(_node.Handle, Handle, out var serverIsReady);
+            RCLRet ret = ActionClientDelegates.native_rcl_action_server_is_available(_node.Handle, Handle, out int serverIsReady);
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ActionClientDelegates.native_rcl_action_server_is_available)}() failed.");
 
-            return serverIsReady;
+            return serverIsReady != 0;
         }
 
         public Task<ActionClientGoalHandle<TAction, TGoal, TResult, TFeedback>> SendGoalAsync(TGoal goal)

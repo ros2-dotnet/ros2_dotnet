@@ -49,10 +49,13 @@ int32_t native_rcl_action_send_cancel_request(void *action_client_handle, void *
   return ret;
 }
 
-int32_t native_rcl_action_server_is_available(void *node_handle, void *client_handle, bool *is_available) {
+int32_t native_rcl_action_server_is_available(void *node_handle, void *client_handle, int32_t *is_available) {
   rcl_node_t * node = (rcl_node_t *)node_handle;
   rcl_action_client_t * client = (rcl_action_client_t *)client_handle;
 
-  rcl_ret_t ret = rcl_action_server_is_available(node, client, is_available);
+  bool is_available_as_bool;
+  rcl_ret_t ret = rcl_action_server_is_available(node, client, &is_available_as_bool);
+  *is_available = is_available_as_bool ? 1 : 0;
+
   return ret;
 }
