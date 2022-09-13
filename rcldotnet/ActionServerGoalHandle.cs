@@ -87,8 +87,8 @@ namespace ROS2
         {
             get
             {
-                bool isActive = RCLdotnetDelegates.native_rcl_action_goal_handle_is_active(Handle);
-                return isActive;
+                int isActive = RCLdotnetDelegates.native_rcl_action_goal_handle_is_active(Handle);
+                return isActive != 0;
             }
         }
 

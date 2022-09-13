@@ -42,7 +42,7 @@ namespace ROS2
         internal static NativeRCLResetErrorType native_rcl_reset_error = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool NativeRCLOkType();
+        internal delegate int NativeRCLOkType();
 
         internal static NativeRCLOkType native_rcl_ok = null;
 
@@ -119,22 +119,22 @@ namespace ROS2
         internal static NativeRCLWaitType native_rcl_wait = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool NativeRCLWaitSetSubscriptionReady(SafeWaitSetHandle waitSetHandle, int index);
+        internal delegate int NativeRCLWaitSetSubscriptionReady(SafeWaitSetHandle waitSetHandle, int index);
 
         internal static NativeRCLWaitSetSubscriptionReady native_rcl_wait_set_subscription_ready = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool NativeRCLWaitSetClientReady(SafeWaitSetHandle waitSetHandle, int index);
+        internal delegate int NativeRCLWaitSetClientReady(SafeWaitSetHandle waitSetHandle, int index);
 
         internal static NativeRCLWaitSetClientReady native_rcl_wait_set_client_ready = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool NativeRCLWaitSetServiceReady(SafeWaitSetHandle waitSetHandle, int index);
+        internal delegate int NativeRCLWaitSetServiceReady(SafeWaitSetHandle waitSetHandle, int index);
 
         internal static NativeRCLWaitSetServiceReady native_rcl_wait_set_service_ready = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool NativeRCLWaitSetGuardConditionReady(SafeWaitSetHandle waitSetHandle, int index);
+        internal delegate int NativeRCLWaitSetGuardConditionReady(SafeWaitSetHandle waitSetHandle, int index);
 
         internal static NativeRCLWaitSetGuardConditionReady native_rcl_wait_set_guard_condition_ready = null;
 
@@ -188,7 +188,7 @@ namespace ROS2
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLActionClientWaitSetGetEntitiesReadyType(
-            SafeWaitSetHandle waitSetHandle, SafeActionClientHandle actionClientHandle, out bool isFeedbackReady, out bool isStatusReady, out bool isGoalResponseReady, out bool isCancelResponseReady, out bool isResultResponseReady);
+            SafeWaitSetHandle waitSetHandle, SafeActionClientHandle actionClientHandle, out int isFeedbackReady, out int isStatusReady, out int isGoalResponseReady, out int isCancelResponseReady, out int isResultResponseReady);
 
         internal static NativeRCLActionClientWaitSetGetEntitiesReadyType native_rcl_action_client_wait_set_get_entities_ready = null;
 
@@ -206,7 +206,7 @@ namespace ROS2
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLActionServerWaitSetGetEntitiesReadyType(
-                SafeWaitSetHandle waitSetHandle, SafeActionServerHandle actionServerHandle, out bool isGoalRequestReady, out bool isCancelRequestReady, out bool isResultRequestReady, out bool isGoalExpired);
+                SafeWaitSetHandle waitSetHandle, SafeActionServerHandle actionServerHandle, out int isGoalRequestReady, out int isCancelRequestReady, out int isResultRequestReady, out int isGoalExpired);
 
         internal static NativeRCLActionServerWaitSetGetEntitiesReadyType native_rcl_action_server_wait_set_get_entities_ready = null;
 
@@ -319,7 +319,7 @@ namespace ROS2
         internal static NativeRCLActionExpireGoalsType native_rcl_action_expire_goals = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool NativeRCLActionGoalHandleIsActiveType(SafeActionGoalHandle actionGoalHandleHandle);
+        internal delegate int NativeRCLActionGoalHandleIsActiveType(SafeActionGoalHandle actionGoalHandleHandle);
         internal static NativeRCLActionGoalHandleIsActiveType native_rcl_action_goal_handle_is_active = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -670,7 +670,7 @@ namespace ROS2
 
         public static bool Ok()
         {
-            return RCLdotnetDelegates.native_rcl_ok();
+            return RCLdotnetDelegates.native_rcl_ok() != 0;
         }
 
         public static Node CreateNode(string nodeName)
@@ -1146,7 +1146,7 @@ namespace ROS2
                 int subscriptionIndex = 0;
                 foreach (Subscription subscription in node.Subscriptions)
                 {
-                    if (RCLdotnetDelegates.native_rcl_wait_set_subscription_ready(waitSetHandle, subscriptionIndex))
+                    if (RCLdotnetDelegates.native_rcl_wait_set_subscription_ready(waitSetHandle, subscriptionIndex) != 0)
                     {
                         IRosMessage message = subscription.CreateMessage();
                         bool result = Take(subscription, message);
@@ -1165,7 +1165,7 @@ namespace ROS2
                     int serviceIndex = 0;
                     foreach (var service in node.Services)
                     {
-                        if (RCLdotnetDelegates.native_rcl_wait_set_service_ready(waitSetHandle, serviceIndex))
+                        if (RCLdotnetDelegates.native_rcl_wait_set_service_ready(waitSetHandle, serviceIndex) != 0)
                         {
                             var request = service.CreateRequest();
                             var response = service.CreateResponse();
@@ -1185,7 +1185,7 @@ namespace ROS2
                     int clientIndex = 0;
                     foreach (var client in node.Clients)
                     {
-                        if (RCLdotnetDelegates.native_rcl_wait_set_client_ready(waitSetHandle, clientIndex))
+                        if (RCLdotnetDelegates.native_rcl_wait_set_client_ready(waitSetHandle, clientIndex) != 0)
                         {
                             var response = client.CreateResponse();
 
@@ -1205,18 +1205,18 @@ namespace ROS2
                         RCLRet ret = RCLdotnetDelegates.native_rcl_action_client_wait_set_get_entities_ready(
                             waitSetHandle,
                             actionClient.Handle,
-                            out bool isFeedbackReady,
-                            out bool isStatusReady,
-                            out bool isGoalResponseReady,
-                            out bool isCancelResponseReady,
-                            out bool isResultResponseReady);
+                            out int isFeedbackReady,
+                            out int isStatusReady,
+                            out int isGoalResponseReady,
+                            out int isCancelResponseReady,
+                            out int isResultResponseReady);
 
                         RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_client_wait_set_get_entities_ready)}() failed.");
 
                         // Check isGoalResponseReady so that a new goalHandle is
                         // already created if the status or feedback for the new
                         // goal is received.
-                        if (isGoalResponseReady)
+                        if (isGoalResponseReady != 0)
                         {
                             var goalResponse = actionClient.CreateSendGoalResponse();
 
@@ -1231,7 +1231,7 @@ namespace ROS2
                         // Check isStatusReady before isFeedbackReady so that
                         // the feedback callback already has the newest status
                         // information if updates are received at the same time.
-                        if (isStatusReady)
+                        if (isStatusReady != 0)
                         {
                             var statusMessage = new GoalStatusArray();
 
@@ -1242,7 +1242,7 @@ namespace ROS2
                             }
                         }
 
-                        if (isFeedbackReady)
+                        if (isFeedbackReady != 0)
                         {
                             var feedbackMessage = actionClient.CreateFeedbackMessage();
 
@@ -1253,7 +1253,7 @@ namespace ROS2
                             }
                         }
 
-                        if (isCancelResponseReady)
+                        if (isCancelResponseReady != 0)
                         {
                             var cancelResponse = new CancelGoal_Response();
 
@@ -1265,7 +1265,7 @@ namespace ROS2
                             }
                         }
 
-                        if (isResultResponseReady)
+                        if (isResultResponseReady != 0)
                         {
                             var resultResponse = actionClient.CreateGetResultResponse();
 
@@ -1283,14 +1283,14 @@ namespace ROS2
                         RCLRet ret = RCLdotnetDelegates.native_rcl_action_server_wait_set_get_entities_ready(
                             waitSetHandle,
                             actionServer.Handle,
-                            out bool isGoalRequestReady,
-                            out bool isCancelRequestReady,
-                            out bool isResultRequestReady,
-                            out bool isGoalExpired);
+                            out int isGoalRequestReady,
+                            out int isCancelRequestReady,
+                            out int isResultRequestReady,
+                            out int isGoalExpired);
 
                         RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_server_wait_set_get_entities_ready)}() failed.");
 
-                        if (isGoalRequestReady)
+                        if (isGoalRequestReady != 0)
                         {
                             var goalRequest = actionServer.CreateSendGoalRequest();
 
@@ -1301,7 +1301,7 @@ namespace ROS2
                             }
                         }
 
-                        if (isCancelRequestReady)
+                        if (isCancelRequestReady != 0)
                         {
                             var cancelRequest = new CancelGoal_Request();
 
@@ -1312,7 +1312,7 @@ namespace ROS2
                             }
                         }
 
-                        if (isResultRequestReady)
+                        if (isResultRequestReady != 0)
                         {
                             var resultRequest = actionServer.CreateGetResultRequest();
 
@@ -1327,7 +1327,7 @@ namespace ROS2
                             }
                         }
 
-                        if (isGoalExpired)
+                        if (isGoalExpired != 0)
                         {
                             actionServer.HandleGoalExpired();
                         }
@@ -1337,7 +1337,7 @@ namespace ROS2
                 int guardConditionIndex = 0;
                 foreach (GuardCondition guardCondition in node.GuardConditions)
                 {
-                    if (RCLdotnetDelegates.native_rcl_wait_set_guard_condition_ready(waitSetHandle, guardConditionIndex))
+                    if (RCLdotnetDelegates.native_rcl_wait_set_guard_condition_ready(waitSetHandle, guardConditionIndex) != 0)
                     {
                         guardCondition.TriggerCallback();
                     }
