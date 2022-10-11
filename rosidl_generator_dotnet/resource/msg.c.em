@@ -11,6 +11,7 @@ from rosidl_parser.definition import AbstractSequence
 from rosidl_parser.definition import Array
 from rosidl_parser.definition import BasicType
 from rosidl_parser.definition import NamespacedType
+from rosidl_parser.definition import BOOLEAN_TYPE
 
 from rosidl_cmake import convert_camel_case_to_lower_case_underscore
 
@@ -72,7 +73,20 @@ bool @(msg_typename)__init_sequence_field_@(member.name)_message(void *message_h
 }
 @[        end if]@
 
-@[        if isinstance(member.type.value_type, BasicType)]@
+@[        if isinstance(member.type.value_type, BasicType) and member.type.value_type.typename == BOOLEAN_TYPE]@
+@# Special handling for marshaling bool as int32_t
+void @(msg_typename)__write_field_@(member.name)(void *message_handle, int32_t /* bool */ value)
+{
+  bool * ros_message = (bool *)message_handle;
+  *ros_message = value != 0;
+}
+
+int32_t /* bool */ @(msg_typename)__read_field_@(member.name)(void *message_handle)
+{
+  bool * ros_message = (bool *)message_handle;
+  return (*ros_message) ? 1 : 0;
+}
+@[        elif isinstance(member.type.value_type, BasicType)]@
 void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_type_to_c(member.type.value_type)) value)
 {
   @(msg_type_to_c(member.type.value_type)) * ros_message = (@(msg_type_to_c(member.type.value_type)) *)message_handle;
@@ -100,6 +114,16 @@ void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_typ
 
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
+@[    elif isinstance(member.type, BasicType) and member.type.typename == BOOLEAN_TYPE]@
+@# Special handling for marshaling bool as int32_t
+int32_t /* bool */ @(msg_typename)__read_field_@(member.name)(void * message_handle) {
+  @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
+  return (ros_message->@(member.name)) ? 1 : 0;
+}
+void @(msg_typename)__write_field_@(member.name)(void * message_handle, int32_t /* bool */ value) {
+  @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
+  ros_message->@(member.name) = value != 0;
+}
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
 @(msg_type_to_c(member.type)) @(msg_typename)__read_field_@(member.name)(void * message_handle) {
   @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;

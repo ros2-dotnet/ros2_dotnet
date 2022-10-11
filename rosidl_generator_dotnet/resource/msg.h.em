@@ -7,6 +7,7 @@ from rosidl_parser.definition import AbstractSequence
 from rosidl_parser.definition import Array
 from rosidl_parser.definition import BasicType
 from rosidl_parser.definition import NamespacedType
+from rosidl_parser.definition import BOOLEAN_TYPE
 from rosidl_generator_dotnet import msg_type_to_c
 
 type_name = message.structure.namespaced_type.name
@@ -62,7 +63,13 @@ int32_t @(msg_prefix)_CDECL @(msg_typename)__getsize_field_@(member.name)_messag
 bool @(msg_prefix)_CDECL @(msg_typename)__init_sequence_field_@(member.name)_message(void *, int32_t);
 
 @[        end if]@
-@[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
+@[        if isinstance(member.type.value_type, BasicType) and member.type.value_type.typename == BOOLEAN_TYPE]@
+@# Special handling for marshaling bool as int32_t
+@(msg_prefix)_EXPORT
+void @(msg_typename)__write_field_@(member.name)(void *, int32_t /* bool */);
+@(msg_prefix)_EXPORT
+int32_t /* bool */ @(msg_prefix)_CDECL @(msg_typename)__read_field_@(member.name)(void *);
+@[        elif isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
 @(msg_prefix)_EXPORT
 void @(msg_typename)__write_field_@(member.name)(void *, @(msg_type_to_c(member.type.value_type)));
 @(msg_prefix)_EXPORT
@@ -71,6 +78,13 @@ void @(msg_typename)__write_field_@(member.name)(void *, @(msg_type_to_c(member.
 
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
+@[    elif isinstance(member.type, BasicType) and member.type.typename == BOOLEAN_TYPE]@
+@# Special handling for marshaling bool as int32_t
+@(msg_prefix)_EXPORT
+int32_t /* bool */ @(msg_prefix)_CDECL @(msg_typename)__read_field_@(member.name)(void *);
+
+@(msg_prefix)_EXPORT
+void @(msg_typename)__write_field_@(member.name)(void *, int32_t /* bool */);
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
 @(msg_prefix)_EXPORT
 @(msg_type_to_c(member.type)) @(msg_prefix)_CDECL @(msg_typename)__read_field_@(member.name)(void *);
