@@ -278,3 +278,52 @@ int32_t native_rcl_take_response(void *client_handle, void *request_header_handl
   return ret;
 }
 
+int32_t native_rcl_create_qos_profile_handle(void **qos_profile_handle)
+{
+  rmw_qos_profile_t *qos_profile = (rmw_qos_profile_t *)malloc(sizeof(rmw_qos_profile_t));
+  *qos_profile = rmw_qos_profile_default;
+  *qos_profile_handle = (void *)qos_profile;
+
+  return RCL_RET_OK;
+}
+
+int32_t native_rcl_destroy_qos_profile_handle(void *qos_profile_handle)
+{
+  rmw_qos_profile_t *qos_profile = (rmw_qos_profile_t *)qos_profile_handle;
+  free(qos_profile);
+
+  return RCL_RET_OK;
+}
+
+int32_t native_rcl_write_to_qos_profile_handle(
+    void *qos_profile_handle,
+    int32_t history,
+    int32_t depth,
+    int32_t reliability,
+    int32_t durability,
+    uint64_t deadline_sec,
+    uint64_t deadline_nsec,
+    uint64_t lifespan_sec,
+    uint64_t lifespan_nsec,
+    int32_t liveliness,
+    uint64_t liveliness_lease_duration_sec,
+    uint64_t liveliness_lease_duration_nsec,
+    int32_t /* bool */ avoid_ros_namespace_conventions)
+{
+  rmw_qos_profile_t *qos_profile = (rmw_qos_profile_t *)qos_profile_handle;
+
+  qos_profile->history = (enum rmw_qos_history_policy_t)history;
+  qos_profile->depth = (size_t)depth;
+  qos_profile->reliability = (enum rmw_qos_reliability_policy_t)reliability;
+  qos_profile->durability = (enum rmw_qos_durability_policy_t)durability;
+  qos_profile->deadline.sec = deadline_sec;
+  qos_profile->deadline.nsec = deadline_nsec;
+  qos_profile->lifespan.sec = lifespan_sec;
+  qos_profile->lifespan.nsec = lifespan_nsec;
+  qos_profile->liveliness = (enum rmw_qos_liveliness_policy_t)liveliness;
+  qos_profile->liveliness_lease_duration.sec = liveliness_lease_duration_sec;
+  qos_profile->liveliness_lease_duration.nsec = liveliness_lease_duration_nsec;
+  qos_profile->avoid_ros_namespace_conventions = avoid_ros_namespace_conventions != 0;
+
+  return RCL_RET_OK;
+}

@@ -172,6 +172,32 @@ namespace ROS2
 
         internal static NativeRCLTakeResponseType native_rcl_take_response = null;
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLCreateQosProfileHandleType(ref SafeQosProfileHandle qosProfileHandle);
+        internal static NativeRCLCreateQosProfileHandleType native_rcl_create_qos_profile_handle = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLDestroyQosProfileHandleType(IntPtr qosProfileHandle);
+        internal static NativeRCLDestroyQosProfileHandleType native_rcl_destroy_qos_profile_handle = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLWriteToQosProfileHandleType(
+            SafeQosProfileHandle qosProfileHandle,
+            int history,
+            int depth,
+            int reliability,
+            int durability,
+            ulong deadlineSec,
+            ulong deadlineNsec,
+            ulong lifespanSec,
+            ulong lifespanNsec,
+            int liveliness,
+            ulong livelinessLeaseDurationSec,
+            ulong livelinessLeaseDurationNsec,
+            int avoidRosNamespaceConventions);
+
+        internal static NativeRCLWriteToQosProfileHandleType native_rcl_write_to_qos_profile_handle = null;
+
         static RCLdotnetDelegates()
         {
             _dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
@@ -344,6 +370,24 @@ namespace ROS2
             RCLdotnetDelegates.native_rcl_take_response =
                 (NativeRCLTakeResponseType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_take_response_ptr, typeof(NativeRCLTakeResponseType));
+
+            IntPtr native_rcl_create_qos_profile_handle_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_create_qos_profile_handle");
+            RCLdotnetDelegates.native_rcl_create_qos_profile_handle =
+                (NativeRCLCreateQosProfileHandleType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_create_qos_profile_handle_ptr, typeof(NativeRCLCreateQosProfileHandleType));
+
+            IntPtr native_rcl_destroy_qos_profile_handle_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_destroy_qos_profile_handle");
+            RCLdotnetDelegates.native_rcl_destroy_qos_profile_handle =
+                (NativeRCLDestroyQosProfileHandleType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_destroy_qos_profile_handle_ptr, typeof(NativeRCLDestroyQosProfileHandleType));
+
+            IntPtr native_rcl_write_to_qos_profile_handle_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_write_to_qos_profile_handle");
+            RCLdotnetDelegates.native_rcl_write_to_qos_profile_handle =
+                (NativeRCLWriteToQosProfileHandleType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_write_to_qos_profile_handle_ptr, typeof(NativeRCLWriteToQosProfileHandleType));
         }
     }
 

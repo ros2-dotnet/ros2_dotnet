@@ -26,7 +26,7 @@ namespace ROS2
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLCreatePublisherHandleType(
-            ref SafePublisherHandle publisherHandle, SafeNodeHandle nodeHandle, [MarshalAs(UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle);
+            ref SafePublisherHandle publisherHandle, SafeNodeHandle nodeHandle, [MarshalAs(UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle, SafeQosProfileHandle qosProfileHandle);
 
         internal static NativeRCLCreatePublisherHandleType native_rcl_create_publisher_handle = null;
 
@@ -38,7 +38,7 @@ namespace ROS2
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLCreateSubscriptionHandleType(
-            ref SafeSubscriptionHandle subscriptionHandle, SafeNodeHandle nodeHandle, [MarshalAs(UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle);
+            ref SafeSubscriptionHandle subscriptionHandle, SafeNodeHandle nodeHandle, [MarshalAs(UnmanagedType.LPStr)] string nodeName, IntPtr typesupportHandle, SafeQosProfileHandle qosProfileHandle);
 
         internal static NativeRCLCreateSubscriptionHandleType native_rcl_create_subscription_handle = null;
 
@@ -172,12 +172,28 @@ namespace ROS2
         // Disposed if the node is not live anymore.
         internal SafeNodeHandle Handle { get; }
 
-        public Publisher<T> CreatePublisher<T>(string topic) where T : IRosMessage
+        public Publisher<T> CreatePublisher<T>(string topic, QosProfile qosProfile = null) where T : IRosMessage
+        {
+            if (qosProfile != null)
+            {
+                using (SafeQosProfileHandle qosProfileHandle = QosProfile.CreateQosProfileHandle())
+                {
+                    QosProfile.WriteToQosProfileHandle(qosProfile, qosProfileHandle);
+                    return CreatePublisherInner<T>(topic, qosProfileHandle);
+                }
+            }
+            else
+            {
+                return CreatePublisherInner<T>(topic, SafeQosProfileHandle.Null);
+            }
+        }
+
+        private Publisher<T> CreatePublisherInner<T>(string topic, SafeQosProfileHandle qosProfileHandle) where T : IRosMessage
         {
             IntPtr typeSupport = MessageStaticMemberCache<T>.GetTypeSupport();
 
             var publisherHandle = new SafePublisherHandle();
-            RCLRet ret = NodeDelegates.native_rcl_create_publisher_handle(ref publisherHandle, Handle, topic, typeSupport);
+            RCLRet ret = NodeDelegates.native_rcl_create_publisher_handle(ref publisherHandle, Handle, topic, typeSupport, qosProfileHandle);
             publisherHandle.SetParent(Handle);
             if (ret != RCLRet.Ok)
             {
@@ -190,12 +206,28 @@ namespace ROS2
             return publisher;
         }
 
-        public Subscription<T> CreateSubscription<T>(string topic, Action<T> callback) where T : IRosMessage, new()
+        public Subscription<T> CreateSubscription<T>(string topic, Action<T> callback, QosProfile qosProfile = null) where T : IRosMessage, new()
+        {
+            if (qosProfile != null)
+            {
+                using (SafeQosProfileHandle qosProfileHandle = QosProfile.CreateQosProfileHandle())
+                {
+                    QosProfile.WriteToQosProfileHandle(qosProfile, qosProfileHandle);
+                    return CreateSubscriptionInner(topic, callback, qosProfileHandle);
+                }
+            }
+            else
+            {
+                return CreateSubscriptionInner(topic, callback, SafeQosProfileHandle.Null);
+            }
+        }
+
+        private Subscription<T> CreateSubscriptionInner<T>(string topic, Action<T> callback, SafeQosProfileHandle qosProfileHandle) where T : IRosMessage, new()
         {
             IntPtr typeSupport = MessageStaticMemberCache<T>.GetTypeSupport();
 
             var subscriptionHandle = new SafeSubscriptionHandle();
-            RCLRet ret = NodeDelegates.native_rcl_create_subscription_handle(ref subscriptionHandle, Handle, topic, typeSupport);
+            RCLRet ret = NodeDelegates.native_rcl_create_subscription_handle(ref subscriptionHandle, Handle, topic, typeSupport, qosProfileHandle);
             subscriptionHandle.SetParent(Handle);
             if (ret != RCLRet.Ok)
             {
