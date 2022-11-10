@@ -1,4 +1,6 @@
 @{
+from rosidl_generator_c import idl_type_to_c
+
 from rosidl_generator_dotnet import msg_type_to_c
 
 from rosidl_parser.definition import AbstractNestedType
@@ -21,6 +23,8 @@ header_filename = "{0}/rcldotnet_{1}.h".format('/'.join(message.structure.namesp
 #include <stdio.h>
 #include <assert.h>
 #include <stdint.h>
+
+#include <rcutils/allocator.h>
 
 #include <@('/'.join(message.structure.namespaced_type.namespaces))/@(convert_camel_case_to_lower_case_underscore(type_name)).h>
 #include "rosidl_runtime_c/message_type_support_struct.h"
@@ -45,19 +49,49 @@ const void * @(msg_typename)__get_typesupport() {
 }
 
 @[for member in message.structure.members]@
-@[    if isinstance(member.type, Array)]@
-void * @(msg_typename)__get_field_@(member.name)_message(void *message_handle, int index) {
+@[    if isinstance(member.type, Array) or isinstance(member.type, AbstractSequence)]@
+void * @(msg_typename)__get_field_@(member.name)_message(void *message_handle, int32_t index) {
   @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
-  return &(ros_message->@(member.name)[index]);
-}
-
-int @(msg_typename)__getsize_array_field_@(member.name)_message() {
 @[        if isinstance(member.type, Array)]@
-  return @(member.type.size);
-@[        else]@
-  return 0;
+  return &(ros_message->@(member.name)[index]);
+@[        elif isinstance(member.type, AbstractSequence)]@
+  return &(ros_message->@(member.name).data[index]);
 @[        end if]@
 }
+
+@[        if isinstance(member.type, AbstractSequence)]@
+int32_t @(msg_typename)__getsize_field_@(member.name)_message(void *message_handle) {
+  @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
+  return ros_message->@(member.name).size;
+}
+
+bool @(msg_typename)__init_sequence_field_@(member.name)_message(void *message_handle, int32_t size) {
+  @(msg_typename) * ros_message = (@(msg_typename) *)message_handle;
+
+  rcutils_allocator_t allocator = rcutils_get_default_allocator();
+
+  if (ros_message->@(member.name).data) {
+    allocator.deallocate(ros_message->@(member.name).data, allocator.state);
+    ros_message->@(member.name).data = NULL;
+    ros_message->@(member.name).size = 0;
+    ros_message->@(member.name).capacity = 0;
+  }
+
+  @(idl_type_to_c(member.type.value_type)) * data = NULL;
+  if (size) {
+    data = (@(idl_type_to_c(member.type.value_type)) *)allocator.zero_allocate(
+      size, sizeof(@(idl_type_to_c(member.type.value_type))), allocator.state);
+    if (!data) {
+      return false;
+    }
+  }
+  
+  ros_message->@(member.name).data = data;
+  ros_message->@(member.name).size = size;
+  ros_message->@(member.name).capacity = size;
+  return true;
+}
+@[        end if]@
 
 @[        if isinstance(member.type.value_type, BasicType)]@
 void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_type_to_c(member.type.value_type)) value)
@@ -74,19 +108,17 @@ void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_typ
 @[        elif isinstance(member.type.value_type, AbstractString)]@
 void @(msg_typename)__write_field_@(member.name)(void *message_handle, @(msg_type_to_c(member.type.value_type)) value)
 {
-  
+  rosidl_runtime_c__String * ros_message = (rosidl_runtime_c__String *)message_handle;
+  rosidl_runtime_c__String__assign(ros_message, value); 
 }
 
 @(msg_type_to_c(member.type.value_type)) @(msg_typename)__read_field_@(member.name)(void *message_handle)
 {
-  @(msg_typename) * ros_message = (@(msg_typename)*)message_handle;
-  return ros_message->@(member.name)->data;
+  rosidl_runtime_c__String * ros_message = (rosidl_runtime_c__String *)message_handle;
+  return ros_message->data;
 }
 @[        end if]@
 
-////////////////////////////////////////////////////////
-@[    elif isinstance(member.type, AbstractSequence)]@
-// TODO: Sequence types are not supported
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
