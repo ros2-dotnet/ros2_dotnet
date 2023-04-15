@@ -7,7 +7,11 @@ on:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        os: ['ubuntu-20.04', 'ubuntu-22.04']
+
+    runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout source
@@ -15,6 +19,7 @@ jobs:
 
     # https://docs.microsoft.com/en-us/dotnet/core/install/linux-package-manager-ubuntu-1804
     - name: Install .NET SDK v2.1
+      if: matrix.os == 'ubuntu-20.04'
       run: |
         wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
         sudo dpkg -i packages-microsoft-prod.deb
@@ -23,6 +28,15 @@ jobs:
         sudo apt-get install -y apt-transport-https
         sudo apt-get update
         sudo apt-get install -y dotnet-sdk-2.1
+
+    - name: Install .NET SDK v6.0
+      if: matrix.os == 'ubuntu-22.04'
+      run: |
+        wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+        sudo dpkg -i packages-microsoft-prod.deb
+        rm packages-microsoft-prod.deb
+        sudo apt-get update
+        sudo apt-get install -y dotnet-sdk-6.0
 
     - name: Setup ROS2
       uses: ros-tooling/setup-ros@v0.6
