@@ -12,13 +12,17 @@ jobs:
         os: ['ubuntu-20.04', 'ubuntu-22.04']
         include:
           - os: ubuntu-20.04
+            test_target_framework: netcoreapp2.0
             ros_distribution: foxy
             ros_version: 2
           - os: ubuntu-22.04
+            test_target_framework: net6.0
             ros_distribution: humble
             ros_version: 2
 
     runs-on: ${{ matrix.os }}
+    env:
+      RCLDOTNET_TEST_TARGET_FRAMEWORK: ${{ matrix.test_target_framework }}
 
     steps:
     - name: Checkout source
