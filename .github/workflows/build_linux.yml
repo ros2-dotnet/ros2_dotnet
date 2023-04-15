@@ -10,6 +10,13 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu-20.04', 'ubuntu-22.04']
+        include:
+          - os: ubuntu-20.04
+            ros_distribution: foxy
+            ros_version: 2
+          - os: ubuntu-22.04
+            ros_distribution: humble
+            ros_version: 2
 
     runs-on: ${{ matrix.os }}
 
@@ -41,13 +48,14 @@ jobs:
     - name: Setup ROS2
       uses: ros-tooling/setup-ros@v0.6
       with:
-        required-ros-distributions: foxy
+        required-ros-distributions: ${{ matrix.ros_distribution }}
 
     - name: Configure ros2_dotnet workspace
       run: |
         mkdir -p ~/ros2_dotnet_ws/src
         cd ~/ros2_dotnet_ws
         cp ${{github.workspace}}/ros2_dotnet.repos .
+        sed -i 's/foxy/${{ matrix.ros_distribution }}/' ${{github.workspace}}/ros2_dotnet.repos
         vcs import src < ros2_dotnet.repos
         rm -rf src/ros2_dotnet/ros2_dotnet
         cp -r ${{github.workspace}} src/ros2_dotnet/ros2_dotnet
@@ -55,12 +63,12 @@ jobs:
 
     - name: Build ros2_dotnet source
       run: |
-        source /opt/ros/foxy/setup.bash
+        source /opt/ros/${{ matrix.ros_distribution }}/setup.bash
         cd ~/ros2_dotnet_ws
         colcon build --event-handlers console_cohesion+ console_package_list+
 
     - name: Run tests
       run: |
-        source /opt/ros/foxy/setup.bash
+        source /opt/ros/${{ matrix.ros_distribution }}/setup.bash
         cd ~/ros2_dotnet_ws
         colcon test --event-handlers console_cohesion+ --return-code-on-test-failure --packages-select rcldotnet
