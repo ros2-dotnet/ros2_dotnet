@@ -54,10 +54,10 @@ namespace ROS2 {
       [DllImport ("kernel32.dll", EntryPoint = "FreeLibrary", SetLastError = true, ExactSpelling = true)]
       private static extern int FreeLibraryDesktop (IntPtr handle);
 
-      [DllImport ("libdl.so", EntryPoint = "dlopen")]
+      [DllImport ("libdl.so.2", EntryPoint = "dlopen")]
       private static extern IntPtr dlopen_unix (String fileName, int flags);
 
-      [DllImport ("libdl.so", EntryPoint = "dlclose")]
+      [DllImport ("libdl.so.2", EntryPoint = "dlclose")]
       private static extern int dlclose_unix (IntPtr handle);
 
       [DllImport ("libdl.dylib", EntryPoint = "dlopen")]
@@ -106,7 +106,7 @@ namespace ROS2 {
 
       private static bool IsUnix () {
         try {
-          IntPtr ptr = dlopen_unix ("libdl.so", RTLD_NOW);
+          IntPtr ptr = dlopen_unix ("libdl.so.2", RTLD_NOW);
           dlclose_unix (ptr);
           return true;
         } catch (TypeLoadException) {
@@ -205,16 +205,16 @@ namespace ROS2 {
 
     internal class DllLoadUtilsUnix : DllLoadUtils {
 
-      [DllImport ("libdl.so", ExactSpelling = true)]
+      [DllImport ("libdl.so.2", ExactSpelling = true)]
       private static extern IntPtr dlopen (String fileName, int flags);
 
-      [DllImport ("libdl.so", ExactSpelling = true)]
+      [DllImport ("libdl.so.2", ExactSpelling = true)]
       private static extern IntPtr dlsym (IntPtr handle, String symbol);
 
-      [DllImport ("libdl.so", ExactSpelling = true)]
+      [DllImport ("libdl.so.2", ExactSpelling = true)]
       private static extern int dlclose (IntPtr handle);
 
-      [DllImport ("libdl.so", ExactSpelling = true)]
+      [DllImport ("libdl.so.2", ExactSpelling = true)]
       private static extern IntPtr dlerror ();
 
       const int RTLD_NOW = 2;
