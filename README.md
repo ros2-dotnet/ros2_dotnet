@@ -47,7 +47,7 @@ see the relevant section below): https://github.com/ros2/ros2/wiki/Installation#
 
 Next make sure you've either installed .Net Core (preferred)
 https://www.microsoft.com/net/learn/get-started or Mono
-https://www.mono-project.com/. (**NOTE**: For building unit tests, .NET 2.1 is
+https://www.mono-project.com/. (**NOTE**: For building unit tests, .NET 6 is
 required).
 
 For running on Linux or Windows Desktop, one can build `ros2_dotnet` (along with
