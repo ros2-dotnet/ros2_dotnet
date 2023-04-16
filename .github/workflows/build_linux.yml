@@ -15,7 +15,7 @@ jobs:
         include:
           # Foxy Fitzroy (June 2020 - May 2023)
           - os: ubuntu-20.04
-            test_target_framework: netcoreapp2.0
+            test_target_framework: net6.0
             ros_distribution: foxy
             ros_version: 2
           # Humble Hawksbill (May 2022 - May 2027)
@@ -32,17 +32,15 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v2
 
-    # https://docs.microsoft.com/en-us/dotnet/core/install/linux-package-manager-ubuntu-1804
-    - name: Install .NET SDK v2.1
+    # https://learn.microsoft.com/en-us/dotnet/core/install/linux-ubuntu#supported-distributions
+    - name: Install .NET SDK v6.0
       if: matrix.os == 'ubuntu-20.04'
       run: |
-        wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+        wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
         sudo dpkg -i packages-microsoft-prod.deb
-        sudo add-apt-repository universe
+        rm packages-microsoft-prod.deb
         sudo apt-get update
-        sudo apt-get install -y apt-transport-https
-        sudo apt-get update
-        sudo apt-get install -y dotnet-sdk-2.1
+        sudo apt-get install -y dotnet-sdk-6.0
 
     - name: Setup ROS2
       uses: ros-tooling/setup-ros@v0.6
