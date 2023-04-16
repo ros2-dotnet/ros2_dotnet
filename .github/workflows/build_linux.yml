@@ -49,9 +49,8 @@ jobs:
       run: |
         mkdir -p ~/ros2_dotnet_ws/src
         cd ~/ros2_dotnet_ws
-        cp ${{github.workspace}}/ros2_dotnet.repos .
-        sed -i 's/foxy/${{ matrix.ros_distribution }}/' ${{github.workspace}}/ros2_dotnet.repos
-        vcs import src < ros2_dotnet.repos
+        cp ${{github.workspace}}/ros2_dotnet_${{ matrix.ros_distribution }}.repos .
+        vcs import src < ros2_dotnet_${{ matrix.ros_distribution }}.repos
         rm -rf src/ros2_dotnet/ros2_dotnet
         cp -r ${{github.workspace}} src/ros2_dotnet/ros2_dotnet
         vcs branch

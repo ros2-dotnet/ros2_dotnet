@@ -52,7 +52,7 @@ required).
 
 For running on Linux or Windows Desktop, one can build `ros2_dotnet` (along with
 all desired packages containing interface definitions) as an overlay on top
-of an existing ROS2 installation. The `ros2_dotnet.repos` contains all
+of an existing ROS2 installation. The `ros2_dotnet_foxy.repos` contains all
 necessary repositories to build the core `ros2_dotnet` project along with all
 standard ROS2 interface packages. If you are using other packages which provide
 interface definitions, those must also be included in the `ros2_dotnet` workspace
@@ -65,7 +65,7 @@ core of ROS2 must be compiled for UWP compatibility.
 Windows (Desktop)
 -----------------
 Assuming you've installed ROS2 (pre-built binary packages) to the directory
-c:\dev\ros2_eloquent per the official [installation instructions](https://index.ros.org/doc/ros2/Installation/Eloquent/Windows-Install-Binary/),
+c:\dev\ros2_foxy per the official [installation instructions](https://index.ros.org/doc/ros2/Installation/Foxy/Windows-Install-Binary/),
 run the following from an Administrator Visual Studio 2019 Developer Command
 Prompt:
 
@@ -76,25 +76,25 @@ This is done for you below in the line preceding `colcon build`. This step
 can/should be omitted if building on top of a built-from-source ROS2 workspace)
 
 ```
-call \dev\ros2_eloquent\local_setup.bat
+call \dev\ros2_foxy\local_setup.bat
 md \dev\ros2_dotnet_ws\src
 cd \dev\ros2_dotnet_ws
-curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet.repos -o ros2_dotnet.repos
-vcs import \dev\ros2_dotnet_ws\src < ros2_dotnet.repos
-git clone --branch eloquent https://github.com/ros2/rosidl src\ros2\rosidl
+curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet_foxy.repos -o ros2_dotnet_foxy.repos
+vcs import \dev\ros2_dotnet_ws\src < ros2_dotnet_foxy.repos
+git clone --branch foxy https://github.com/ros2/rosidl src\ros2\rosidl
 colcon build --merge-install
 ```
 
 
 Linux
 -----
-Assuming ROS2 eloquent installed to the standard location, run the following commands:
+Assuming ROS2 foxy installed to the standard location, run the following commands:
 ```
-source /opt/ros/eloquent/setup.bash
+source /opt/ros/foxy/setup.bash
 mkdir -p ~/ros2_dotnet_ws/src
 cd ~/ros2_dotnet_ws
-wget https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet.repos
-vcs import ~/ros2_dotnet_ws/src < ros2_dotnet.repos
+wget https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet_foxy.repos
+vcs import ~/ros2_dotnet_ws/src < ros2_dotnet_foxy.repos
 colcon build
 ```
 
