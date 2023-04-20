@@ -1,14 +1,12 @@
 ROS2 for .NET
 =============
 
-Build status
-------------
-
 | Target | Status |
 |----------|--------|
-| **Universal Windows Platform (x86/x64)** | ![Build (UWP)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(UWP)/badge.svg) |
-| **Windows Desktop (x64)** | ![Build (Desktop)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(Desktop)/badge.svg) |
-| **Linux** | ![Build (Desktop)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(Linux)/badge.svg) |
+| **Linux** | [![Build (Linux)](https://github.com/ros2-dotnet/ros2_dotnet/actions/workflows/build_linux.yml/badge.svg)](https://github.com/ros2-dotnet/ros2_dotnet/actions/workflows/build_linux.yml) |
+| **Windows Desktop** | [![Build (Desktop)](https://github.com/ros2-dotnet/ros2_dotnet/actions/workflows/build_desktop.yml/badge.svg)](https://github.com/ros2-dotnet/ros2_dotnet/actions/workflows/build_desktop.yml) |
+
+_Windows UWP CI Builds are currently disabled, see [this issue](https://github.com/ros2-dotnet/ros2_dotnet/issues/92) for more information._
 
 Introduction
 ------------
