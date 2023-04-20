@@ -97,7 +97,17 @@ if(BUILD_TESTING)
       ${builtin_interfaces_ASSEMBLIES_DLL}
   )
 
+  # Used by CI to test the different target frameworks in a matrix.
+  if(DEFINED ENV{RCLDOTNET_TEST_TARGET_FRAMEWORK})
+    set(RCLDOTNET_TEST_TARGET_FRAMEWORK $ENV{RCLDOTNET_TEST_TARGET_FRAMEWORK})
+  else()
+    set(RCLDOTNET_TEST_TARGET_FRAMEWORK "net6.0")
+  endif()
+
   add_dotnet_test(test_messages
+    TARGET_FRAMEWORK
+    ${RCLDOTNET_TEST_TARGET_FRAMEWORK}
+    SOURCES
     ${CS_SOURCES}
     test/test_messages.cs
     INCLUDE_DLLS
