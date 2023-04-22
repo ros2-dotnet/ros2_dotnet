@@ -1,4 +1,6 @@
 @{
+from ast import literal_eval
+
 from rosidl_generator_dotnet import get_field_name
 from rosidl_generator_dotnet import get_dotnet_type
 from rosidl_generator_dotnet import get_builtin_dotnet_type
@@ -24,9 +26,9 @@ public class @(type_name) : global::ROS2.IRosMessage {
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
-    public const int @(get_field_name(type_name, member.name))_Length = @(member.type.size);
+    public const int @(get_field_name(type_name, member.name))Length = @(member.type.size);
 @[    elif isinstance(member.type, AbstractSequence) and member.type.has_maximum_size()]@
-    public const int @(get_field_name(type_name, member.name))_MaxCount = @(member.type.maximum_size);
+    public const int @(get_field_name(type_name, member.name))MaxCount = @(member.type.maximum_size);
 @[    end if]@
 @[end for]@
 
@@ -34,29 +36,65 @@ public class @(type_name) : global::ROS2.IRosMessage {
     {
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
-        @(get_field_name(type_name, member.name)) = new @(get_dotnet_type(member.type.value_type))[@(member.type.size)];
 @[          if isinstance(member.type.value_type, AbstractString)]@
+@[              if member.has_annotation('default')]@
+        @(get_field_name(type_name, member.name)) = new @(get_dotnet_type(member.type.value_type))[@(member.type.size)]
+        {
+@[                  for val in literal_eval(member.get_annotation_value('default')['value'])]@
+            @(constant_value_to_dotnet(member.type.value_type, val)),
+@[                  end for]@
+        };
+@[              else]@
+        @(get_field_name(type_name, member.name)) = new @(get_dotnet_type(member.type.value_type))[@(member.type.size)];
         for (var i__local_variable = 0; i__local_variable < @(member.type.size); i__local_variable++)
         {
             @(get_field_name(type_name, member.name))[i__local_variable] = "";
         }
+@[              end if]@
 @[          elif isinstance(member.type.value_type, BasicType)]@
+@[              if member.has_annotation('default')]@
+        @(get_field_name(type_name, member.name)) = new @(get_dotnet_type(member.type.value_type))[@(member.type.size)]
+        {
+@[                  for val in literal_eval(member.get_annotation_value('default')['value'])]@
+            @(constant_value_to_dotnet(member.type.value_type, val)),
+@[                  end for]@
+        };
+@[              else]@
+        @(get_field_name(type_name, member.name)) = new @(get_dotnet_type(member.type.value_type))[@(member.type.size)];
 @# Basic types get initialized by the array constructor.
+@[              end if]@
 @[          elif isinstance(member.type.value_type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[          else]@
+        @(get_field_name(type_name, member.name)) = new @(get_dotnet_type(member.type.value_type))[@(member.type.size)];
         for (var i__local_variable = 0; i__local_variable < @(member.type.size); i__local_variable++)
         {
             @(get_field_name(type_name, member.name))[i__local_variable] = new @(get_dotnet_type(member.type.value_type))();
         }
 @[          end if]@
 @[    elif isinstance(member.type, AbstractSequence)]@
+@[        if member.has_annotation('default')]@
+        @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>()
+        {
+@[            for val in literal_eval(member.get_annotation_value('default')['value'])]@
+            @(constant_value_to_dotnet(member.type.value_type, val)),
+@[            end for]@
+        };
+@[        else]@
         @(get_field_name(type_name, member.name)) = new List<@(get_dotnet_type(member.type.value_type))>();
+@[        end if]@
 @[    elif isinstance(member.type, AbstractWString)]@
 // TODO: Unicode types are not supported
 @[    elif isinstance(member.type, BasicType)]@
+@[        if member.has_annotation('default')]@
+        @(get_field_name(type_name, member.name)) = @(constant_value_to_dotnet(member.type, member.get_annotation_value('default')['value']));
+@[        end if]@
 @[    elif isinstance(member.type, AbstractString)]@
+@[        if member.has_annotation('default')]@
+        @(get_field_name(type_name, member.name)) = @(constant_value_to_dotnet(member.type, member.get_annotation_value('default')['value']));
+@[        else]@
         @(get_field_name(type_name, member.name)) = "";
+@[        end if]@
 @[    else]@
         @(get_field_name(type_name, member.name)) = new @(get_dotnet_type(member.type))();
 @[    end if]@

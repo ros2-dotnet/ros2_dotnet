@@ -53,6 +53,7 @@ def generate_dotnet(generator_arguments_file, typesupport_impls):
 def escape_string(s):
     s = s.replace('\\', '\\\\')
     s = s.replace("'", "\\'")
+    s = s.replace("\"", "\\\"")
     return s
 
 
@@ -149,12 +150,12 @@ def msg_type_to_c(type_):
     assert isinstance(type_, BasicType)
     return BASIC_IDL_TYPES_TO_C[type_.typename]
 
-def upperfirst(s):
-    return s[0].capitalize() + s[1:]
-
+# Taken from http://stackoverflow.com/a/6425628
+def convert_lower_case_underscore_to_camel_case(word):
+    return ''.join(x.capitalize() or '_' for x in word.split('_'))
 
 def get_field_name(type_name, field_name):
-    if upperfirst(field_name) == type_name:
+    if convert_lower_case_underscore_to_camel_case(field_name) == type_name:
         return "{0}_".format(type_name)
     else:
-        return upperfirst(field_name)
+        return convert_lower_case_underscore_to_camel_case(field_name)
