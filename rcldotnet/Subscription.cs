@@ -14,33 +14,51 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using ROS2.Interfaces;
-using ROS2.Utils;
 
 namespace ROS2 {
-  public class Subscription<T> : ISubscription<T>
-    where T : IMessage, new () {
-      private Action<T> callback_;
 
-      public Subscription (IntPtr handle, Action<T> callback) {
-        Handle = handle;
-        callback_ = callback;
-      }
-
-      public IntPtr Handle { get; }
-
-      public IMessage CreateMessage () {
-        IMessage msg = (IMessage) new T ();
-        return msg;
-      }
-
-      public void TriggerCallback (IMessage message) {
-        callback_ ((T) message);
-      }
+  /// <summary>
+  /// Base class of a Subscription without generic type arguments for use in collections or so.
+  /// </summary>
+  public abstract class Subscription
+  {
+    // Only allow internal subclasses.
+    internal Subscription()
+    {
     }
+
+    // Subscription does intentionaly (for now) not implement IDisposable as this
+    // needs some extra consideration how the type works after its
+    // internal handle is disposed.
+    // By relying on the GC/Finalizer of SafeHandle the handle only gets
+    // Disposed if the subscription is not live anymore.
+    internal abstract SafeSubscriptionHandle Handle { get; }
+
+    internal abstract IRosMessage CreateMessage();
+
+    internal abstract SafeHandle CreateMessageHandle();
+
+    internal abstract void TriggerCallback(IRosMessage message);
+  }
+
+  public class Subscription<T> : Subscription
+    where T : IRosMessage, new() {
+    private Action<T> callback_;
+
+    internal Subscription(SafeSubscriptionHandle handle, Action<T> callback) {
+      Handle = handle;
+      callback_ = callback;
+    }
+
+    internal override SafeSubscriptionHandle Handle { get; }
+
+    internal override IRosMessage CreateMessage() => (IRosMessage)new T();
+
+    internal override SafeHandle CreateMessageHandle() => MessageStaticMemberCache<T>.CreateMessageHandle();
+
+    internal override void TriggerCallback(IRosMessage message) {
+      callback_((T) message);
+    }
+  }
 }

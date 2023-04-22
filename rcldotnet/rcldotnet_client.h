@@ -1,4 +1,4 @@
-// Copyright 2016-2018 Esteve Fernandez <esteve@apache.org>
+// Copyright 2021 Stefan Hoffmann <stefan.hoffmann@schiller.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
+#ifndef RCLDOTNET_CLIENT_H
+#define RCLDOTNET_CLIENT_H
 
-#include <rmw/rmw.h>
-#include <rcl/error_handling.h>
-#include <rcl/rcl.h>
-#include <rcl/node.h>
+#include "rcldotnet_macros.h"
 
-#include "rosidl_runtime_c/message_type_support_struct.h"
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_send_request(void *client_handle, void *request_handle, int64_t *sequence_number);
 
-#include "rcldotnet_publisher.h"
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_service_server_is_available(void *node_handle, void *client_handle, bool *is_available);
 
-int32_t native_rcl_publish(void * publisher_handle, void * raw_ros_message)
-{
-  rcl_publisher_t * publisher = (rcl_publisher_t *)publisher_handle;
-
-  rcl_ret_t ret = rcl_publish(publisher, raw_ros_message, NULL);
-  
-  return ret;
-}
+#endif // RCLDOTNET_CLIENT_H

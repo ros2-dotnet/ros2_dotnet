@@ -1,4 +1,4 @@
-// Copyright 2016-2018 Esteve Fernandez <esteve@apache.org>
+// Copyright 2021 Stefan Hoffmann <stefan.hoffmann@schiller.de>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,16 +20,24 @@
 #include <rcl/error_handling.h>
 #include <rcl/rcl.h>
 #include <rcl/node.h>
+#include <rcl/client.h>
+#include <rcl/graph.h>
 
 #include "rosidl_runtime_c/message_type_support_struct.h"
 
-#include "rcldotnet_publisher.h"
+#include "rcldotnet_client.h"
 
-int32_t native_rcl_publish(void * publisher_handle, void * raw_ros_message)
-{
-  rcl_publisher_t * publisher = (rcl_publisher_t *)publisher_handle;
+int32_t native_rcl_send_request(void *client_handle, void *request_handle, int64_t *sequence_number) {
+  rcl_client_t * client = (rcl_client_t *)client_handle;
 
-  rcl_ret_t ret = rcl_publish(publisher, raw_ros_message, NULL);
-  
+  rcl_ret_t ret = rcl_send_request(client, request_handle, sequence_number);
+  return ret;
+}
+
+int32_t native_rcl_service_server_is_available(void *node_handle, void *client_handle, bool *is_available) {
+  rcl_node_t * node = (rcl_node_t *)node_handle;
+  rcl_client_t * client = (rcl_client_t *)client_handle;
+
+  rcl_ret_t ret = rcl_service_server_is_available(node, client, is_available);
   return ret;
 }

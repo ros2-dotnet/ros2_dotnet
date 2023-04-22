@@ -15,21 +15,17 @@
 
 using System;
 
-namespace ROS2 {
-  namespace Interfaces {
-    public interface IMessageStruct { }
+namespace ROS2
+{
+    public interface IRosMessage
+    {
+        // must be implemented on deriving types, gets called via reflection
+        // (static abstract interface members are not supported yet.)
+        // public static abstract IntPtr __GetTypeSupport();
+        // public static abstract SafeHandle __CreateMessageHandle();
+        
+        void __ReadFromHandle(IntPtr messageHandle);
 
-    public interface IMessage {
-      IntPtr _CREATE_NATIVE_MESSAGE ();
-      void _READ_HANDLE (IntPtr messageHandle);
-      void _DESTROY_NATIVE_MESSAGE (IntPtr messageHandle);
-      void _WRITE_HANDLE (IntPtr messageHandle);
+        void __WriteToHandle(IntPtr messageHandle);
     }
-
-    public interface IDisposable {
-      IntPtr Handle {
-        get;
-      }
-    }
-  }
 }

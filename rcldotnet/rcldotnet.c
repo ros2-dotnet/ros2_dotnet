@@ -45,11 +45,17 @@ const char *native_rcl_get_rmw_identifier() {
   return rmw_get_implementation_identifier();
 }
 
-const char *native_rcl_get_error_string() {
-  return rcl_get_error_string().str;
+void native_rcl_get_error_string(char *buffer, int32_t bufferSize) {
+  size_t minBufferSize = (size_t)bufferSize < (size_t)RCUTILS_ERROR_MESSAGE_MAX_LENGTH
+    ? (size_t)bufferSize
+    : (size_t)RCUTILS_ERROR_MESSAGE_MAX_LENGTH;
+  
+  strncpy(buffer, rcl_get_error_string().str, minBufferSize);
 }
 
-void native_rcl_reset_error() { rcl_reset_error(); }
+void native_rcl_reset_error(void) {
+  rcl_reset_error();
+}
 
 bool native_rcl_ok() { return rcl_context_is_valid(&context); }
 
@@ -63,26 +69,41 @@ int32_t native_rcl_create_node_handle(void **node_handle, const char *name, cons
   return ret;
 }
 
-void *native_rcl_get_zero_initialized_wait_set() {
-  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)malloc(sizeof(rcl_wait_set_t));
-  *wait_set = rcl_get_zero_initialized_wait_set();
-  return (void *)wait_set;
+int32_t native_rcl_destroy_node_handle(void *node_handle) {
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+
+  rcl_ret_t ret = rcl_node_fini(node);
+  free(node);
+
+  return ret;
 }
 
-int32_t native_rcl_wait_set_init(
-    void *wait_set_handle,
-    long number_of_subscriptions,
-    long number_of_guard_conditions,
-    long number_of_timers,
-    long number_of_clients,
-    long number_of_services,
-    long number_of_events) {
-  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+int32_t native_rcl_create_wait_set_handle(
+    void **wait_set_handle,
+    int32_t number_of_subscriptions,
+    int32_t number_of_guard_conditions,
+    int32_t number_of_timers,
+    int32_t number_of_clients,
+    int32_t number_of_services,
+    int32_t number_of_events) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)malloc(sizeof(rcl_wait_set_t));
+  *wait_set = rcl_get_zero_initialized_wait_set();
 
   rcl_ret_t ret = rcl_wait_set_init(
       wait_set, number_of_subscriptions, number_of_guard_conditions,
       number_of_timers, number_of_clients, number_of_services,
       number_of_events, &context, rcl_get_default_allocator());
+
+  *wait_set_handle = (void *)wait_set;
+
+  return ret;
+}
+
+int32_t native_rcl_destroy_wait_set_handle(void *wait_set_handle) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+
+  rcl_ret_t ret = rcl_wait_set_fini(wait_set);
+  free(wait_set);
 
   return ret;
 }
@@ -102,11 +123,23 @@ int32_t native_rcl_wait_set_add_subscription(void *wait_set_handle, void *subscr
   return ret;
 }
 
-void native_rcl_destroy_wait_set(void *wait_set_handle) {
-  free((rcl_wait_set_t *)wait_set_handle);
+int32_t native_rcl_wait_set_add_service(void *wait_set_handle, void *service_handle) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+  rcl_service_t *service = (rcl_service_t *)service_handle;
+  rcl_ret_t ret = rcl_wait_set_add_service(wait_set, service, NULL);
+
+  return ret;
 }
 
-int32_t native_rcl_wait_set(void *wait_set_handle, long timeout) {
+int32_t native_rcl_wait_set_add_client(void *wait_set_handle, void *client_handle) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+  rcl_client_t *service = (rcl_client_t *)client_handle;
+  rcl_ret_t ret = rcl_wait_set_add_client(wait_set, service, NULL);
+
+  return ret;
+}
+
+int32_t native_rcl_wait(void *wait_set_handle, int64_t timeout) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
   rcl_ret_t ret = rcl_wait(wait_set, timeout);
 
@@ -120,9 +153,45 @@ int32_t native_rcl_take(void *subscription_handle, void *message_handle) {
   return ret;
 }
 
-int32_t native_rcl_wait(void *wait_set_handle, int64_t timeout) {
-  rcl_wait_set_t * wait_set = (rcl_wait_set_t *)wait_set_handle;
-  rcl_ret_t ret = rcl_wait(wait_set, timeout);
+int32_t native_rcl_create_request_id_handle(void **request_id_handle) {
+  rmw_request_id_t *request_id = (rmw_request_id_t *)malloc(sizeof(rmw_request_id_t));
+  memset(request_id, 0, sizeof(rmw_request_id_t));
 
+  *request_id_handle = (void *)request_id;
+  return RCL_RET_OK;
+}
+
+int32_t native_rcl_destroy_request_id_handle(void *request_id_handle) {
+  free((rmw_request_id_t *)request_id_handle);
+  return RCL_RET_OK;
+}
+
+int64_t native_rcl_request_id_get_sequence_number(void *request_id_handle) {
+  rmw_request_id_t *request_id = (rmw_request_id_t *)request_id_handle;
+  return request_id->sequence_number;
+}
+
+int32_t native_rcl_take_request(void *service_handle, void *request_header_handle, void *request_handle) {
+  rcl_service_t * service = (rcl_service_t *)service_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_take_request(service, request_header, request_handle);
   return ret;
 }
+
+int32_t native_rcl_send_response(void *service_handle, void *request_header_handle, void *resopnse_handle) {
+  rcl_service_t * service = (rcl_service_t *)service_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_send_response(service, request_header, resopnse_handle);
+  return ret;
+}
+
+int32_t native_rcl_take_response(void *client_handle, void *request_header_handle, void *response_handle) {
+  rcl_client_t * client = (rcl_client_t *)client_handle;
+  rmw_request_id_t * request_header = (rmw_request_id_t *)request_header_handle;
+
+  rcl_ret_t ret = rcl_take_response(client, request_header, response_handle);
+  return ret;
+}
+

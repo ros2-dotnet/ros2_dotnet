@@ -14,52 +14,82 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using ROS2.Interfaces;
 using ROS2.Utils;
 
-namespace ROS2 {
-  internal class PublisherDelegates {
+namespace ROS2
+{
+  internal static class PublisherDelegates {
     internal static readonly DllLoadUtils dllLoadUtils;
 
     [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
-    internal delegate void NativeRCLPublishType (
-      IntPtr publisherHandle, IntPtr messageHandle);
+    internal delegate RCLRet NativeRCLPublishType (
+      SafePublisherHandle publisherHandle, SafeHandle messageHandle);
 
     internal static NativeRCLPublishType native_rcl_publish = null;
 
     static PublisherDelegates () {
       dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils ();
       IntPtr nativelibrary = dllLoadUtils.LoadLibrary ("rcldotnet_publisher");
+
       IntPtr native_rcl_publish_ptr = dllLoadUtils.GetProcAddress (nativelibrary, "native_rcl_publish");
       PublisherDelegates.native_rcl_publish = (NativeRCLPublishType) Marshal.GetDelegateForFunctionPointer (
         native_rcl_publish_ptr, typeof (NativeRCLPublishType));
     }
   }
 
-  public class Publisher<T> : IPublisher<T>
-    where T : IMessage {
+  /// <summary>
+  /// Base class of a Publisher without generic type arguments for use in collections or so.
+  /// </summary>
+  public abstract class Publisher
+  {
+    // Only allow internal subclasses.
+    internal Publisher()
+    {
+    }
 
-      public Publisher (IntPtr handle) {
-        Handle = handle;
-      }
+    // Publisher does intentionaly (for now) not implement IDisposable as this
+    // needs some extra consideration how the type works after its
+    // internal handle is disposed.
+    // By relying on the GC/Finalizer of SafeHandle the handle only gets
+    // Disposed if the publisher is not live anymore.
+    internal abstract SafePublisherHandle Handle { get; }
+  }
 
-      public IntPtr Handle { get; }
+  public sealed class Publisher<T> : Publisher
+    where T : IRosMessage {
 
-      public void Publish (T msg) {
-        IntPtr messageHandle = msg._CREATE_NATIVE_MESSAGE ();
+    internal Publisher (SafePublisherHandle handle) {
+      Handle = handle;
+    }
 
-        msg._WRITE_HANDLE (messageHandle);
+    internal override SafePublisherHandle Handle { get; }
 
-        PublisherDelegates.native_rcl_publish (Handle, messageHandle);
+    public void Publish (T message) {
+      using (var messageHandle = MessageStaticMemberCache<T>.CreateMessageHandle())
+      {
+        bool mustRelease = false;
+        try
+        {
+          // Using SafeHandles for __WriteToHandle() is very tedious as this needs to be
+          // handled in generated code across multiple assemblies.
+          // Array and collection indexing would need to create SafeHandles everywere.
+          // It's not worth it, especialy considering the extra allocations for SafeHandles in
+          // arrays or collections that don't realy represent their own native recource.
+          messageHandle.DangerousAddRef(ref mustRelease);
+          message.__WriteToHandle(messageHandle.DangerousGetHandle());
+        }
+        finally
+        {
+          if (mustRelease)
+          {
+            messageHandle.DangerousRelease();
+          }
+        }
 
-        msg._DESTROY_NATIVE_MESSAGE (messageHandle);
+        RCLRet ret = PublisherDelegates.native_rcl_publish(Handle, messageHandle);
+        RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(PublisherDelegates.native_rcl_publish)}() failed.");
       }
     }
+  }
 }

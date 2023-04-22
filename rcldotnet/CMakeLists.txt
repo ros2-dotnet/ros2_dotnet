@@ -25,14 +25,25 @@ if(NOT WIN32)
   endif()
 endif()
 
+set(CSHARP_TARGET_FRAMEWORK "netstandard2.0")
+
 set(CS_SOURCES
-  INode.cs
-  IPublisher.cs
-  ISubscription.cs
-  ISubscriptionBase.cs
+  Client.cs
+  MessageStaticMemberCache.cs
   Node.cs
   Publisher.cs
   RCLdotnet.cs
+  RCLExceptionHelper.cs
+  RCLRet.cs
+  SafeClientHandle.cs
+  SafeNodeHandle.cs
+  SafePublisherHandle.cs
+  SafeRequestIdHandle.cs
+  SafeServiceHandle.cs
+  SafeSubscriptionHandle.cs
+  SafeWaitSetHandle.cs
+  Service.cs
+  ServiceDefinitionStaticMemberCache.cs
   Subscription.cs
 )
 
@@ -51,7 +62,7 @@ add_dotnet_library(${PROJECT_NAME}_assemblies
 install_dotnet(${PROJECT_NAME}_assemblies DESTINATION lib/${PROJECT_NAME}/dotnet)
 ament_export_assemblies_dll("lib/${PROJECT_NAME}/dotnet/${PROJECT_NAME}_assemblies.dll")
 
-set(_native_sources "rcldotnet;rcldotnet_node;rcldotnet_publisher")
+set(_native_sources "rcldotnet;rcldotnet_node;rcldotnet_publisher;rcldotnet_client")
 
 foreach(_target_name ${_native_sources})
   add_library(${_target_name} SHARED
@@ -110,6 +121,7 @@ if(BUILD_TESTING)
     SOURCES
     ${CS_SOURCES}
     test/test_messages.cs
+    test/test_services.cs
     INCLUDE_DLLS
     ${_assemblies_dep_dlls}
     INCLUDE_REFERENCES

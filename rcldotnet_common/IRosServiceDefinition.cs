@@ -1,4 +1,4 @@
-/* Copyright 2018 Esteve Fernandez <esteve@apache.org>
+/* Copyright 2021-2022 Stefan Hoffmann <stefan.hoffmann@schiller.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,14 @@
  * limitations under the License.
  */
 
-using System;
-using System.Collections.Generic;
-using ROS2.Interfaces;
-
-namespace ROS2 {
-    public interface INode {
-        IList<ISubscriptionBase> Subscriptions { get; }
-
-        IPublisher<T> CreatePublisher<T> (string topic) where T : IMessage;
-
-        ISubscription<T> CreateSubscription<T> (string topic, Action<T> callback) where T : IMessage, new ();
+namespace ROS2
+{
+    public interface IRosServiceDefinition<TRequest, TResponse>
+        where TRequest : IRosMessage, new()
+        where TResponse : IRosMessage, new()
+    {
+        // must be implemented on deriving types, gets called via reflection
+        // (static abstract interface members are not supported yet.)
+        // public static abstract IntPtr __GetTypeSupport();
     }
 }

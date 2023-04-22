@@ -10,8 +10,8 @@ find_package(DotNETExtra REQUIRED)
 
 set(CS_SOURCES
   DllLoadUtils.cs
-  Interfaces.cs
-  RCLRet.cs
+  IRosMessage.cs
+  IRosServiceDefinition.cs
 )
 
 add_dotnet_library(${PROJECT_NAME} ${CS_SOURCES})

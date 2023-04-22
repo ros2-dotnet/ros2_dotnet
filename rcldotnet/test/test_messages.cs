@@ -1,13 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime;
-using System.Runtime.InteropServices;
-using System.Threading;
-
 using ROS2;
-using ROS2.Utils;
-
 using Xunit;
 
 namespace RCLdotnetTests
@@ -18,16 +11,16 @@ namespace RCLdotnetTests
     public void TestPublishString()
     {
       RCLdotnet.Init ();
-      INode node_string_1 = RCLdotnet.CreateNode ("test_string_1");
-      INode node_string_2 = RCLdotnet.CreateNode ("test_string_2");
-      IPublisher<std_msgs.msg.String> chatter_pub = node_string_1.CreatePublisher<std_msgs.msg.String> ("topic_string");
+      Node node_string_1 = RCLdotnet.CreateNode ("test_string_1");
+      Node node_string_2 = RCLdotnet.CreateNode ("test_string_2");
+      Publisher<std_msgs.msg.String> chatter_pub = node_string_1.CreatePublisher<std_msgs.msg.String> ("topic_string");
 
       std_msgs.msg.String msg = new std_msgs.msg.String ();
       std_msgs.msg.String msg2 = new std_msgs.msg.String ();
       msg.Data = "Hello";
 
       bool received=false;
-      ISubscription<std_msgs.msg.String> chatter_sub = node_string_2.CreateSubscription<std_msgs.msg.String> (
+      Subscription<std_msgs.msg.String> chatter_sub = node_string_2.CreateSubscription<std_msgs.msg.String> (
         "topic_string", rcv_msg =>
         {
           received=true;
@@ -49,9 +42,9 @@ namespace RCLdotnetTests
     public void TestPublishBuiltins()
     {
       RCLdotnet.Init ();
-      INode node_builtins_1 = RCLdotnet.CreateNode ("test_builtins_1");
-      INode node_builtins_2 = RCLdotnet.CreateNode ("test_builtins_2");
-      IPublisher<test_msgs.msg.Builtins> chatter_pub = node_builtins_1.CreatePublisher<test_msgs.msg.Builtins> ("topic_builtins");
+      Node node_builtins_1 = RCLdotnet.CreateNode ("test_builtins_1");
+      Node node_builtins_2 = RCLdotnet.CreateNode ("test_builtins_2");
+      Publisher<test_msgs.msg.Builtins> chatter_pub = node_builtins_1.CreatePublisher<test_msgs.msg.Builtins> ("topic_builtins");
 
       test_msgs.msg.Builtins msg = new test_msgs.msg.Builtins ();
       test_msgs.msg.Builtins msg2 = new test_msgs.msg.Builtins ();
@@ -61,7 +54,7 @@ namespace RCLdotnetTests
       msg.Time_value.Nanosec = 4u;
 
       bool received=false;
-      ISubscription<test_msgs.msg.Builtins> chatter_sub = node_builtins_2.CreateSubscription<test_msgs.msg.Builtins> (
+      Subscription<test_msgs.msg.Builtins> chatter_sub = node_builtins_2.CreateSubscription<test_msgs.msg.Builtins> (
         "topic_builtins", rcv_msg =>
         {
           received=true;
@@ -87,9 +80,9 @@ namespace RCLdotnetTests
     public void TestPublishArrays()
     {
       RCLdotnet.Init ();
-      INode node_array_1 = RCLdotnet.CreateNode ("test_arrays_1");
-      INode node_array_2 = RCLdotnet.CreateNode ("test_arrays_2");
-      IPublisher<test_msgs.msg.Arrays> chatter_pub = node_array_1.CreatePublisher<test_msgs.msg.Arrays> ("topic_array");
+      Node node_array_1 = RCLdotnet.CreateNode ("test_arrays_1");
+      Node node_array_2 = RCLdotnet.CreateNode ("test_arrays_2");
+      Publisher<test_msgs.msg.Arrays> chatter_pub = node_array_1.CreatePublisher<test_msgs.msg.Arrays> ("topic_array");
 
       test_msgs.msg.Arrays msg = new test_msgs.msg.Arrays ();
       test_msgs.msg.Arrays msg2 = new test_msgs.msg.Arrays ();
@@ -215,7 +208,7 @@ namespace RCLdotnetTests
       msg.Basic_types_values[2] = basic_type_3;
 
       bool received=false;
-      ISubscription<test_msgs.msg.Arrays> chatter_sub = node_array_2.CreateSubscription<test_msgs.msg.Arrays> (
+      Subscription<test_msgs.msg.Arrays> chatter_sub = node_array_2.CreateSubscription<test_msgs.msg.Arrays> (
         "topic_array", rcv_msg =>
         {
             received = true;
@@ -418,9 +411,9 @@ namespace RCLdotnetTests
     public void TestPublishUnboundedSequences()
     {
       RCLdotnet.Init();
-      INode node_array_1 = RCLdotnet.CreateNode("test_unbounded_sequences_1");
-      INode node_array_2 = RCLdotnet.CreateNode("test_unbounded_sequences_2");
-      IPublisher<test_msgs.msg.UnboundedSequences> chatter_pub = node_array_1.CreatePublisher<test_msgs.msg.UnboundedSequences>("topic_unbounded_sequences");
+      Node node_array_1 = RCLdotnet.CreateNode("test_unbounded_sequences_1");
+      Node node_array_2 = RCLdotnet.CreateNode("test_unbounded_sequences_2");
+      Publisher<test_msgs.msg.UnboundedSequences> chatter_pub = node_array_1.CreatePublisher<test_msgs.msg.UnboundedSequences>("topic_unbounded_sequences");
 
       test_msgs.msg.UnboundedSequences msg = new test_msgs.msg.UnboundedSequences();
       test_msgs.msg.UnboundedSequences msg2 = new test_msgs.msg.UnboundedSequences();
@@ -545,7 +538,7 @@ namespace RCLdotnetTests
       msg.Basic_types_values.Add(basic_type_3);
 
       bool received=false;
-      ISubscription<test_msgs.msg.UnboundedSequences> chatter_sub = node_array_2.CreateSubscription<test_msgs.msg.UnboundedSequences>(
+      Subscription<test_msgs.msg.UnboundedSequences> chatter_sub = node_array_2.CreateSubscription<test_msgs.msg.UnboundedSequences>(
         "topic_unbounded_sequences", rcv_msg =>
         {
           received=true;
@@ -693,9 +686,9 @@ namespace RCLdotnetTests
     public void TestPublishBoundedSequences()
     {
       RCLdotnet.Init();
-      INode node_array_1 = RCLdotnet.CreateNode("test_bounded_sequences_1");
-      INode node_array_2 = RCLdotnet.CreateNode("test_bounded_sequences_2");
-      IPublisher<test_msgs.msg.BoundedSequences> chatter_pub = node_array_1.CreatePublisher<test_msgs.msg.BoundedSequences>("topic_bounded_sequences");
+      Node node_array_1 = RCLdotnet.CreateNode("test_bounded_sequences_1");
+      Node node_array_2 = RCLdotnet.CreateNode("test_bounded_sequences_2");
+      Publisher<test_msgs.msg.BoundedSequences> chatter_pub = node_array_1.CreatePublisher<test_msgs.msg.BoundedSequences>("topic_bounded_sequences");
 
       test_msgs.msg.BoundedSequences msg = new test_msgs.msg.BoundedSequences();
       test_msgs.msg.BoundedSequences msg2 = new test_msgs.msg.BoundedSequences();
@@ -820,7 +813,7 @@ namespace RCLdotnetTests
       msg.Basic_types_values.Add(basic_type_3);
 
       bool received=false;
-      ISubscription<test_msgs.msg.BoundedSequences> chatter_sub = node_array_2.CreateSubscription<test_msgs.msg.BoundedSequences>(
+      Subscription<test_msgs.msg.BoundedSequences> chatter_sub = node_array_2.CreateSubscription<test_msgs.msg.BoundedSequences>(
         "topic_bounded_sequences", rcv_msg =>
         {
           received=true;
