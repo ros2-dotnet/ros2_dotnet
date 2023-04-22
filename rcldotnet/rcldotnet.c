@@ -708,15 +708,23 @@ int32_t native_rcl_write_to_qos_profile_handle(
 {
   rmw_qos_profile_t *qos_profile = (rmw_qos_profile_t *)qos_profile_handle;
 
-  qos_profile->history = (enum rmw_qos_history_policy_t)history;
+  // Can't name the enums for both Foxy and Humble the in code.
+  // So use implicit conversions for now...
+  // This breaking change was introduced in https://github.com/ros2/rmw/commit/05f973575e8e93454e39f51da6227509061ff189
+  // In Foxy they are defined as `enum rmw_qos_history_policy_t { ... };
+  //   -> so the type is called `enum rmw_qos_history_policy_t`
+  // In Humble tey are defined as `typedef enum rmw_qos_history_policy_e { ... } rmw_qos_history_policy_t;
+  //   -> so the type is called `rmw_qos_history_policy_t`
+
+  qos_profile->history = /* (rmw_qos_history_policy_t) */ history;
   qos_profile->depth = (size_t)depth;
-  qos_profile->reliability = (enum rmw_qos_reliability_policy_t)reliability;
-  qos_profile->durability = (enum rmw_qos_durability_policy_t)durability;
+  qos_profile->reliability = /* (rmw_qos_reliability_policy_t) */ reliability;
+  qos_profile->durability = /* (rmw_qos_durability_policy_t) */ durability;
   qos_profile->deadline.sec = deadline_sec;
   qos_profile->deadline.nsec = deadline_nsec;
   qos_profile->lifespan.sec = lifespan_sec;
   qos_profile->lifespan.nsec = lifespan_nsec;
-  qos_profile->liveliness = (enum rmw_qos_liveliness_policy_t)liveliness;
+  qos_profile->liveliness = /* (rmw_qos_liveliness_policy_t) */ liveliness;
   qos_profile->liveliness_lease_duration.sec = liveliness_lease_duration_sec;
   qos_profile->liveliness_lease_duration.nsec = liveliness_lease_duration_nsec;
   qos_profile->avoid_ros_namespace_conventions = avoid_ros_namespace_conventions != 0;
