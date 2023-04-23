@@ -30,4 +30,4 @@ repositories:
   ament_dotnet/ament_cmake_export_assemblies:
     type: git
     url: https://github.com/esteve/ament_cmake_export_assemblies.git
-    version: master
+    version: main
