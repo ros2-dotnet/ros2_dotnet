@@ -98,7 +98,7 @@ repositories:
   ros2_dotnet/dotnet_cmake_module:
     type: git
     url: https://github.com/ros2-dotnet/dotnet_cmake_module.git
-    version: master
+    version: main
   ros2_dotnet/ros2_dotnet:
     type: git
     url: https://github.com/ros2-dotnet/ros2_dotnet.git

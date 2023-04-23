@@ -26,4 +26,4 @@ repositories:
   ros2_dotnet/dotnet_cmake_module:
     type: git
     url: https://github.com/ms-iot/dotnet_cmake_module.git
-    version: master
+    version: main
