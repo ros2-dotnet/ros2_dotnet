@@ -25,5 +25,5 @@ repositories:
     version: foxy
   ros2_dotnet/dotnet_cmake_module:
     type: git
-    url: https://github.com/ms-iot/dotnet_cmake_module.git
+    url: https://github.com/ros2-dotnet/dotnet_cmake_module.git
     version: main

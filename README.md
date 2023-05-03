@@ -76,7 +76,7 @@ can/should be omitted if building on top of a built-from-source ROS2 workspace)
 call \dev\ros2_foxy\local_setup.bat
 md \dev\ros2_dotnet_ws\src
 cd \dev\ros2_dotnet_ws
-curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet_foxy.repos -o ros2_dotnet_foxy.repos
+curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/main/ros2_dotnet_foxy.repos -o ros2_dotnet_foxy.repos
 vcs import \dev\ros2_dotnet_ws\src < ros2_dotnet_foxy.repos
 git clone --branch foxy https://github.com/ros2/rosidl src\ros2\rosidl
 colcon build --merge-install
@@ -90,7 +90,7 @@ Assuming ROS2 foxy installed to the standard location, run the following command
 source /opt/ros/foxy/setup.bash
 mkdir -p ~/ros2_dotnet_ws/src
 cd ~/ros2_dotnet_ws
-wget https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet_foxy.repos
+wget https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/main/ros2_dotnet_foxy.repos
 vcs import ~/ros2_dotnet_ws/src < ros2_dotnet_foxy.repos
 colcon build
 ```
@@ -111,7 +111,7 @@ ament
 ```
 md \dev\ament\src
 cd \dev\ament
-curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ament_dotnet_uwp.repos -o ament_dotnet_uwp.repos
+curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/main/ament_dotnet_uwp.repos -o ament_dotnet_uwp.repos
 vcs import src < ament_dotnet_uwp.repos
 colcon build --merge-install
 call install\local_setup.bat
@@ -125,7 +125,7 @@ Replace `%TARGET_ARCH%` with Win32 or x64
 ```
 md \dev\ros2\src
 cd \dev\ros2
-curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
+curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/main/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
 vcs import src < ros2_dotnet_uwp.repos
 cd \dev\ament
 call install\local_setup.bat
