@@ -34,7 +34,7 @@ namespace ROS2
             // #define RCUTILS_ERROR_MESSAGE_MAX_LENGTH 1024
             var errorStringBuffer = new byte[1024];
             RCLdotnetDelegates.native_rcl_get_error_string(errorStringBuffer, errorStringBuffer.Length);
-            
+
             string errorString = System.Text.Encoding.UTF8.GetString(errorStringBuffer).TrimEnd('\0');
 
             RCLdotnetDelegates.native_rcl_reset_error();

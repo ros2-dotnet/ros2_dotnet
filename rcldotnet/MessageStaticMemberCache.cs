@@ -22,8 +22,8 @@ namespace ROS2
     internal static class MessageStaticMemberCache<T>
         where T : IRosMessage
     {
-        private static IntPtr s_typeSupport;
-        private static Func<SafeHandle> s_createMessageHandle;
+        private static readonly IntPtr s_typeSupport;
+        private static readonly Func<SafeHandle> s_createMessageHandle;
 
         static MessageStaticMemberCache()
         {
@@ -71,7 +71,7 @@ namespace ROS2
             {
                 throw new InvalidOperationException($"Type '{typeof(T).FullName}' did not define a correct __GetTypeSupport mehtod.");
             }
-            
+
             return s_typeSupport;
         }
 

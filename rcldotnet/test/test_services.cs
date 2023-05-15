@@ -29,11 +29,11 @@ namespace RCLdotnetTests
 
             test_msgs.srv.BasicTypes_Request serviceReceivedRequest = null;
             test_msgs.srv.BasicTypes_Response clientReceivedResponse = null;
-            
+
             var service = serviceNode.CreateService<test_msgs.srv.BasicTypes, test_msgs.srv.BasicTypes_Request, test_msgs.srv.BasicTypes_Response>("unittest_dotnet_service", HandleRequest);
 
             var client = clientNode.CreateClient<test_msgs.srv.BasicTypes, test_msgs.srv.BasicTypes_Request, test_msgs.srv.BasicTypes_Response>("unittest_dotnet_service");
-            
+
             var request = new test_msgs.srv.BasicTypes_Request();
             request.BoolValue = true;
             request.ByteValue = 36;

@@ -23,15 +23,15 @@ namespace ROS2
 {
     internal static class ClientDelegates
     {
-        internal static readonly DllLoadUtils dllLoadUtils;
+        internal static readonly DllLoadUtils _dllLoadUtils;
 
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLSendRequestType(
-            SafeClientHandle clientHandle, SafeHandle requestHandle, out long seqneceNumber);
+            SafeClientHandle clientHandle, SafeHandle requestHandle, out long sequenceNumber);
 
         internal static NativeRCLSendRequestType native_rcl_send_request = null;
 
-        [UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLServiceServerIsAvailableType(
             SafeNodeHandle nodeHandle, SafeClientHandle clientHandle, out bool isAvailable);
 
@@ -39,14 +39,14 @@ namespace ROS2
 
         static ClientDelegates()
         {
-            dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
-            IntPtr nativelibrary = dllLoadUtils.LoadLibrary("rcldotnet_client");
+            _dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
+            IntPtr nativeLibrary = _dllLoadUtils.LoadLibrary("rcldotnet_client");
 
-            IntPtr native_rcl_send_request_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_rcl_send_request");
+            IntPtr native_rcl_send_request_ptr = _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_send_request");
             ClientDelegates.native_rcl_send_request = (NativeRCLSendRequestType)Marshal.GetDelegateForFunctionPointer(
                 native_rcl_send_request_ptr, typeof(NativeRCLSendRequestType));
 
-            IntPtr native_rcl_service_server_is_available_ptr = dllLoadUtils.GetProcAddress(nativelibrary, "native_rcl_service_server_is_available");
+            IntPtr native_rcl_service_server_is_available_ptr = _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_service_server_is_available");
             ClientDelegates.native_rcl_service_server_is_available = (NativeRCLServiceServerIsAvailableType)Marshal.GetDelegateForFunctionPointer(
                 native_rcl_service_server_is_available_ptr, typeof(NativeRCLServiceServerIsAvailableType));
         }
@@ -84,7 +84,7 @@ namespace ROS2
         // ros2_java uses a WeakReference here. Not sure if its needed or not.
         private readonly Node _node;
         private readonly ConcurrentDictionary<long, PendingRequest> _pendingRequests = new ConcurrentDictionary<long, PendingRequest>();
-        
+
         internal Client(SafeClientHandle handle, Node node)
         {
             Handle = handle;

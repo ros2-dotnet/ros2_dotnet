@@ -16,49 +16,53 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace ROS2 {
+namespace ROS2
+{
 
-  /// <summary>
-  /// Base class of a Subscription without generic type arguments for use in collections or so.
-  /// </summary>
-  public abstract class Subscription
-  {
-    // Only allow internal subclasses.
-    internal Subscription()
+    /// <summary>
+    /// Base class of a Subscription without generic type arguments for use in collections or so.
+    /// </summary>
+    public abstract class Subscription
     {
+        // Only allow internal subclasses.
+        internal Subscription()
+        {
+        }
+
+        // Subscription does intentionaly (for now) not implement IDisposable as this
+        // needs some extra consideration how the type works after its
+        // internal handle is disposed.
+        // By relying on the GC/Finalizer of SafeHandle the handle only gets
+        // Disposed if the subscription is not live anymore.
+        internal abstract SafeSubscriptionHandle Handle { get; }
+
+        internal abstract IRosMessage CreateMessage();
+
+        internal abstract SafeHandle CreateMessageHandle();
+
+        internal abstract void TriggerCallback(IRosMessage message);
     }
 
-    // Subscription does intentionaly (for now) not implement IDisposable as this
-    // needs some extra consideration how the type works after its
-    // internal handle is disposed.
-    // By relying on the GC/Finalizer of SafeHandle the handle only gets
-    // Disposed if the subscription is not live anymore.
-    internal abstract SafeSubscriptionHandle Handle { get; }
+    public class Subscription<T> : Subscription
+        where T : IRosMessage, new()
+    {
+        private readonly Action<T> _callback;
 
-    internal abstract IRosMessage CreateMessage();
+        internal Subscription(SafeSubscriptionHandle handle, Action<T> callback)
+        {
+            Handle = handle;
+            _callback = callback;
+        }
 
-    internal abstract SafeHandle CreateMessageHandle();
+        internal override SafeSubscriptionHandle Handle { get; }
 
-    internal abstract void TriggerCallback(IRosMessage message);
-  }
+        internal override IRosMessage CreateMessage() => (IRosMessage)new T();
 
-  public class Subscription<T> : Subscription
-    where T : IRosMessage, new() {
-    private Action<T> callback_;
+        internal override SafeHandle CreateMessageHandle() => MessageStaticMemberCache<T>.CreateMessageHandle();
 
-    internal Subscription(SafeSubscriptionHandle handle, Action<T> callback) {
-      Handle = handle;
-      callback_ = callback;
+        internal override void TriggerCallback(IRosMessage message)
+        {
+            _callback((T)message);
+        }
     }
-
-    internal override SafeSubscriptionHandle Handle { get; }
-
-    internal override IRosMessage CreateMessage() => (IRosMessage)new T();
-
-    internal override SafeHandle CreateMessageHandle() => MessageStaticMemberCache<T>.CreateMessageHandle();
-
-    internal override void TriggerCallback(IRosMessage message) {
-      callback_((T) message);
-    }
-  }
 }
