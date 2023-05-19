@@ -27,6 +27,6 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_action_send_cancel_request(void *action_client_handle, void *cancel_request_handle, int64_t *sequence_number);
 
 RCLDOTNET_EXPORT
-int32_t RCLDOTNET_CDECL native_rcl_action_server_is_available(void *node_handle, void *action_client_handle, bool *is_available);
+int32_t RCLDOTNET_CDECL native_rcl_action_server_is_available(void *node_handle, void *action_client_handle, int32_t *is_available);
 
 #endif // RCLDOTNET_CLIENT_H

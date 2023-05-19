@@ -188,7 +188,7 @@ namespace ROS2
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLActionClientWaitSetGetEntitiesReadyType(
-            SafeWaitSetHandle waitSetHandle, SafeActionClientHandle actionClientHandle, out bool isFeedbackReady, out bool isStatusReady, out bool isGoalResponseReady, out bool isCancelResponseReady, out bool isResultResponseReady);
+            SafeWaitSetHandle waitSetHandle, SafeActionClientHandle actionClientHandle, out int isFeedbackReady, out int isStatusReady, out int isGoalResponseReady, out int isCancelResponseReady, out int isResultResponseReady);
 
         internal static NativeRCLActionClientWaitSetGetEntitiesReadyType native_rcl_action_client_wait_set_get_entities_ready = null;
 
@@ -206,7 +206,7 @@ namespace ROS2
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLActionServerWaitSetGetEntitiesReadyType(
-                SafeWaitSetHandle waitSetHandle, SafeActionServerHandle actionServerHandle, out bool isGoalRequestReady, out bool isCancelRequestReady, out bool isResultRequestReady, out bool isGoalExpired);
+                SafeWaitSetHandle waitSetHandle, SafeActionServerHandle actionServerHandle, out int isGoalRequestReady, out int isCancelRequestReady, out int isResultRequestReady, out int isGoalExpired);
 
         internal static NativeRCLActionServerWaitSetGetEntitiesReadyType native_rcl_action_server_wait_set_get_entities_ready = null;
 
@@ -318,7 +318,7 @@ namespace ROS2
         internal static NativeRCLActionExpireGoalsType native_rcl_action_expire_goals = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool NativeRCLActionGoalHandleIsActiveType(SafeActionGoalHandle actionGoalHandleHandle);
+        internal delegate int NativeRCLActionGoalHandleIsActiveType(SafeActionGoalHandle actionGoalHandleHandle);
         internal static NativeRCLActionGoalHandleIsActiveType native_rcl_action_goal_handle_is_active = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -1248,18 +1248,18 @@ namespace ROS2
                         RCLRet ret = RCLdotnetDelegates.native_rcl_action_client_wait_set_get_entities_ready(
                             waitSetHandle,
                             actionClient.Handle,
-                            out bool isFeedbackReady,
-                            out bool isStatusReady,
-                            out bool isGoalResponseReady,
-                            out bool isCancelResponseReady,
-                            out bool isResultResponseReady);
+                            out int isFeedbackReady,
+                            out int isStatusReady,
+                            out int isGoalResponseReady,
+                            out int isCancelResponseReady,
+                            out int isResultResponseReady);
 
                         RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_client_wait_set_get_entities_ready)}() failed.");
 
                         // Check isGoalResponseReady so that a new goalHandle is
                         // already created if the status or feedback for the new
                         // goal is received.
-                        if (isGoalResponseReady)
+                        if (isGoalResponseReady != 0)
                         {
                             var goalResponse = actionClient.CreateSendGoalResponse();
 
@@ -1274,7 +1274,7 @@ namespace ROS2
                         // Check isStatusReady before isFeedbackReady so that
                         // the feedback callback already has the newest status
                         // information if updates are received at the same time.
-                        if (isStatusReady)
+                        if (isStatusReady != 0)
                         {
                             var statusMessage = new GoalStatusArray();
 
@@ -1285,7 +1285,7 @@ namespace ROS2
                             }
                         }
 
-                        if (isFeedbackReady)
+                        if (isFeedbackReady != 0)
                         {
                             var feedbackMessage = actionClient.CreateFeedbackMessage();
 
@@ -1296,7 +1296,7 @@ namespace ROS2
                             }
                         }
 
-                        if (isCancelResponseReady)
+                        if (isCancelResponseReady != 0)
                         {
                             var cancelResponse = new CancelGoal_Response();
 
@@ -1308,7 +1308,7 @@ namespace ROS2
                             }
                         }
 
-                        if (isResultResponseReady)
+                        if (isResultResponseReady != 0)
                         {
                             var resultResponse = actionClient.CreateGetResultResponse();
 
@@ -1326,14 +1326,14 @@ namespace ROS2
                         RCLRet ret = RCLdotnetDelegates.native_rcl_action_server_wait_set_get_entities_ready(
                             waitSetHandle,
                             actionServer.Handle,
-                            out bool isGoalRequestReady,
-                            out bool isCancelRequestReady,
-                            out bool isResultRequestReady,
-                            out bool isGoalExpired);
+                            out int isGoalRequestReady,
+                            out int isCancelRequestReady,
+                            out int isResultRequestReady,
+                            out int isGoalExpired);
 
                         RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_action_server_wait_set_get_entities_ready)}() failed.");
 
-                        if (isGoalRequestReady)
+                        if (isGoalRequestReady != 0)
                         {
                             var goalRequest = actionServer.CreateSendGoalRequest();
 
@@ -1344,7 +1344,7 @@ namespace ROS2
                             }
                         }
 
-                        if (isCancelRequestReady)
+                        if (isCancelRequestReady != 0)
                         {
                             var cancelRequest = new CancelGoal_Request();
 
@@ -1355,7 +1355,7 @@ namespace ROS2
                             }
                         }
 
-                        if (isResultRequestReady)
+                        if (isResultRequestReady != 0)
                         {
                             var resultRequest = actionServer.CreateGetResultRequest();
 
@@ -1370,7 +1370,7 @@ namespace ROS2
                             }
                         }
 
-                        if (isGoalExpired)
+                        if (isGoalExpired != 0)
                         {
                             actionServer.HandleGoalExpired();
                         }
