@@ -33,7 +33,7 @@ namespace ROS2
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLServiceServerIsAvailableType(
-            SafeNodeHandle nodeHandle, SafeClientHandle clientHandle, out bool isAvailable);
+            SafeNodeHandle nodeHandle, SafeClientHandle clientHandle, out int isAvailable);
 
         internal static NativeRCLServiceServerIsAvailableType native_rcl_service_server_is_available = null;
 
@@ -95,10 +95,10 @@ namespace ROS2
 
         public bool ServiceIsReady()
         {
-            RCLRet ret = ClientDelegates.native_rcl_service_server_is_available(_node.Handle, Handle, out var serviceIsReady);
+            RCLRet ret = ClientDelegates.native_rcl_service_server_is_available(_node.Handle, Handle, out int serviceIsReady);
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClientDelegates.native_rcl_service_server_is_available)}() failed.");
 
-            return serviceIsReady;
+            return serviceIsReady != 0;
         }
 
         public Task<TResponse> SendRequestAsync(TRequest request)

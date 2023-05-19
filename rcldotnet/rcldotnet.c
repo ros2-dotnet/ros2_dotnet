@@ -57,7 +57,10 @@ void native_rcl_reset_error(void) {
   rcl_reset_error();
 }
 
-bool native_rcl_ok() { return rcl_context_is_valid(&context); }
+int32_t native_rcl_ok() {
+  bool result = rcl_context_is_valid(&context);
+  return result ? 1 : 0;
+}
 
 int32_t native_rcl_create_node_handle(void **node_handle, const char *name, const char *namespace) {
   rcl_node_t *node = (rcl_node_t *)malloc(sizeof(rcl_node_t));
@@ -178,7 +181,7 @@ int32_t native_rcl_wait(void *wait_set_handle, int64_t timeout) {
   return ret;
 }
 
-bool native_rcl_wait_set_subscription_ready(void *wait_set_handle, int32_t index) {
+int32_t native_rcl_wait_set_subscription_ready(void *wait_set_handle, int32_t index) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
 
   if (index >= wait_set->size_of_subscriptions)
@@ -186,10 +189,11 @@ bool native_rcl_wait_set_subscription_ready(void *wait_set_handle, int32_t index
     return false;
   }
 
-  return wait_set->subscriptions[index] != NULL;
+  bool result = wait_set->subscriptions[index] != NULL;
+  return result ? 1 : 0;
 }
 
-bool native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index) {
+int32_t native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
 
   if (index >= wait_set->size_of_clients)
@@ -197,10 +201,11 @@ bool native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index) {
     return false;
   }
 
-  return wait_set->clients[index] != NULL;
+  bool result = wait_set->clients[index] != NULL;
+  return result ? 1 : 0;
 }
 
-bool native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index) {
+int32_t native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
 
   if (index >= wait_set->size_of_services)
@@ -208,10 +213,11 @@ bool native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index) {
     return false;
   }
 
-  return wait_set->services[index] != NULL;
+  bool result = wait_set->services[index] != NULL;
+  return result ? 1 : 0;
 }
 
-bool native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t index) {
+int32_t native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t index) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
 
   if (index >= wait_set->size_of_guard_conditions)
@@ -219,7 +225,8 @@ bool native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t in
     return false;
   }
 
-  return wait_set->guard_conditions[index] != NULL;
+  bool result = wait_set->guard_conditions[index] != NULL;
+  return result ? 1 : 0;
 }
 
 int32_t native_rcl_take(void *subscription_handle, void *message_handle) {

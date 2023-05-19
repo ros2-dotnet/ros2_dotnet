@@ -30,7 +30,7 @@ RCLDOTNET_EXPORT
 void RCLDOTNET_CDECL native_rcl_reset_error(void);
 
 RCLDOTNET_EXPORT
-bool RCLDOTNET_CDECL native_rcl_ok();
+int32_t RCLDOTNET_CDECL native_rcl_ok();
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_create_node_handle(void **, const char *, const char *);
@@ -76,16 +76,16 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait(void *, int64_t);
 
 RCLDOTNET_EXPORT
-bool RCLDOTNET_CDECL native_rcl_wait_set_subscription_ready(void *wait_set_handle, int32_t index);
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_subscription_ready(void *wait_set_handle, int32_t index);
 
 RCLDOTNET_EXPORT
-bool RCLDOTNET_CDECL native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index);
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index);
 
 RCLDOTNET_EXPORT
-bool RCLDOTNET_CDECL native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index);
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index);
 
 RCLDOTNET_EXPORT
-bool RCLDOTNET_CDECL native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t index);
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t index);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_take(void *, void *);

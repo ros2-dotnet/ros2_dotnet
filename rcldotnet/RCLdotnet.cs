@@ -40,7 +40,7 @@ namespace ROS2
         internal static NativeRCLResetErrorType native_rcl_reset_error = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool NativeRCLOkType();
+        internal delegate int NativeRCLOkType();
 
         internal static NativeRCLOkType native_rcl_ok = null;
 
@@ -117,22 +117,22 @@ namespace ROS2
         internal static NativeRCLWaitType native_rcl_wait = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool NativeRCLWaitSetSubscriptionReady(SafeWaitSetHandle waitSetHandle, int index);
+        internal delegate int NativeRCLWaitSetSubscriptionReady(SafeWaitSetHandle waitSetHandle, int index);
 
         internal static NativeRCLWaitSetSubscriptionReady native_rcl_wait_set_subscription_ready = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool NativeRCLWaitSetClientReady(SafeWaitSetHandle waitSetHandle, int index);
+        internal delegate int NativeRCLWaitSetClientReady(SafeWaitSetHandle waitSetHandle, int index);
 
         internal static NativeRCLWaitSetClientReady native_rcl_wait_set_client_ready = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool NativeRCLWaitSetServiceReady(SafeWaitSetHandle waitSetHandle, int index);
+        internal delegate int NativeRCLWaitSetServiceReady(SafeWaitSetHandle waitSetHandle, int index);
 
         internal static NativeRCLWaitSetServiceReady native_rcl_wait_set_service_ready = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate bool NativeRCLWaitSetGuardConditionReady(SafeWaitSetHandle waitSetHandle, int index);
+        internal delegate int NativeRCLWaitSetGuardConditionReady(SafeWaitSetHandle waitSetHandle, int index);
 
         internal static NativeRCLWaitSetGuardConditionReady native_rcl_wait_set_guard_condition_ready = null;
 
@@ -354,7 +354,7 @@ namespace ROS2
 
         public static bool Ok()
         {
-            return RCLdotnetDelegates.native_rcl_ok();
+            return RCLdotnetDelegates.native_rcl_ok() != 0;
         }
 
         public static Node CreateNode(string nodeName)
@@ -676,7 +676,7 @@ namespace ROS2
                 int subscriptionIndex = 0;
                 foreach (Subscription subscription in node.Subscriptions)
                 {
-                    if (RCLdotnetDelegates.native_rcl_wait_set_subscription_ready(waitSetHandle, subscriptionIndex))
+                    if (RCLdotnetDelegates.native_rcl_wait_set_subscription_ready(waitSetHandle, subscriptionIndex) != 0)
                     {
                         IRosMessage message = subscription.CreateMessage();
                         bool result = Take(subscription, message);
@@ -695,7 +695,7 @@ namespace ROS2
                     int serviceIndex = 0;
                     foreach (var service in node.Services)
                     {
-                        if (RCLdotnetDelegates.native_rcl_wait_set_service_ready(waitSetHandle, serviceIndex))
+                        if (RCLdotnetDelegates.native_rcl_wait_set_service_ready(waitSetHandle, serviceIndex) != 0)
                         {
                             var request = service.CreateRequest();
                             var response = service.CreateResponse();
@@ -715,7 +715,7 @@ namespace ROS2
                     int clientIndex = 0;
                     foreach (var client in node.Clients)
                     {
-                        if (RCLdotnetDelegates.native_rcl_wait_set_client_ready(waitSetHandle, clientIndex))
+                        if (RCLdotnetDelegates.native_rcl_wait_set_client_ready(waitSetHandle, clientIndex) != 0)
                         {
                             var response = client.CreateResponse();
 
@@ -734,7 +734,7 @@ namespace ROS2
                 int guardConditionIndex = 0;
                 foreach (GuardCondition guardCondition in node.GuardConditions)
                 {
-                    if (RCLdotnetDelegates.native_rcl_wait_set_guard_condition_ready(waitSetHandle, guardConditionIndex))
+                    if (RCLdotnetDelegates.native_rcl_wait_set_guard_condition_ready(waitSetHandle, guardConditionIndex) != 0)
                     {
                         guardCondition.TriggerCallback();
                     }
