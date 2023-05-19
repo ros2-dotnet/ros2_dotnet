@@ -39,6 +39,12 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_destroy_node_handle(void *node_handle);
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_create_guard_condition_handle(void **guard_condition_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_destroy_guard_condition_handle(void *guard_condition_handle);
+
+RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_create_wait_set_handle(
     void **wait_set_handle,
     int32_t numberOfSubscriptions,
@@ -64,7 +70,22 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_client(void *wait_set_handle, void *client_handle);
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_guard_condition_handle(void *wait_set_handle, void *guard_condition_handle);
+
+RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait(void *, int64_t);
+
+RCLDOTNET_EXPORT
+bool RCLDOTNET_CDECL native_rcl_wait_set_subscription_ready(void *wait_set_handle, int32_t index);
+
+RCLDOTNET_EXPORT
+bool RCLDOTNET_CDECL native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index);
+
+RCLDOTNET_EXPORT
+bool RCLDOTNET_CDECL native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index);
+
+RCLDOTNET_EXPORT
+bool RCLDOTNET_CDECL native_rcl_wait_set_guard_condition_ready(void *wait_set_handle, int32_t index);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_take(void *, void *);

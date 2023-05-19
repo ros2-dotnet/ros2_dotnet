@@ -45,9 +45,16 @@ add_dotnet_executable(rcldotnet_example_client
   ${_assemblies_dep_dlls}
 )
 
+add_dotnet_executable(rcldotnet_guard_condition
+  RCLDotnetGuardCondition.cs
+  INCLUDE_DLLS
+  ${_assemblies_dep_dlls}
+)
+
 install_dotnet(rcldotnet_talker DESTINATION lib/${PROJECT_NAME}/dotnet)
 install_dotnet(rcldotnet_listener DESTINATION lib/${PROJECT_NAME}/dotnet)
 install_dotnet(rcldotnet_example_service DESTINATION lib/${PROJECT_NAME}/dotnet)
 install_dotnet(rcldotnet_example_client DESTINATION lib/${PROJECT_NAME}/dotnet)
+install_dotnet(rcldotnet_guard_condition DESTINATION lib/${PROJECT_NAME}/dotnet)
 
 ament_package()
