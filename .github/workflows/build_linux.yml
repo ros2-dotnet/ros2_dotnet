@@ -12,6 +12,7 @@ jobs:
         ros_distribution:
           - foxy
           - humble
+          - iron
           - rolling
         include:
           # Foxy Fitzroy (June 2020 - May 2023)
@@ -23,6 +24,11 @@ jobs:
           - os: ubuntu-22.04
             test_target_framework: net6.0
             ros_distribution: humble
+            ros_version: 2
+          # Iron Irwini (May 2023 - November 2024)
+          - os: ubuntu-22.04
+            test_target_framework: net6.0
+            ros_distribution: iron
             ros_version: 2
           # Rolling Ridley  (June 2020 - Present)
           - os: ubuntu-22.04
