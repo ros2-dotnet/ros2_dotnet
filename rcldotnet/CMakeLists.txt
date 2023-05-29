@@ -143,6 +143,7 @@ if(BUILD_TESTING)
     ${RCLDOTNET_TEST_TARGET_FRAMEWORK}
     SOURCES
     ${CS_SOURCES}
+    test/test_actions.cs
     test/test_guard_conditions.cs
     test/test_messages.cs
     test/test_services.cs
