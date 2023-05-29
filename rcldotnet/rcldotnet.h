@@ -108,4 +108,26 @@ int32_t RCLDOTNET_CDECL native_rcl_send_response(void *service_handle, void *req
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_take_response(void *client_handle, void *request_header_handle, void *response_handle);
 
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_create_qos_profile_handle(void **qos_profile_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_destroy_qos_profile_handle(void *qos_profile_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_write_to_qos_profile_handle(
+    void *qos_profile_handle,
+    int32_t history,
+    int32_t depth,
+    int32_t reliability,
+    int32_t durability,
+    uint64_t deadline_sec,
+    uint64_t deadline_nsec,
+    uint64_t lifespan_sec,
+    uint64_t lifespan_nsec,
+    int32_t liveliness,
+    uint64_t liveliness_lease_duration_sec,
+    uint64_t liveliness_lease_duration_nsec,
+    int32_t /* bool */ avoid_ros_namespace_conventions);
+
 #endif // RCLDOTNET_H

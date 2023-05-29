@@ -33,6 +33,7 @@ set(CS_SOURCES
   MessageStaticMemberCache.cs
   Node.cs
   Publisher.cs
+  QosProfile.cs
   RCLdotnet.cs
   RCLExceptionHelper.cs
   RCLRet.cs
@@ -40,6 +41,7 @@ set(CS_SOURCES
   SafeGuardConditionHandle.cs
   SafeNodeHandle.cs
   SafePublisherHandle.cs
+  SafeQosProfileHandle.cs
   SafeRequestIdHandle.cs
   SafeServiceHandle.cs
   SafeSubscriptionHandle.cs
