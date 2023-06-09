@@ -15,6 +15,8 @@ find_package(rmw REQUIRED)
 find_package(rmw_implementation REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 find_package(rosidl_generator_c REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 
 find_package(dotnet_cmake_module REQUIRED)
 find_package(DotNETExtra REQUIRED)
@@ -72,6 +74,8 @@ set(_assemblies_dep_dlls
   ${builtin_interfaces_ASSEMBLIES_DLL}
   ${rcldotnet_common_ASSEMBLIES_DLL}
   ${unique_identifier_msgs_ASSEMBLIES_DLL}
+  ${sensor_msgs_ASSEMBLIES_DLL}
+  ${std_msgs_ASSEMBLIES_DLL}
 )
 
 add_dotnet_library(${PROJECT_NAME}_assemblies

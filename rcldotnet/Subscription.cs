@@ -34,7 +34,7 @@ namespace ROS2
         // internal handle is disposed.
         // By relying on the GC/Finalizer of SafeHandle the handle only gets
         // Disposed if the subscription is not live anymore.
-        internal abstract SafeSubscriptionHandle Handle { get; }
+        public abstract SafeSubscriptionHandle Handle { get; }
 
         internal abstract IRosMessage CreateMessage();
 
@@ -54,7 +54,7 @@ namespace ROS2
             _callback = callback;
         }
 
-        internal override SafeSubscriptionHandle Handle { get; }
+        public override SafeSubscriptionHandle Handle { get; }
 
         internal override IRosMessage CreateMessage() => (IRosMessage)new T();
 

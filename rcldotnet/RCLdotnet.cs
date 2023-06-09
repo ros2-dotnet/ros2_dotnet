@@ -18,6 +18,7 @@ using System.Runtime.InteropServices;
 using action_msgs.msg;
 using action_msgs.srv;
 using ROS2.Utils;
+using sensor_msgs.msg;
 
 namespace ROS2
 {
@@ -848,7 +849,14 @@ namespace ROS2
                 switch (ret)
                 {
                     case RCLRet.Ok:
-                        ReadFromMessageHandle(message, messageHandle);
+                        if (!(message is sensor_msgs.msg.Image))
+                        {
+                            ReadFromMessageHandle(message, messageHandle);
+                        }
+                        else
+                        {
+                            HackedReadFromMessageHandle(message, messageHandle);
+                        }
                         return true;
 
                     case RCLRet.SubscriptionTakeFailed:
@@ -1410,6 +1418,59 @@ namespace ROS2
             string rmw_identifier = Marshal.PtrToStringAnsi(ptr);
             return rmw_identifier;
         }
+
+
+
+        public static void HackedImage__ReadFromHandle(global::System.IntPtr messageHandle, sensor_msgs.msg.Image image) 
+        {
+            image.Header.__ReadFromHandle(sensor_msgs.msg.Image.native_get_field_header_HANDLE(messageHandle));
+            image.Height = sensor_msgs.msg.Image.native_read_field_height(messageHandle);
+            image.Width = sensor_msgs.msg.Image.native_read_field_width(messageHandle);
+            IntPtr pStr_Encoding = sensor_msgs.msg.Image.native_read_field_encoding(messageHandle);
+            image.Encoding = Marshal.PtrToStringAnsi(pStr_Encoding);
+            image.Encoding="HackedEncoding";
+            image.IsBigendian = sensor_msgs.msg.Image.native_read_field_is_bigendian(messageHandle);
+            image.Step = sensor_msgs.msg.Image.native_read_field_step(messageHandle);
+            {
+                int size__local_variable = sensor_msgs.msg.Image.native_getsize_field_data_message(messageHandle);
+
+                //nav_msgs__msg__OccupancyGrid__get_field_data_message
+                
+                IntPtr first = sensor_msgs.msg.Image.native_get_field_data_message(messageHandle,0);
+
+                image.Data = new System.Collections.Generic.List<byte>(size__local_variable);
+                for (int i__local_variable = 0; i__local_variable < size__local_variable; i__local_variable++)
+                {
+                    image.Data.Add(sensor_msgs.msg.Image.native_read_field_data(sensor_msgs.msg.Image.native_get_field_data_message(messageHandle, i__local_variable)));
+                }
+            }
+        }
+
+        internal static void HackedReadFromMessageHandle(IRosMessage message, SafeHandle messageHandle)
+        {
+            bool mustRelease = false;
+            try
+            {
+                // Using SafeHandles for __ReadFromHandle() is very tedious as
+                // this needs to be handled in generated code across multiple
+                // assemblies. Array and collection indexing would need to
+                // create SafeHandles everywhere. It's not worth it, especially
+                // considering the extra allocations for SafeHandles in arrays
+                // or collections that don't really represent their own native
+                // resource.
+                messageHandle.DangerousAddRef(ref mustRelease);
+                HackedImage__ReadFromHandle(messageHandle.DangerousGetHandle(),message as sensor_msgs.msg.Image);
+                //message.__ReadFromHandle(messageHandle.DangerousGetHandle());
+            }
+            finally
+            {
+                if (mustRelease)
+                {
+                    messageHandle.DangerousRelease();
+                }
+            }
+        }
+        
 
         internal static void ReadFromMessageHandle(IRosMessage message, SafeHandle messageHandle)
         {
