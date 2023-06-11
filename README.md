@@ -21,8 +21,7 @@ The current set of features include:
 - Generation of all builtin ROS types
 - Support for publishers and subscriptions
 - Support for clients and services
-- Cross-platform support (Linux, Windows)
-  - For using ROS 2 with Hololens see https://github.com/ms-iot/ros_msft_mrtk
+- Cross-platform support (Linux, Windows, Windows IoT Core, UWP)
 
 What's missing?
 ---------------
@@ -40,7 +39,8 @@ Sounds great, how can I try this out?
 -------------------------------------
 
 First of all install the standard ROS2 dependencies for your operating system
-of choice: https://github.com/ros2/ros2/wiki/Installation#building-from-source
+of choice (**NOTE**: only do this if building Windows Desktop or Linux. For UWP,
+see the relevant section below): https://github.com/ros2/ros2/wiki/Installation#building-from-source
 
 Next make sure you've either installed .Net Core (preferred)
 https://www.microsoft.com/net/learn/get-started or Mono
@@ -92,6 +92,14 @@ wget https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/main/ros2_dotnet_
 vcs import ~/ros2_dotnet_ws/src < ros2_dotnet_foxy.repos
 colcon build
 ```
+
+Universal Windows Platform (Win32, Win64)
+-----------------------------------------
+
+For running within UWP (Universal Windows Platform) applications, the entire core of ROS2 must be compiled for UWP compatibility.
+
+See the [Mixed Reality Toolkit for ROS 2](https://github.com/ms-iot/ros_msft_mrtk) which provides instructions, scripts and binary packages to set up an UWP application for Hololens.
+This Toolkit builds upon this and core ROS 2 packages that provide support for UWP.
 
 ### Publisher and subscriber
 
