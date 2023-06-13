@@ -19,6 +19,8 @@ using action_msgs.msg;
 using action_msgs.srv;
 using ROS2.Utils;
 using sensor_msgs.msg;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace ROS2
 {
@@ -855,7 +857,7 @@ namespace ROS2
                         }
                         else
                         {
-                            HackedReadFromMessageHandle(message, messageHandle);
+                            HackedReadFromMessageHandle(subscription, message, messageHandle);
                         }
                         return true;
 
@@ -1420,33 +1422,84 @@ namespace ROS2
         }
 
 
+        // WORKAROUND IMAGES
+        // public static Dictionary<Subscription, sensor_msgs.msg.Image> lastImages =new Dictionary<Subscription, sensor_msgs.msg.Image>();
+        
+        public static Dictionary<Subscription, sensor_msgs.msg.Image> imageSubscription = new Dictionary<Subscription, sensor_msgs.msg.Image>();
 
-        public static void HackedImage__ReadFromHandle(global::System.IntPtr messageHandle, sensor_msgs.msg.Image image) 
+        public static Dictionary<sensor_msgs.msg.Image, byte[]> lastImagesBytes = new Dictionary<Image, byte[]>();
+
+        public static object IMG_DATA_LOCK = new object();
+                
+
+        public static void HackedImage__ReadFromHandle(Subscription subscription, global::System.IntPtr messageHandle, sensor_msgs.msg.Image image) 
         {
+            Debug.WriteLine("HackedImage__ReadFromHandle");
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+
+            lock(IMG_DATA_LOCK)
+            {
             image.Header.__ReadFromHandle(sensor_msgs.msg.Image.native_get_field_header_HANDLE(messageHandle));
             image.Height = sensor_msgs.msg.Image.native_read_field_height(messageHandle);
             image.Width = sensor_msgs.msg.Image.native_read_field_width(messageHandle);
             IntPtr pStr_Encoding = sensor_msgs.msg.Image.native_read_field_encoding(messageHandle);
             image.Encoding = Marshal.PtrToStringAnsi(pStr_Encoding);
-            image.Encoding="HackedEncoding";
+            
             image.IsBigendian = sensor_msgs.msg.Image.native_read_field_is_bigendian(messageHandle);
             image.Step = sensor_msgs.msg.Image.native_read_field_step(messageHandle);
-            {
-                int size__local_variable = sensor_msgs.msg.Image.native_getsize_field_data_message(messageHandle);
-
-                //nav_msgs__msg__OccupancyGrid__get_field_data_message
-                
-                IntPtr first = sensor_msgs.msg.Image.native_get_field_data_message(messageHandle,0);
-
-                image.Data = new System.Collections.Generic.List<byte>(size__local_variable);
-                for (int i__local_variable = 0; i__local_variable < size__local_variable; i__local_variable++)
                 {
-                    image.Data.Add(sensor_msgs.msg.Image.native_read_field_data(sensor_msgs.msg.Image.native_get_field_data_message(messageHandle, i__local_variable)));
+                    int size__local_variable = sensor_msgs.msg.Image.native_getsize_field_data_message(messageHandle);
+
+                    HackedMemoryCopy(subscription, messageHandle, image, size__local_variable);
+
+                    // sw.Stop();
+
+                    // var sw2 = System.Diagnostics.Stopwatch.StartNew();
+
+                    // image.Data = new System.Collections.Generic.List<byte>(size__local_variable);
+                    // for (int i__local_variable = 0; i__local_variable < size__local_variable; i__local_variable++)
+                    // {
+                    //     image.Data.Add(sensor_msgs.msg.Image.native_read_field_data(sensor_msgs.msg.Image.native_get_field_data_message(messageHandle, i__local_variable)));
+                    // }
+
+                    // sw2.Stop();
+                    // Console.WriteLine($"copying image took: {sw.ElapsedTicks} ticks, {sw2.ElapsedTicks} ticks: {(float)(sw.ElapsedTicks - sw2.ElapsedTicks)/(float)sw.ElapsedTicks}");
                 }
             }
+            sw.Stop();
+            Debug.WriteLine($"HackedImage__ReadFromHandle END: {sw.ElapsedMilliseconds} ms");
         }
 
-        internal static void HackedReadFromMessageHandle(IRosMessage message, SafeHandle messageHandle)
+        private static void HackedMemoryCopy(Subscription subscription, IntPtr messageHandle, sensor_msgs.msg.Image image, int size__local_variable)
+        {
+            IntPtr first = sensor_msgs.msg.Image.native_get_field_data_message(messageHandle, 0);
+
+            // lastImagesHandles[image] = new Tuple<IntPtr, uint>(first, (uint)size__local_variable);
+
+            byte[] bytes = null;
+            if (imageSubscription.ContainsKey(subscription))
+            {
+                var lastImage = imageSubscription[subscription];
+                bytes = lastImagesBytes[lastImage];
+                lastImagesBytes.Remove(lastImage);
+            }
+
+            if (bytes == null || bytes.Length != size__local_variable)
+            {
+                Debug.WriteLine("HackedImage__ReadFromHandle: new byte buffer created");
+
+                bytes = new byte[size__local_variable];
+                // Console.WriteLine($"makmustReleaseing new size for image subscription: {size__local_variable} subscription: {subscription.GetHashCode()}");
+            }
+
+
+            Marshal.Copy(first,bytes, 0, (int)(size__local_variable));
+
+            lastImagesBytes[image] = bytes;
+            imageSubscription[subscription] = image;
+        }
+
+        internal static void HackedReadFromMessageHandle(Subscription subscription, IRosMessage message, SafeHandle messageHandle)
         {
             bool mustRelease = false;
             try
@@ -1459,8 +1512,12 @@ namespace ROS2
                 // or collections that don't really represent their own native
                 // resource.
                 messageHandle.DangerousAddRef(ref mustRelease);
-                HackedImage__ReadFromHandle(messageHandle.DangerousGetHandle(),message as sensor_msgs.msg.Image);
+                HackedImage__ReadFromHandle(subscription, messageHandle.DangerousGetHandle(),message as sensor_msgs.msg.Image);
                 //message.__ReadFromHandle(messageHandle.DangerousGetHandle());
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine("HackedImage__ReadFromHandle: exception");
             }
             finally
             {
