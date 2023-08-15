@@ -21,6 +21,7 @@ The current set of features include:
 - Generation of all builtin ROS types
 - Support for publishers and subscriptions
 - Support for clients and services
+- Support action clients and servers
 - Cross-platform support (Linux, Windows, Windows IoT Core, UWP)
 
 What's missing?
@@ -30,7 +31,6 @@ Lots of things!
 - Unicode types
 - String constants (specifically BoundedString)
 - Component nodes
-- Actions
 - Tests
 - Documentation
 - More examples (e.g. IoT, VB, UWP, HoloLens, etc.)
