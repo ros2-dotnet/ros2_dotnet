@@ -68,6 +68,17 @@ foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
       "${_output_path}/${_parent_folder}/${_module_name}.c"
       )
   elseif(_parent_folder STREQUAL "action")
+    list(APPEND _generated_cs_files
+      "${_output_path}/${_parent_folder}/${_module_name}.cs"
+      )
+
+    list(APPEND _generated_h_files
+      "${_output_path}/${_parent_folder}/rcldotnet_${_module_name}.h"
+      )
+
+    list(APPEND _generated_c_ts_files
+      "${_output_path}/${_parent_folder}/${_module_name}.c"
+      )
   else()
     message(FATAL_ERROR "Interface file with unknown parent folder: ${_idl_file}")
   endif()
@@ -87,13 +98,18 @@ endforeach()
 set(target_dependencies
   "${rosidl_generator_dotnet_BIN}"
   ${rosidl_generator_dotnet_GENERATOR_FILES}
-  "${rosidl_generator_dotnet_TEMPLATE_DIR}/idl.h.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/action.c.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/action.cs.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/action.h.em"
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/idl.c.em"
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/idl.cs.em"
-  "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.h.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/idl.h.em"
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.c.em"
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.cs.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/msg.h.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/srv.c.em"
   "${rosidl_generator_dotnet_TEMPLATE_DIR}/srv.cs.em"
+  "${rosidl_generator_dotnet_TEMPLATE_DIR}/srv.h.em"
   ${rosidl_generate_interfaces_ABS_IDL_FILES}
   ${_dependency_files})
 foreach(dep ${target_dependencies})

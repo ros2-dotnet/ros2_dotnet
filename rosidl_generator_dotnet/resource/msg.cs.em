@@ -17,11 +17,17 @@ from rosidl_parser.definition import NamespacedType
 
 type_name = message.structure.namespaced_type.name
 msg_typename = '%s__%s' % ('__'.join(message.structure.namespaced_type.namespaces), type_name)
+
+if 'action_interface' not in locals():
+    action_interface = None
+
+additional_interfaces_str = ', ' + action_interface if action_interface is not None else ''
+
 }
 namespace @('.'.join(message.structure.namespaced_type.namespaces))
 {
 
-public class @(type_name) : global::ROS2.IRosMessage {
+public class @(type_name) : global::ROS2.IRosMessage@(additional_interfaces_str) {
     private static readonly DllLoadUtils dllLoadUtils;
 
 @[for member in message.structure.members]@
@@ -277,7 +283,7 @@ public class @(type_name) : global::ROS2.IRosMessage {
               IntPtr pStr_@(get_field_name(type_name, member.name)) = native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
               @(get_field_name(type_name, member.name))[i__local_variable] = Marshal.PtrToStringAnsi(pStr_@(get_field_name(type_name, member.name)));
 @[        elif isinstance(member.type.value_type, AbstractWString)]@
-              // TODO: Unicode types are not supported  
+              // TODO: Unicode types are not supported
 @[        else]@
               @(get_field_name(type_name, member.name))[i__local_variable] = new @(get_dotnet_type(member.type.value_type))();
               @(get_field_name(type_name, member.name))[i__local_variable].__ReadFromHandle(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
@@ -296,7 +302,7 @@ public class @(type_name) : global::ROS2.IRosMessage {
               IntPtr pStr_@(get_field_name(type_name, member.name)) = native_read_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
               @(get_field_name(type_name, member.name)).Add(Marshal.PtrToStringAnsi(pStr_@(get_field_name(type_name, member.name))));
 @[        elif isinstance(member.type.value_type, AbstractWString)]@
-              // TODO: Unicode types are not supported  
+              // TODO: Unicode types are not supported
 @[        else]@
               @(get_field_name(type_name, member.name)).Add(new @(get_dotnet_type(member.type.value_type))());
               @(get_field_name(type_name, member.name))[i__local_variable].__ReadFromHandle(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
@@ -348,7 +354,7 @@ public class @(type_name) : global::ROS2.IRosMessage {
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
                 native_write_field_@(member.name)(native_get_field_@(member.name)_message(messageHandle, i__local_variable), value__local_variable);
 @[        elif isinstance(member.type.value_type, AbstractWString)]
-// TODO: Unicode types are not supported  
+// TODO: Unicode types are not supported
 @[        else]@
                 value__local_variable.__WriteToHandle(native_get_field_@(member.name)_message(messageHandle, i__local_variable));
 @[        end if]@
@@ -381,6 +387,25 @@ public class @(type_name) : global::ROS2.IRosMessage {
     public @(get_dotnet_type(member.type)) @(get_field_name(type_name, member.name)) { get; set; }
 @[    end if]@
 @[end for]@
+
+@[if action_interface is not None and (
+    action_interface.startswith("global::ROS2.IRosActionSendGoalRequest") or
+    action_interface.startswith("global::ROS2.IRosActionGetResultRequest") or
+    action_interface.startswith("global::ROS2.IRosActionFeedbackMessage")
+)]@
+    global::ROS2.IRosMessage @(action_interface).GoalIdAsRosMessage
+    {
+        get => GoalId;
+        set => GoalId = (global::unique_identifier_msgs.msg.UUID)value;
+    }
+@[end if]@
+@[if action_interface is not None and action_interface.startswith("global::ROS2.IRosActionSendGoalResponse")]@
+    global::ROS2.IRosMessage @(action_interface).StampAsRosMessage
+    {
+        get => Stamp;
+        set => Stamp = (global::builtin_interfaces.msg.Time)value;
+    }
+@[end if]@
 
     private sealed class Safe@(type_name)Handle : global::System.Runtime.InteropServices.SafeHandle
     {

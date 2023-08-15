@@ -142,6 +142,11 @@ def get_dotnet_type(type_, use_primitives=True):
 
     return get_builtin_dotnet_type(type_.typename, use_primitives=use_primitives)
 
+def get_dotnet_type_for_message(message):
+    return '%s.%s' % (
+        '.'.join(message.structure.namespaced_type.namespaces),
+        message.structure.namespaced_type.name)
+
 def msg_type_to_c(type_):
     if isinstance(type_, AbstractString):
         return 'char *'

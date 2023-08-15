@@ -1,6 +1,9 @@
 // generated from rosidl_generator_dotnet/resource/idl.cs.em
 // with input from @(package_name):@(interface_path)
 // generated code does not contain a copyright notice
+@{
+from rosidl_generator_dotnet import get_dotnet_type_for_message
+}@
 @
 @#######################################################################
 @# EmPy template for generating <idl>.cs files
@@ -62,5 +65,84 @@ TEMPLATE(
 @# Handle actions
 @#######################################################################
 @
-@#TODO - actions not implemented
+@{
+from rosidl_parser.definition import Action
+}@
+@[for action in content.get_elements_of_type(Action)]@
+@{
+TEMPLATE(
+    'msg.cs.em',
+    package_name=package_name, interface_path=interface_path, message=action.goal)
+}@
+
+@{
+TEMPLATE(
+    'msg.cs.em',
+    package_name=package_name, interface_path=interface_path, message=action.result)
+}@
+
+@{
+TEMPLATE(
+    'msg.cs.em',
+    package_name=package_name, interface_path=interface_path, message=action.feedback)
+}@
+
+@{
+TEMPLATE(
+    'msg.cs.em',
+    package_name=package_name, interface_path=interface_path, message=action.send_goal_service.request_message,
+    action_interface='global::ROS2.IRosActionSendGoalRequest<global::%s>' % get_dotnet_type_for_message(action.goal)
+)
+}@
+
+@{
+TEMPLATE(
+    'msg.cs.em',
+    package_name=package_name, interface_path=interface_path, message=action.send_goal_service.response_message,
+    action_interface='global::ROS2.IRosActionSendGoalResponse'
+)
+}@
+
+@{
+TEMPLATE(
+    'srv.cs.em',
+    package_name=package_name, interface_path=interface_path, service=action.send_goal_service)
+}@
+
+@{
+TEMPLATE(
+    'msg.cs.em',
+    package_name=package_name, interface_path=interface_path, message=action.get_result_service.request_message,
+    action_interface='global::ROS2.IRosActionGetResultRequest'
+)
+}@
+
+@{
+TEMPLATE(
+    'msg.cs.em',
+    package_name=package_name, interface_path=interface_path, message=action.get_result_service.response_message,
+    action_interface='global::ROS2.IRosActionGetResultResponse<global::%s>' % get_dotnet_type_for_message(action.result)
+)
+}@
+
+@{
+TEMPLATE(
+    'srv.cs.em',
+    package_name=package_name, interface_path=interface_path, service=action.get_result_service)
+}@
+
+@{
+TEMPLATE(
+    'msg.cs.em',
+    package_name=package_name, interface_path=interface_path, message=action.feedback_message,
+    action_interface='global::ROS2.IRosActionFeedbackMessage<global::%s>' % get_dotnet_type_for_message(action.feedback)
+)
+}@
+
+@{
+TEMPLATE(
+    'action.cs.em',
+    package_name=package_name, interface_path=interface_path, action=action)
+}@
+@[end for]@
 @

@@ -73,24 +73,7 @@ namespace ROS2
         {
             using (var messageHandle = MessageStaticMemberCache<T>.CreateMessageHandle())
             {
-                bool mustRelease = false;
-                try
-                {
-                    // Using SafeHandles for __WriteToHandle() is very tedious as this needs to be
-                    // handled in generated code across multiple assemblies.
-                    // Array and collection indexing would need to create SafeHandles everywere.
-                    // It's not worth it, especialy considering the extra allocations for SafeHandles in
-                    // arrays or collections that don't realy represent their own native recource.
-                    messageHandle.DangerousAddRef(ref mustRelease);
-                    message.__WriteToHandle(messageHandle.DangerousGetHandle());
-                }
-                finally
-                {
-                    if (mustRelease)
-                    {
-                        messageHandle.DangerousRelease();
-                    }
-                }
+                RCLdotnet.WriteToMessageHandle(message, messageHandle);
 
                 RCLRet ret = PublisherDelegates.native_rcl_publish(Handle, messageHandle);
                 RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(PublisherDelegates.native_rcl_publish)}() failed.");

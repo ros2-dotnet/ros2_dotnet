@@ -72,6 +72,30 @@ namespace ROS2
 
         internal static NativeRCLDestroyClientHandleType native_rcl_destroy_client_handle = null;
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionCreateClientHandleType(
+            ref SafeActionClientHandle actionClientHandle, SafeNodeHandle nodeHandle, [MarshalAs(UnmanagedType.LPStr)] string actionName, IntPtr typesupportHandle);
+
+        internal static NativeRCLActionCreateClientHandleType native_rcl_action_create_client_handle = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionDestroyClientHandleType(
+            IntPtr actionClientHandle, SafeNodeHandle nodeHandle);
+
+        internal static NativeRCLActionDestroyClientHandleType native_rcl_action_destroy_client_handle = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionCreateServerHandleType(
+            ref SafeActionServerHandle actionServerHandle, SafeNodeHandle nodeHandle, [MarshalAs(UnmanagedType.LPStr)] string actionName, IntPtr typesupportHandle);
+
+        internal static NativeRCLActionCreateServerHandleType native_rcl_action_create_server_handle = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLActionDestroyServerHandleType(
+            IntPtr actionServerHandle, SafeNodeHandle nodeHandle);
+
+        internal static NativeRCLActionDestroyServerHandleType native_rcl_action_destroy_server_handle = null;
+
         static NodeDelegates()
         {
             _dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
@@ -132,6 +156,32 @@ namespace ROS2
             NodeDelegates.native_rcl_destroy_client_handle =
                 (NativeRCLDestroyClientHandleType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_destroy_client_handle_ptr, typeof(NativeRCLDestroyClientHandleType));
+
+            IntPtr native_rcl_action_create_client_handle_ptr = _dllLoadUtils.GetProcAddress(
+                nativeLibrary, "native_rcl_action_create_client_handle");
+
+            NodeDelegates.native_rcl_action_create_client_handle =
+                (NativeRCLActionCreateClientHandleType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_create_client_handle_ptr, typeof(NativeRCLActionCreateClientHandleType));
+
+            IntPtr native_rcl_action_destroy_client_handle_ptr = _dllLoadUtils.GetProcAddress(
+                nativeLibrary, "native_rcl_action_destroy_client_handle");
+
+            NodeDelegates.native_rcl_action_destroy_client_handle =
+                (NativeRCLActionDestroyClientHandleType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_destroy_client_handle_ptr, typeof(NativeRCLActionDestroyClientHandleType));
+
+            IntPtr native_rcl_action_create_server_handle_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_create_server_handle");
+            NodeDelegates.native_rcl_action_create_server_handle =
+                (NativeRCLActionCreateServerHandleType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_create_server_handle_ptr, typeof(NativeRCLActionCreateServerHandleType));
+
+            IntPtr native_rcl_action_destroy_server_handle_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_action_destroy_server_handle");
+            NodeDelegates.native_rcl_action_destroy_server_handle =
+                (NativeRCLActionDestroyServerHandleType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_action_destroy_server_handle_ptr, typeof(NativeRCLActionDestroyServerHandleType));
         }
     }
 
@@ -145,6 +195,10 @@ namespace ROS2
 
         private readonly IList<GuardCondition> _guardConditions;
 
+        private readonly IList<ActionClient> _actionClients;
+
+        private readonly IList<ActionServer> _actionServers;
+
         internal Node(SafeNodeHandle handle)
         {
             Handle = handle;
@@ -152,6 +206,8 @@ namespace ROS2
             _services = new List<Service>();
             _clients = new List<Client>();
             _guardConditions = new List<GuardCondition>();
+            _actionClients = new List<ActionClient>();
+            _actionServers = new List<ActionServer>();
         }
 
         public IList<Subscription> Subscriptions => _subscriptions;
@@ -164,6 +220,10 @@ namespace ROS2
         public IList<Client> Clients => _clients;
 
         public IList<GuardCondition> GuardConditions => _guardConditions;
+
+        public IList<ActionClient> ActionClients => _actionClients;
+
+        public IList<ActionServer> ActionServers => _actionServers;
 
         // Node does intentionaly (for now) not implement IDisposable as this
         // needs some extra consideration how the type works after its
@@ -298,6 +358,87 @@ namespace ROS2
             var guardCondition = new GuardCondition(guardConditionHandle, callback);
             _guardConditions.Add(guardCondition);
             return guardCondition;
+        }
+
+        public ActionClient<TAction, TGoal, TResult, TFeedback> CreateActionClient<TAction, TGoal, TResult, TFeedback>(string actionName)
+            where TAction : IRosActionDefinition<TGoal, TResult, TFeedback>
+            where TGoal : IRosMessage, new()
+            where TResult : IRosMessage, new()
+            where TFeedback : IRosMessage, new()
+        {
+            IntPtr typeSupport = ActionDefinitionStaticMemberCache<TAction, TGoal, TResult, TFeedback>.GetTypeSupport();
+
+            var actionClientHandle = new SafeActionClientHandle();
+            RCLRet ret = NodeDelegates.native_rcl_action_create_client_handle(ref actionClientHandle, Handle, actionName, typeSupport);
+            actionClientHandle.SetParent(Handle);
+            if (ret != RCLRet.Ok)
+            {
+                actionClientHandle.Dispose();
+                throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_action_create_client_handle)}() failed.");
+            }
+
+            // TODO: (sh) Add actionName to ActionClient.
+            var actionClient = new ActionClient<TAction, TGoal, TResult, TFeedback>(actionClientHandle, this);
+            _actionClients.Add(actionClient);
+            return actionClient;
+        }
+
+        // TODO: (sh) Make acceptedCallback an async callback? Add as overload? (`Func<GoalHandle, Task>`)
+        // TODO: (sh) Make acceptedCallback an async callback which returns the `TResult` (`Func<GoalHandle, Task<TResult>>`)?
+        //      Add as overload?
+        //      In that case this would be more or less an `executeCallback` from `rclpy`.
+        public ActionServer<TAction, TGoal, TResult, TFeedback> CreateActionServer<TAction, TGoal, TResult, TFeedback>(
+            string actionName,
+            Action<ActionServerGoalHandle<TAction, TGoal, TResult, TFeedback>> acceptedCallback,
+            // This has an additional `goalId` parameter compared to `rclpy`.
+            Func<Guid, TGoal, GoalResponse> goalCallback = null,
+            Func<ActionServerGoalHandle<TAction, TGoal, TResult, TFeedback>, CancelResponse> cancelCallback = null
+        )
+            where TAction : IRosActionDefinition<TGoal, TResult, TFeedback>
+            where TGoal : IRosMessage, new()
+            where TResult : IRosMessage, new()
+            where TFeedback : IRosMessage, new()
+        {
+            if (goalCallback == null)
+            {
+                goalCallback = DefaultGoalCallback;
+            }
+
+            if (cancelCallback == null)
+            {
+                cancelCallback = DefaultCancelCallback;
+            }
+
+            IntPtr typeSupport = ActionDefinitionStaticMemberCache<TAction, TGoal, TResult, TFeedback>.GetTypeSupport();
+
+            var actionServerHandle = new SafeActionServerHandle();
+            RCLRet ret = NodeDelegates.native_rcl_action_create_server_handle(ref actionServerHandle, Handle, actionName, typeSupport);
+            actionServerHandle.SetParent(Handle);
+            if (ret != RCLRet.Ok)
+            {
+                actionServerHandle.Dispose();
+                throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(NodeDelegates.native_rcl_action_create_server_handle)}() failed.");
+            }
+
+            // TODO: (sh) Add actionName to ActionServer.
+            var actionServer = new ActionServer<TAction, TGoal, TResult, TFeedback>(
+                actionServerHandle,
+                acceptedCallback,
+                goalCallback,
+                cancelCallback);
+
+            _actionServers.Add(actionServer);
+            return actionServer;
+        }
+
+        private static GoalResponse DefaultGoalCallback<TGoal>(Guid goalId, TGoal goal)
+        {
+            return GoalResponse.AcceptAndExecute;
+        }
+
+        private static CancelResponse DefaultCancelCallback(ActionServerGoalHandle goalHandle)
+        {
+            return CancelResponse.Reject;
         }
     }
 }
