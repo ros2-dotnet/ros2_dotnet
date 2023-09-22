@@ -18,7 +18,7 @@
 #include "rcldotnet_macros.h"
 
 RCLDOTNET_EXPORT
-int32_t RCLDOTNET_CDECL native_rcl_init();
+int32_t RCLDOTNET_CDECL native_rcl_init(int argc, const char *argv[]);
 
 rcl_clock_t *native_rcl_get_default_clock();
 
