@@ -26,7 +26,8 @@ namespace ROS2
         internal static readonly DllLoadUtils _dllLoadUtils;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate RCLRet NativeRCLInitType();
+        internal delegate RCLRet NativeRCLInitType(
+            int argc, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] argv);
 
         internal static NativeRCLInitType native_rcl_init = null;
 
@@ -1396,7 +1397,8 @@ namespace ROS2
             {
                 if (!initialized)
                 {
-                    RCLRet ret = RCLdotnetDelegates.native_rcl_init();
+                    string[] args = System.Environment.GetCommandLineArgs();
+                    RCLRet ret = RCLdotnetDelegates.native_rcl_init(args.Length, args);
                     RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_init)}() failed.");
                     initialized = true;
                 }
