@@ -96,6 +96,14 @@ namespace ROS2
 
         internal static NativeRCLActionDestroyServerHandleType native_rcl_action_destroy_server_handle = null;
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate string NativeRCLGetStringType(
+            SafeNodeHandle nodeHandle);
+
+        internal static NativeRCLGetStringType native_rcl_get_name_handle = null;
+
+        internal static NativeRCLGetStringType native_rcl_get_namespace_handle = null;
+
         static NodeDelegates()
         {
             _dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
@@ -182,6 +190,18 @@ namespace ROS2
             NodeDelegates.native_rcl_action_destroy_server_handle =
                 (NativeRCLActionDestroyServerHandleType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_action_destroy_server_handle_ptr, typeof(NativeRCLActionDestroyServerHandleType));
+
+            IntPtr native_rcl_get_name_handle_ptr = _dllLoadUtils.GetProcAddress(
+                nativeLibrary, "native_rcl_get_name_handle");
+            NodeDelegates.native_rcl_get_name_handle =
+                (NativeRCLGetStringType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_get_name_handle_ptr, typeof(NativeRCLGetStringType));
+
+            IntPtr native_rcl_get_namespace_handle_ptr = _dllLoadUtils.GetProcAddress(
+                nativeLibrary, "native_rcl_get_namespace_handle");
+            NodeDelegates.native_rcl_get_namespace_handle =
+                (NativeRCLGetStringType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_get_namespace_handle_ptr, typeof(NativeRCLGetStringType));
         }
     }
 
@@ -440,5 +460,9 @@ namespace ROS2
         {
             return CancelResponse.Reject;
         }
+
+        public string GetName() => NodeDelegates.native_rcl_get_name_handle(Handle);
+
+        public string GetNamespace() => NodeDelegates.native_rcl_get_namespace_handle(Handle);
     }
 }
