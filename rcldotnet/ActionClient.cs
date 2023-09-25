@@ -19,7 +19,6 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using action_msgs.msg;
 using action_msgs.srv;
-using builtin_interfaces.msg;
 using ROS2.Utils;
 using unique_identifier_msgs.msg;
 
@@ -375,7 +374,7 @@ namespace ROS2
             var goalId = pendingGoalRequest.GoalId;
             var goalResponseCasted = (IRosActionSendGoalResponse)goalResponse;
             var accepted = goalResponseCasted.Accepted;
-            var stamp = (Time)goalResponseCasted.StampAsRosMessage;
+            var stamp = (builtin_interfaces.msg.Time)goalResponseCasted.StampAsRosMessage;
 
             var goalHandle = new ActionClientGoalHandle<TAction, TGoal, TResult, TFeedback>(this, goalId, accepted, stamp, pendingGoalRequest.FeedbackCallback);
 

@@ -49,6 +49,25 @@ rcl_clock_t *native_rcl_get_default_clock() {
   return &clock;
 }
 
+int32_t native_rcl_create_clock_handle(void **clock_handle, int32_t clock_type) {
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  rcl_clock_t *clock;
+
+  rcl_ret_t ret = rcl_clock_init((rcl_clock_type_t)clock_type, clock, &allocator);
+  
+  *clock_handle = (void *)clock;
+  return ret;
+}
+
+int32_t native_rcl_destroy_clock_handle(void *clock_handle) {
+  rcl_clock_t *clock = (rcl_clock_t *)clock_handle;
+
+  rcl_ret_t ret = rcl_clock_fini(clock);
+  free(clock);
+
+  return ret;
+}
+
 const char *native_rcl_get_rmw_identifier() {
   return rmw_get_implementation_identifier();
 }

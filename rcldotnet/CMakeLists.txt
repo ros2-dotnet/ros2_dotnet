@@ -39,6 +39,7 @@ set(CS_SOURCES
   ActionServer.cs
   ActionServerGoalHandle.cs
   Client.cs
+  Clock.cs
   GuardCondition.cs
   GuidExtensions.cs
   MessageStaticMemberCache.cs
@@ -52,6 +53,7 @@ set(CS_SOURCES
   SafeActionGoalHandle.cs
   SafeActionServerHandle.cs
   SafeClientHandle.cs
+  SafeClockHandle.cs
   SafeGuardConditionHandle.cs
   SafeNodeHandle.cs
   SafePublisherHandle.cs
@@ -87,6 +89,7 @@ ament_export_assemblies_dll("lib/${PROJECT_NAME}/dotnet/${PROJECT_NAME}_assembli
 add_library(${PROJECT_NAME}_native SHARED
   rcldotnet_action_client.c
   rcldotnet_client.c
+  rcldotnet_clock.c
   rcldotnet_guard_condition.c
   rcldotnet_node.c
   rcldotnet_publisher.c

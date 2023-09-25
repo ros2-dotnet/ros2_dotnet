@@ -23,6 +23,12 @@ int32_t RCLDOTNET_CDECL native_rcl_init(int argc, const char *argv[]);
 rcl_clock_t *native_rcl_get_default_clock();
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_create_clock_handle(void **clock_handle, int32_t clock_type);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_destroy_clock_handle(void *clock_handle);
+
+RCLDOTNET_EXPORT
 const char * RCLDOTNET_CDECL native_rcl_get_rmw_identifier();
 
 RCLDOTNET_EXPORT

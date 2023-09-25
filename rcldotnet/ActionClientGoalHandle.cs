@@ -16,7 +16,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using builtin_interfaces.msg;
 
 namespace ROS2
 {
@@ -31,7 +30,7 @@ namespace ROS2
 
         public abstract bool Accepted { get; }
 
-        public abstract Time Stamp { get; }
+        public abstract builtin_interfaces.msg.Time Stamp { get; }
 
         public abstract ActionGoalStatus Status { get; internal set; }
     }
@@ -51,7 +50,7 @@ namespace ROS2
             ActionClient<TAction, TGoal, TResult, TFeedback> actionClient,
             Guid goalId,
             bool accepted,
-            Time stamp,
+            builtin_interfaces.msg.Time stamp,
             Action<TFeedback> feedbackCallback)
         {
             GoalId = goalId;
@@ -65,7 +64,7 @@ namespace ROS2
 
         public override bool Accepted { get; }
 
-        public override Time Stamp { get; }
+        public override builtin_interfaces.msg.Time Stamp { get; }
 
         public override ActionGoalStatus Status { get; internal set; }
 
