@@ -15,6 +15,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using builtin_interfaces.msg;
 using ROS2.Utils;
 
 namespace ROS2
@@ -39,10 +40,22 @@ namespace ROS2
         SteadyTime
     }
 
-    public struct Time
+    public struct TimePoint
     {
-        public uint seconds;
-        public uint nanoseconds;
+        private const long SECONDS_TO_NANOSECONDS = 1000L * 1000L * 1000L;
+
+        public long nanoseconds;
+
+        public Time ToMsg()
+        {
+            long sec = nanoseconds / SECONDS_TO_NANOSECONDS;
+            long nanosec = nanoseconds - (sec * SECONDS_TO_NANOSECONDS);
+            return new Time
+            {
+                Sec = (int)sec,
+                Nanosec = (uint)nanosec
+            };
+        }
     }
 
     internal static class ClockDelegates
@@ -51,7 +64,7 @@ namespace ROS2
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLClockGetNowType(
-            SafeClockHandle clockHandle, out long time);
+            SafeClockHandle clockHandle, out TimePoint time);
 
         internal static NativeRCLClockGetNowType native_rcl_clock_get_now = null;
 
@@ -68,7 +81,6 @@ namespace ROS2
 
     public sealed class Clock
     {
-        private const long SECONDS_TO_NANOSECONDS = 1000L * 1000L * 1000L;
 
         internal Clock(SafeClockHandle handle)
         {
@@ -79,15 +91,11 @@ namespace ROS2
 
         public Time Now()
         {
-            RCLRet ret = ClockDelegates.native_rcl_clock_get_now(Handle, out long timePoint);
+            RCLRet ret = ClockDelegates.native_rcl_clock_get_now(Handle, out TimePoint timePoint);
 
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClockDelegates.native_rcl_clock_get_now)}() failed.");
 
-            Time time = new Time();
-            time.seconds = (uint)(timePoint / SECONDS_TO_NANOSECONDS);
-            time.nanoseconds = (uint)(timePoint - (time.seconds * SECONDS_TO_NANOSECONDS));
-
-            return time;
+            return timePoint.ToMsg();
         }
     }
 }
