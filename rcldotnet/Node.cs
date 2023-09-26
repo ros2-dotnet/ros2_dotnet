@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using ROS2.ParameterInfrastructure;
 using ROS2.Utils;
 
 namespace ROS2
@@ -143,6 +144,8 @@ namespace ROS2
 
         private readonly IList<Timer> _timers;
 
+        private readonly ParameterServer _parameterServer;
+
         internal Node(SafeNodeHandle handle)
         {
             Handle = handle;
@@ -156,6 +159,8 @@ namespace ROS2
             _actionClients = new List<ActionClient>();
             _actionServers = new List<ActionServer>();
             _timers = new List<Timer>();
+
+            _parameterServer = new ParameterServer(this);
         }
 
         public string Name => RCLdotnet.GetStringFromNativeDelegate(NodeDelegates.native_rcl_node_get_name_handle, Handle);
