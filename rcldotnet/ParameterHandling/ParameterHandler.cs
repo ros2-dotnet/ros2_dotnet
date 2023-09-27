@@ -36,16 +36,17 @@ namespace ROS2
             {typeof(List<string>), ParameterType.PARAMETER_STRING_ARRAY}
         };
 
+        private readonly Node _node;
         private readonly IDictionary<string, Parameter> _parameters = new Dictionary<string, Parameter>();
         private readonly IDictionary<string, ParameterDescriptor> _descriptors = new Dictionary<string, ParameterDescriptor>();
 
-        // TODO: Implement parameter event publishing
-        private Publisher<ParameterEvent> _publisherEvent;
+        private readonly Publisher<ParameterEvent> _publisherEvent;
 
         private Action<List<Parameter>> _onSetParameterCallback;
 
         internal ParameterHandler(Node node)
         {
+            _node = node;
             _publisherEvent = node.CreatePublisher<ParameterEvent>("/parameter_events", QosProfile.ParameterEventsProfile);
 
             node.CreateService<DescribeParameters, DescribeParameters_Request, DescribeParameters_Response>("~/describe_parameters", OnDescribeParameters);
@@ -66,7 +67,30 @@ namespace ROS2
             _onSetParameterCallback -= callback;
         }
 
-        private Parameter DeclareParameter(string name, Type type, ParameterDescriptor descriptor = null)
+        private ParameterEvent GenerateParameterEventMessage()
+        {
+            return new ParameterEvent
+            {
+                Node = $"{_node.GetNamespace()}{_node.GetName()}",
+                Stamp = _node.Clock.Now()
+            };
+        }
+
+        private void PublishParametersDeclaredEvent(IEnumerable<Parameter> parameters)
+        {
+            ParameterEvent parameterEvent = GenerateParameterEventMessage();
+            parameterEvent.NewParameters.AddRange(parameters);
+            _publisherEvent.Publish(parameterEvent);
+        }
+
+        private void PublishParametersChangedEvent(IEnumerable<Parameter> parameters)
+        {
+            ParameterEvent parameterEvent = GenerateParameterEventMessage();
+            parameterEvent.ChangedParameters.AddRange(parameters);
+            _publisherEvent.Publish(parameterEvent);
+        }
+
+        private void DeclareParameter(string name, Type type, Action<ParameterValue> assignDefaultCallback, ParameterDescriptor descriptor = null)
         {
             if (!_typeToParameterType.TryGetValue(type, out byte typeCode))
             {
@@ -92,63 +116,80 @@ namespace ROS2
                 }
 
                 // TODO: Should we update the description if it doesn't match or throw an error?
-
-                return parameter;
+                return;
             }
 
             Parameter declaredParameter = new Parameter { Name = name, Value = { Type = typeCode } };
             _parameters.Add(name, declaredParameter);
             _descriptors.Add(name, descriptor);
-            return declaredParameter;
+
+            assignDefaultCallback?.Invoke(declaredParameter.Value);
+
+            PublishParametersDeclaredEvent(new List<Parameter> { declaredParameter });
         }
 
-        public void DeclareParameter(string name, bool defaultValue = false)
+        public void DeclareParameter(string name, bool defaultValue = false, ParameterDescriptor descriptor = null)
         {
-            DeclareParameter(name, typeof(bool)).Value.BoolValue = defaultValue;
+            DeclareParameter(name, typeof(bool), value => { value.BoolValue = defaultValue; }, descriptor);
         }
 
-        public void DeclareParameter(string name, int defaultValue = 0) => DeclareParameter(name, (long)defaultValue);
+        public void DeclareParameter(string name, int defaultValue = 0, ParameterDescriptor descriptor = null) => DeclareParameter(name, (long)defaultValue, descriptor);
 
-        public void DeclareParameter(string name, long defaultValue = 0L)
+        public void DeclareParameter(string name, long defaultValue = 0L, ParameterDescriptor descriptor = null)
         {
-            DeclareParameter(name, typeof(long)).Value.IntegerValue = defaultValue;
+            DeclareParameter(name, typeof(long), value => { value.IntegerValue = defaultValue; }, descriptor);
         }
 
-        public void DeclareParameter(string name, float defaultValue = 0.0f) => DeclareParameter(name, (double)defaultValue);
+        public void DeclareParameter(string name, float defaultValue = 0.0f, ParameterDescriptor descriptor = null) => DeclareParameter(name, (double)defaultValue, descriptor);
 
-        public void DeclareParameter(string name, double defaultValue = 0.0)
+        public void DeclareParameter(string name, double defaultValue = 0.0, ParameterDescriptor descriptor = null)
         {
-            DeclareParameter(name, typeof(double)).Value.DoubleValue = defaultValue;
+            DeclareParameter(name, typeof(double), value => { value.DoubleValue = defaultValue; }, descriptor);
         }
 
-        public void DeclareParameter(string name, string defaultValue = "")
+        public void DeclareParameter(string name, string defaultValue = "", ParameterDescriptor descriptor = null)
         {
-            DeclareParameter(name, typeof(string)).Value.StringValue = defaultValue;
+            DeclareParameter(name, typeof(string), value => { value.StringValue = defaultValue; }, descriptor);
         }
 
-        public void DeclareParameter(string name, List<byte> defaultValue = null)
+        public void DeclareParameter(string name, IEnumerable<byte> defaultValue = null, ParameterDescriptor descriptor = null)
         {
-            DeclareParameter(name, typeof(List<byte>)).Value.ByteArrayValue = defaultValue;
+            DeclareParameter(name, typeof(List<byte>), value =>
+            {
+                if (defaultValue != null) value.ByteArrayValue.AddRange(defaultValue);
+            }, descriptor);
         }
 
-        public void DeclareParameter(string name, List<bool> defaultValue = null)
+        public void DeclareParameter(string name, IEnumerable<bool> defaultValue = null, ParameterDescriptor descriptor = null)
         {
-            DeclareParameter(name, typeof(List<bool>)).Value.BoolArrayValue = defaultValue;
+            DeclareParameter(name, typeof(List<bool>), value =>
+            {
+                if (defaultValue != null) value.BoolArrayValue.AddRange(defaultValue);
+            }, descriptor);
         }
 
-        public void DeclareParameter(string name, List<long> defaultValue = null)
+        public void DeclareParameter(string name, IEnumerable<long> defaultValue = null, ParameterDescriptor descriptor = null)
         {
-            DeclareParameter(name, typeof(List<long>)).Value.IntegerArrayValue = defaultValue;
+            DeclareParameter(name, typeof(List<long>), value =>
+            {
+                if (defaultValue != null) value.IntegerArrayValue.AddRange(defaultValue);
+            }, descriptor);
         }
 
-        public void DeclareParameter(string name, List<double> defaultValue = null)
+        public void DeclareParameter(string name, IEnumerable<double> defaultValue = null, ParameterDescriptor descriptor = null)
         {
-            DeclareParameter(name, typeof(List<double>)).Value.DoubleArrayValue = defaultValue;
+            DeclareParameter(name, typeof(List<double>), value =>
+            {
+                if (defaultValue != null) value.DoubleArrayValue.AddRange(defaultValue);
+            }, descriptor);
         }
 
-        public void DeclareParameter(string name, List<string> defaultValue = null)
+        public void DeclareParameter(string name, IEnumerable<string> defaultValue = null, ParameterDescriptor descriptor = null)
         {
-            DeclareParameter(name, typeof(List<string>)).Value.StringArrayValue = defaultValue;
+            DeclareParameter(name, typeof(List<string>), value =>
+            {
+                if (defaultValue != null) value.StringArrayValue.AddRange(defaultValue);
+            }, descriptor);
         }
 
         private void OnDescribeParameters(DescribeParameters_Request request, DescribeParameters_Response response)
@@ -366,6 +407,7 @@ namespace ROS2
                 UpdateParameter(source);
             }
 
+            PublishParametersChangedEvent(parameters);
             _onSetParameterCallback?.Invoke(parameters);
 
             return result;
