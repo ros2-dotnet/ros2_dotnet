@@ -13,23 +13,13 @@
  * limitations under the License.
  */
 
-using rcl_interfaces.msg;
+using System;
 
-namespace ROS2.ParameterInfrastructure
+namespace ROS2.ParameterHandling.Exceptions
 {
-    internal class ParameterBuilderBool : ParameterBuilder
+    public abstract class ParameterException : Exception
     {
-        public Parameter BuildParameter(ParameterServer server, string name, object defaultValue)
-        {
-            return new ParameterBool(server, name, (bool)defaultValue);
-        }
-    }
-
-    public class ParameterBool : ParameterTyped<bool>
-    {
-        internal override byte Type => ParameterType.PARAMETER_BOOL;
-
-        public ParameterBool(ParameterServer server, string name, bool defaultValue) : base(server, name, defaultValue)
+        protected ParameterException(string message) : base(message)
         {
         }
     }

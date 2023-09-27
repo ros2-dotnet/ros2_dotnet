@@ -68,9 +68,11 @@ set(CS_SOURCES
   ServiceDefinitionStaticMemberCache.cs
   Subscription.cs
   Timer.cs
-  ParameterInfrastructure/Parameter.cs
-  ParameterInfrastructure/ParameterBool.cs
-  ParameterInfrastructure/ParameterServer.cs
+  ParameterHandling/ParameterHandler.cs
+  ParameterHandling/Exceptions/ParameterException.cs
+  ParameterHandling/Exceptions/ParameterNotDeclaredException.cs
+  ParameterHandling/Exceptions/ParameterTypeMismatchException.cs
+  ParameterHandling/Exceptions/InvalidParameterTypeException.cs
 )
 
 find_package(rcldotnet_common REQUIRED)
