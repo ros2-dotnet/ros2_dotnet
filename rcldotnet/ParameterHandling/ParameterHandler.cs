@@ -36,7 +36,8 @@ namespace ROS2
             {typeof(List<string>), ParameterType.PARAMETER_STRING_ARRAY}
         };
 
-        private readonly IDictionary<string, Parameter> _parameters;
+        private readonly IDictionary<string, Parameter> _parameters = new Dictionary<string, Parameter>();
+        private readonly IDictionary<string, ParameterDescriptor> _descriptors = new Dictionary<string, ParameterDescriptor>();
 
         // TODO: Implement parameter event publishing
         private Publisher<ParameterEvent> _publisherEvent;
@@ -45,11 +46,9 @@ namespace ROS2
 
         internal ParameterHandler(Node node)
         {
-            _parameters = new Dictionary<string, Parameter>();
+            _publisherEvent = node.CreatePublisher<ParameterEvent>("/parameter_events", QosProfile.ParameterEventsProfile);
 
-            _publisherEvent = node.CreatePublisher<ParameterEvent>("/parameter_events");
-
-            node.CreateService<DescribeParameters, DescribeParameters_Request, DescribeParameters_Response>("~/describe_parameters", OnDescribeParameter);
+            node.CreateService<DescribeParameters, DescribeParameters_Request, DescribeParameters_Response>("~/describe_parameters", OnDescribeParameters);
             node.CreateService<GetParameterTypes, GetParameterTypes_Request, GetParameterTypes_Response>("~/get_parameter_types", OnGetParameterTypes);
             node.CreateService<GetParameters, GetParameters_Request, GetParameters_Response>("~/get_parameters", OnGetParameters);
             node.CreateService<ListParameters, ListParameters_Request, ListParameters_Response>("~/list_parameters", OnListParameters);
@@ -67,28 +66,39 @@ namespace ROS2
             _onSetParameterCallback -= callback;
         }
 
-        private Parameter DeclareParameter(string name, Type type)
+        private Parameter DeclareParameter(string name, Type type, ParameterDescriptor descriptor = null)
         {
             if (!_typeToParameterType.TryGetValue(type, out byte typeCode))
             {
                 throw new InvalidParameterTypeException(type);
             }
 
+            if (descriptor == null)
+            {
+                descriptor = new ParameterDescriptor
+                {
+                    Name = name,
+                    Type = typeCode
+                };
+            }
+
             if (_parameters.TryGetValue(name, out Parameter parameter))
             {
+
                 if (parameter.Value.Type != typeCode)
                 {
                     throw new ParameterTypeMismatchException(
                         $"Attempted to redefine parameter \"{name}\" from type {parameter.Value.Type} to {typeCode}!");
                 }
 
-                // TODO: Consider updating description
+                // TODO: Should we update the description if it doesn't match or throw an error?
 
                 return parameter;
             }
 
             Parameter declaredParameter = new Parameter { Name = name, Value = { Type = typeCode } };
             _parameters.Add(name, declaredParameter);
+            _descriptors.Add(name, descriptor);
             return declaredParameter;
         }
 
@@ -141,9 +151,15 @@ namespace ROS2
             DeclareParameter(name, typeof(List<string>)).Value.StringArrayValue = defaultValue;
         }
 
-        private void OnDescribeParameter(DescribeParameters_Request request, DescribeParameters_Response response)
+        private void OnDescribeParameters(DescribeParameters_Request request, DescribeParameters_Response response)
         {
-            // TODO: Implement parameter descriptions.
+            foreach (string name in request.Names)
+            {
+                response.Descriptors.Add(
+                    _descriptors.TryGetValue(name, out ParameterDescriptor descriptor)
+                        ? descriptor
+                        : new ParameterDescriptor());
+            }
         }
 
         private void OnGetParameterTypes(GetParameterTypes_Request request, GetParameterTypes_Response response)
@@ -254,16 +270,22 @@ namespace ROS2
         private SetParametersResult CheckParameterCompatibility(Parameter update)
         {
             SetParametersResult result = new SetParametersResult();
-            if (!_parameters.TryGetValue(update.Name, out Parameter parameter))
+            if (!_descriptors.TryGetValue(update.Name, out ParameterDescriptor descriptor))
             {
                 result.Successful = false;
                 result.Reason = "Parameter was not declared!";
             }
-            else if (update.Value.Type != parameter.Value.Type)
+            else if (descriptor.ReadOnly)
             {
                 result.Successful = false;
-                result.Reason = $"Parameter type mismatch: {parameter.Value.Type} != {update.Value.Type}!";
+                result.Reason = "Parameter is readonly!";
             }
+            else if (update.Value.Type != descriptor.Type)
+            {
+                result.Successful = false;
+                result.Reason = $"Parameter type mismatch: {descriptor.Type} != {update.Value.Type}!";
+            }
+            // TODO: Check value compatibility against ParameterDescriptor constraints.
             else
             {
                 result.Successful = true;
