@@ -1,4 +1,5 @@
 using System;
+using rcl_interfaces.msg;
 using ROS2;
 
 namespace ConsoleApplication
@@ -15,6 +16,7 @@ namespace ConsoleApplication
         {
             RCLdotnet.Init();
             _node = RCLdotnet.CreateNode("talker");
+            _node.DeclareParameter("publish_string_prefix", "Hello World");
 
             _chatterPub = _node.CreatePublisher<std_msgs.msg.String>("chatter");
 
@@ -23,7 +25,7 @@ namespace ConsoleApplication
 
         private void PublishChatter(TimeSpan elapsed)
         {
-            _msg.Data = $"Hello World: {_i}";
+            _msg.Data = $"{_node.GetParameter("publish_string_prefix").StringValue}: {_i}";
             Console.WriteLine($"Publishing: \"{_msg.Data}\"");
             _chatterPub.Publish(_msg);
 

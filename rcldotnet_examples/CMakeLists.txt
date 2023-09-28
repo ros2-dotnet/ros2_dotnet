@@ -22,6 +22,7 @@ set(_assemblies_dep_dlls
     ${rcldotnet_common_ASSEMBLIES_DLL}
     ${rcldotnet_ASSEMBLIES_DLL}
     ${builtin_interfaces_ASSEMBLIES_DLL}
+    ${rcl_interfaces_ASSEMBLIES_DLL}
     ${std_msgs_ASSEMBLIES_DLL}
     ${std_srvs_ASSEMBLIES_DLL}
     ${test_msgs_ASSEMBLIES_DLL}
