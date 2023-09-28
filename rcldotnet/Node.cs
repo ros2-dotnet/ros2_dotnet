@@ -199,12 +199,34 @@ namespace ROS2
         // Disposed if the node is not live anymore.
         internal SafeNodeHandle Handle { get; }
 
+        private Subscription<rosgraph_msgs.msg.Clock> ClockSubscription { get; set; }
+
         private void OnSetParameters(List<Parameter> parameters)
         {
             Parameter simulatedTimeParameter = parameters.Find(parameter => parameter.Name == ParameterNameSimulatedTime);
             if (simulatedTimeParameter == null) return;
 
-            // TODO: Update clock setup if applicable.
+            // Update clock setup if applicable.
+            bool subscribedToClock = ClockSubscription != null;
+            bool useSimulatedTime = simulatedTimeParameter.Value.BoolValue;
+            if (useSimulatedTime == subscribedToClock) return;
+
+            if (useSimulatedTime)
+            {
+                ClockSubscription = CreateSubscription<rosgraph_msgs.msg.Clock>("/clock", OnClockMessage, QosProfile.DefaultProfile.WithKeepLast(1));
+                _clock.EnableRosTimeOverride();
+            }
+            else
+            {
+                DestroySubscription(ClockSubscription);
+                ClockSubscription = null;
+                _clock.DisableRosTimeOverride();
+            }
+        }
+
+        private void OnClockMessage(rosgraph_msgs.msg.Clock message)
+        {
+            _clock.SetRosTimeOverride(TimePoint.FromMsg(message.Clock_).nanoseconds);
         }
 
         public Publisher<T> CreatePublisher<T>(string topic, QosProfile qosProfile = null) where T : IRosMessage
@@ -274,6 +296,15 @@ namespace ROS2
             Subscription<T> subscription = new Subscription<T>(subscriptionHandle, callback);
             _subscriptions.Add(subscription);
             return subscription;
+        }
+
+        internal bool DestroySubscription(Subscription subscription)
+        {
+            if (!_subscriptions.Contains(subscription)) return false;
+
+            _subscriptions.Remove(subscription);
+            subscription.Handle.Dispose();
+            return true;
         }
 
         public Service<TService, TRequest, TResponse> CreateService<TService, TRequest, TResponse>(string serviceName, Action<TRequest, TResponse> callback)
