@@ -8,6 +8,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rcl REQUIRED)
 find_package(rcl_action REQUIRED)
 find_package(action_msgs REQUIRED)
+find_package(rosgraph_msgs REQUIRED)
 find_package(rcl_interfaces REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(unique_identifier_msgs REQUIRED)
@@ -80,6 +81,7 @@ find_package(rcldotnet_common REQUIRED)
 
 set(_assemblies_dep_dlls
   ${action_msgs_ASSEMBLIES_DLL}
+  ${rosgraph_msgs_ASSEMBLIES_DLL}
   ${builtin_interfaces_ASSEMBLIES_DLL}
   ${rcl_interfaces_ASSEMBLIES_DLL}
   ${rcldotnet_common_ASSEMBLIES_DLL}
@@ -110,6 +112,7 @@ add_library(${PROJECT_NAME}_native SHARED
 
 ament_target_dependencies(${PROJECT_NAME}_native
   "action_msgs"
+  "rosgraph_msgs"
   "builtin_interfaces"
   "unique_identifier_msgs"
   "rcl"

@@ -132,7 +132,7 @@ namespace ROS2
         {
             return new ParameterEvent
             {
-                Node = $"{_node.GetNamespace()}{_node.GetName()}",
+                Node = _node.FullyQualifiedName,
                 Stamp = _node.Clock.Now()
             };
         }
