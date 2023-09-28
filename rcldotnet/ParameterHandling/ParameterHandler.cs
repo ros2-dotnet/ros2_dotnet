@@ -49,13 +49,74 @@ namespace ROS2
             _node = node;
             _publisherEvent = node.CreatePublisher<ParameterEvent>("/parameter_events", QosProfile.ParameterEventsProfile);
 
-            node.CreateService<DescribeParameters, DescribeParameters_Request, DescribeParameters_Response>("~/describe_parameters", OnDescribeParameters);
-            node.CreateService<GetParameterTypes, GetParameterTypes_Request, GetParameterTypes_Response>("~/get_parameter_types", OnGetParameterTypes);
-            node.CreateService<GetParameters, GetParameters_Request, GetParameters_Response>("~/get_parameters", OnGetParameters);
-            node.CreateService<ListParameters, ListParameters_Request, ListParameters_Response>("~/list_parameters", OnListParameters);
-            node.CreateService<SetParameters, SetParameters_Request, SetParameters_Response>("~/set_parameters", OnSetParameters);
-            node.CreateService<SetParametersAtomically, SetParametersAtomically_Request, SetParametersAtomically_Response>("~/set_parameters_atomically", OnSetParametersAtomically);
+            node.CreateService<DescribeParameters, DescribeParameters_Request, DescribeParameters_Response>("~/describe_parameters", OnDescribeParametersServiceRequest);
+            node.CreateService<GetParameterTypes, GetParameterTypes_Request, GetParameterTypes_Response>("~/get_parameter_types", OnGetParameterTypesServiceRequest);
+            node.CreateService<GetParameters, GetParameters_Request, GetParameters_Response>("~/get_parameters", OnGetParametersServiceRequest);
+            node.CreateService<ListParameters, ListParameters_Request, ListParameters_Response>("~/list_parameters", OnListParametersServiceRequest);
+            node.CreateService<SetParameters, SetParameters_Request, SetParameters_Response>("~/set_parameters", OnSetParametersServiceRequest);
+            node.CreateService<SetParametersAtomically, SetParametersAtomically_Request, SetParametersAtomically_Response>("~/set_parameters_atomically", OnSetParametersAtomicallyServiceRequest);
         }
+
+        #region Service Request Handlers
+
+        private void OnDescribeParametersServiceRequest(DescribeParameters_Request request, DescribeParameters_Response response)
+        {
+            foreach (string name in request.Names)
+            {
+                response.Descriptors.Add(
+                    _descriptors.TryGetValue(name, out ParameterDescriptor descriptor)
+                        ? descriptor
+                        : new ParameterDescriptor());
+            }
+        }
+
+        private void OnGetParameterTypesServiceRequest(GetParameterTypes_Request request, GetParameterTypes_Response response)
+        {
+            foreach (Parameter parameter in _parameters.Values)
+            {
+                response.Types.Add(parameter.Value.Type);
+            }
+        }
+
+        private void OnGetParametersServiceRequest(GetParameters_Request request, GetParameters_Response response)
+        {
+            response.Values.AddRange(GetParameters(request.Names));
+        }
+
+        private void OnListParametersServiceRequest(ListParameters_Request request, ListParameters_Response response)
+        {
+            bool hasPrefixes = request.Prefixes.Count != 0;
+            foreach (Parameter parameter in _parameters.Values)
+            {
+                bool matchesCriteria = !hasPrefixes;
+
+                if (hasPrefixes)
+                {
+                    foreach (string prefix in request.Prefixes)
+                    {
+                        if (parameter.Name.StartsWith(prefix))
+                        {
+                            matchesCriteria = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (matchesCriteria) response.Result.Names.Add(parameter.Name);
+            }
+        }
+
+        private void OnSetParametersServiceRequest(SetParameters_Request request, SetParameters_Response response)
+        {
+            response.Results.AddRange(SetParameters(request.Parameters));
+        }
+
+        private void OnSetParametersAtomicallyServiceRequest(SetParametersAtomically_Request request, SetParametersAtomically_Response response)
+        {
+            response.Result = SetParametersAtomically(request.Parameters);
+        }
+
+        #endregion
 
         public void AddOnSetParameterCallback(Action<List<Parameter>> callback)
         {
@@ -87,6 +148,13 @@ namespace ROS2
         {
             ParameterEvent parameterEvent = GenerateParameterEventMessage();
             parameterEvent.ChangedParameters.AddRange(parameters);
+            _publisherEvent.Publish(parameterEvent);
+        }
+
+        private void PublishParametersDeletedEvent(IEnumerable<Parameter> parameters)
+        {
+            ParameterEvent parameterEvent = GenerateParameterEventMessage();
+            parameterEvent.DeletedParameters.AddRange(parameters);
             _publisherEvent.Publish(parameterEvent);
         }
 
@@ -192,23 +260,21 @@ namespace ROS2
             }, descriptor);
         }
 
-        private void OnDescribeParameters(DescribeParameters_Request request, DescribeParameters_Response response)
+        public void UndeclareParameter(string name)
         {
-            foreach (string name in request.Names)
+            if (!_descriptors.TryGetValue(name, out ParameterDescriptor descriptor))
             {
-                response.Descriptors.Add(
-                    _descriptors.TryGetValue(name, out ParameterDescriptor descriptor)
-                        ? descriptor
-                        : new ParameterDescriptor());
+                throw new ParameterNotDeclaredException(name);
             }
-        }
 
-        private void OnGetParameterTypes(GetParameterTypes_Request request, GetParameterTypes_Response response)
-        {
-            foreach (Parameter parameter in _parameters.Values)
-            {
-                response.Types.Add(parameter.Value.Type);
-            }
+            if (descriptor.ReadOnly) throw new ParameterImmutableException(name);
+
+            Parameter parameter = _parameters[name];
+
+            _parameters.Remove(name);
+            _descriptors.Remove(name);
+
+            PublishParametersDeletedEvent(new List<Parameter> { parameter });
         }
 
         private ParameterValue CloneParameterValue(ParameterValue toClone)
@@ -255,6 +321,16 @@ namespace ROS2
             return clone;
         }
 
+        public ParameterValue GetParameter(string name)
+        {
+            if (_parameters.TryGetValue(name, out Parameter parameter))
+            {
+                return CloneParameterValue(parameter.Value);
+            }
+
+            throw new ParameterNotDeclaredException(name);
+        }
+
         public List<ParameterValue> GetParameters(IEnumerable<string> names)
         {
             List<ParameterValue> results = new List<ParameterValue>();
@@ -270,44 +346,6 @@ namespace ROS2
             return results;
         }
 
-        private void OnGetParameters(GetParameters_Request request, GetParameters_Response response)
-        {
-            response.Values.AddRange(GetParameters(request.Names));
-        }
-
-        public ParameterValue GetParameter(string name)
-        {
-            if (_parameters.TryGetValue(name, out Parameter parameter))
-            {
-                return CloneParameterValue(parameter.Value);
-            }
-
-            throw new ParameterNotDeclaredException(name);
-        }
-
-        private void OnListParameters(ListParameters_Request request, ListParameters_Response response)
-        {
-            bool hasPrefixes = request.Prefixes.Count != 0;
-            foreach (Parameter parameter in _parameters.Values)
-            {
-                bool matchesCriteria = !hasPrefixes;
-
-                if (hasPrefixes)
-                {
-                    foreach (string prefix in request.Prefixes)
-                    {
-                        if (parameter.Name.StartsWith(prefix))
-                        {
-                            matchesCriteria = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (matchesCriteria) response.Result.Names.Add(parameter.Name);
-            }
-        }
-
         private SetParametersResult CheckParameterCompatibility(Parameter update)
         {
             SetParametersResult result = new SetParametersResult();
@@ -319,7 +357,7 @@ namespace ROS2
             else if (descriptor.ReadOnly)
             {
                 result.Successful = false;
-                result.Reason = "Parameter is readonly!";
+                result.Reason = "Parameter is read-only!";
             }
             else if (update.Value.Type != descriptor.Type)
             {
@@ -373,6 +411,11 @@ namespace ROS2
             }
         }
 
+        public SetParametersResult SetParameter(Parameter parameter)
+        {
+            return SetParametersAtomically(new List<Parameter> { parameter });
+        }
+
         public List<SetParametersResult> SetParameters(List<Parameter> parameters)
         {
             List<SetParametersResult> results = new List<SetParametersResult>();
@@ -383,11 +426,6 @@ namespace ROS2
             }
 
             return results;
-        }
-
-        private void OnSetParameters(SetParameters_Request request, SetParameters_Response response)
-        {
-            response.Results.AddRange(SetParameters(request.Parameters));
         }
 
         public SetParametersResult SetParametersAtomically(List<Parameter> parameters)
@@ -413,9 +451,6 @@ namespace ROS2
             return result;
         }
 
-        private void OnSetParametersAtomically(SetParametersAtomically_Request request, SetParametersAtomically_Response response)
-        {
-            response.Result = SetParametersAtomically(request.Parameters);
-        }
+        public bool HasParameter(string name) => _parameters.ContainsKey(name);
     }
 }

@@ -69,10 +69,11 @@ set(CS_SOURCES
   Subscription.cs
   Timer.cs
   ParameterHandling/ParameterHandler.cs
+  ParameterHandling/Exceptions/InvalidParameterTypeException.cs
   ParameterHandling/Exceptions/ParameterException.cs
+  ParameterHandling/Exceptions/ParameterImmutableException.cs
   ParameterHandling/Exceptions/ParameterNotDeclaredException.cs
   ParameterHandling/Exceptions/ParameterTypeMismatchException.cs
-  ParameterHandling/Exceptions/InvalidParameterTypeException.cs
 )
 
 find_package(rcldotnet_common REQUIRED)
