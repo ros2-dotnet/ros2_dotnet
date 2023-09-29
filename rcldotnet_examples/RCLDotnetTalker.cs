@@ -1,34 +1,41 @@
 using System;
-using System.Threading;
-
 using ROS2;
 
 namespace ConsoleApplication
 {
     public class RCLDotnetTalker
     {
-        public static void Main(string[] args)
+        private readonly Node node;
+        private readonly Publisher<std_msgs.msg.String> chatterPub;
+
+        private int i = 0;
+        std_msgs.msg.String msg = new();
+
+        private RCLDotnetTalker()
         {
             RCLdotnet.Init();
+            node = RCLdotnet.CreateNode("talker");
 
-            Node node = RCLdotnet.CreateNode("talker");
+            chatterPub = node.CreatePublisher<std_msgs.msg.String>("chatter");
 
-            Publisher<std_msgs.msg.String> chatterPub = node.CreatePublisher<std_msgs.msg.String>("chatter");
+            ROS2.Timer timer = node.CreateTimer(new Duration(1.0), PublishChatter);
+        }
 
-            std_msgs.msg.String msg = new std_msgs.msg.String();
+        private void PublishChatter()
+        {
+            msg.Data = $"Hello World: {i}";
+            Console.WriteLine($"Publishing: \"{msg.Data}\"");
+            chatterPub.Publish(msg);
 
-            int i = 1;
+            i++;
+        }
 
-            while (RCLdotnet.Ok())
-            {
-                msg.Data = "Hello World: " + i;
-                i++;
-                Console.WriteLine("Publishing: \"" + msg.Data + "\"");
-                chatterPub.Publish(msg);
+        private void Spin() => RCLdotnet.Spin(node);
 
-                // Sleep a little bit between each message
-                Thread.Sleep(1000);
-            }
+        public static void Main(string[] args)
+        {
+            RCLDotnetTalker talker = new RCLDotnetTalker();
+            talker.Spin();
         }
     }
 }

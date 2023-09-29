@@ -110,6 +110,11 @@ namespace ROS2
         internal static NativeRCLWaitSetAddClientType native_rcl_wait_set_add_client = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLWaitSetAddTimerType(SafeWaitSetHandle waitSetHandle, SafeTimerHandle timerHandle);
+
+        internal static NativeRCLWaitSetAddTimerType native_rcl_wait_set_add_timer = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLWaitSetAddGuardConditionType(SafeWaitSetHandle waitSetHandle, SafeGuardConditionHandle guardConditionHandle);
 
         internal static NativeRCLWaitSetAddGuardConditionType native_rcl_wait_set_add_guard_condition = null;
@@ -355,15 +360,22 @@ namespace ROS2
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate IntPtr NativeRCLGetStringType(SafeHandle handle);
 
-        internal delegate RCLRet NativeRCLCreateClockHandleType(
-            ref SafeClockHandle clockHandles, int clockType);
+        internal delegate RCLRet NativeRCLCreateClockHandleType(ref SafeClockHandle clockHandle, int clockType);
 
         internal static NativeRCLCreateClockHandleType native_rcl_create_clock_handle = null;
 
-        internal delegate RCLRet NativeRCLDestroyClockHandleType(
-            IntPtr clockHandle);
+        internal delegate RCLRet NativeRCLDestroyClockHandleType(IntPtr clockHandle);
 
         internal static NativeRCLDestroyClockHandleType native_rcl_destroy_clock_handle = null;
+
+        internal delegate RCLRet NativeRCLCreateTimerHandleType(
+            ref SafeTimerHandle timerHandle, SafeClockHandle clockHandle, Duration period, TimerCallback callback);
+
+        internal static NativeRCLCreateTimerHandleType native_rcl_create_timer_handle = null;
+
+        internal delegate RCLRet NativeRCLDestroyTimerHandleType(IntPtr timerHandle);
+
+        internal static NativeRCLDestroyTimerHandleType native_rcl_destroy_timer_handle = null;
 
         static RCLdotnetDelegates()
         {
@@ -459,6 +471,8 @@ namespace ROS2
             RCLdotnetDelegates.native_rcl_wait_set_add_client =
                 (NativeRCLWaitSetAddClientType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_wait_set_add_client_ptr, typeof(NativeRCLWaitSetAddClientType));
+
+            _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_wait_set_add_timer), out native_rcl_wait_set_add_timer);
 
             IntPtr native_rcl_wait_set_add_guard_condition_ptr =
                 _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_wait_set_add_guard_condition");
@@ -718,17 +732,10 @@ namespace ROS2
                 (NativeRCLWriteToQosProfileHandleType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_write_to_qos_profile_handle_ptr, typeof(NativeRCLWriteToQosProfileHandleType));
 
-            IntPtr native_rcl_create_clock_handle_ptr =
-                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_create_clock_handle");
-            RCLdotnetDelegates.native_rcl_create_clock_handle =
-                (NativeRCLCreateClockHandleType)Marshal.GetDelegateForFunctionPointer(
-                    native_rcl_create_clock_handle_ptr, typeof(NativeRCLCreateClockHandleType));
-
-            IntPtr native_rcl_destroy_clock_handle_ptr =
-                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_destroy_clock_handle");
-            RCLdotnetDelegates.native_rcl_destroy_clock_handle =
-                (NativeRCLDestroyClockHandleType)Marshal.GetDelegateForFunctionPointer(
-                    native_rcl_destroy_clock_handle_ptr, typeof(NativeRCLDestroyClockHandleType));
+            _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_create_clock_handle), out native_rcl_create_clock_handle);
+            _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_destroy_clock_handle), out native_rcl_destroy_clock_handle);
+            _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_create_timer_handle), out native_rcl_create_timer_handle);
+            _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_destroy_timer_handle), out native_rcl_destroy_timer_handle);
         }
     }
 
@@ -826,6 +833,12 @@ namespace ROS2
         {
             RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_add_client(waitSetHandle, clientHandle);
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_wait_set_add_client)}() failed.");
+        }
+
+        private static void WaitSetAddTimer(SafeWaitSetHandle waitSetHandle, SafeTimerHandle timerHandle)
+        {
+            RCLRet ret = RCLdotnetDelegates.native_rcl_wait_set_add_timer(waitSetHandle, timerHandle);
+            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_wait_set_add_timer)}() failed.");
         }
 
         private static void WaitSetAddGuardCondition(SafeWaitSetHandle waitSetHandle, SafeGuardConditionHandle guardConditionHandle)
@@ -1122,7 +1135,7 @@ namespace ROS2
         {
             int numberOfSubscriptions = node.Subscriptions.Count;
             int numberOfGuardConditions = node.GuardConditions.Count;
-            int numberOfTimers = 0;
+            int numberOfTimers = node.Timers.Count;
             int numberOfClients = node.Clients.Count;
             int numberOfServices = node.Services.Count;
             int numberOfEvents = 0;
@@ -1218,6 +1231,11 @@ namespace ROS2
                 foreach (var actionServer in node.ActionServers)
                 {
                     WaitSetAddActionServer(waitSetHandle, actionServer.Handle);
+                }
+
+                foreach (var timer in node.Timers)
+                {
+                    WaitSetAddTimer(waitSetHandle, timer.Handle);
                 }
 
                 bool ready = Wait(waitSetHandle, timeout);

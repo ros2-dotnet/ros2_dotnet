@@ -76,6 +76,9 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_client(void *wait_set_handle, void *client_handle);
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_timer(void *wait_set_handle, void *timer_handle);
+
+RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_guard_condition_handle(void *wait_set_handle, void *guard_condition_handle);
 
 RCLDOTNET_EXPORT
@@ -241,5 +244,11 @@ int32_t RCLDOTNET_CDECL native_rcl_write_to_qos_profile_handle(
     uint64_t liveliness_lease_duration_sec,
     uint64_t liveliness_lease_duration_nsec,
     int32_t /* bool */ avoid_ros_namespace_conventions);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_create_timer_handle(void **timer_handle, void *clock_handle, int64_t period, rcl_timer_callback_t callback);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_destroy_timer_handle(void *timer_handle);
 
 #endif // RCLDOTNET_H

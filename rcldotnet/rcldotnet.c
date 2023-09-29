@@ -187,6 +187,14 @@ int32_t native_rcl_wait_set_add_client(void *wait_set_handle, void *client_handl
   return ret;
 }
 
+int32_t native_rcl_wait_set_add_timer(void *wait_set_handle, void *timer_handle) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+  rcl_timer_t *timer = (rcl_timer_t *)timer_handle;
+  rcl_ret_t ret = rcl_wait_set_add_timer(wait_set, timer, NULL);
+
+  return ret;
+}
+
 int32_t native_rcl_wait_set_add_guard_condition(void *wait_set_handle, void *guard_condition_handle) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
   rcl_guard_condition_t *guard_condition = (rcl_guard_condition_t *)guard_condition_handle;
@@ -740,4 +748,24 @@ int32_t native_rcl_write_to_qos_profile_handle(
   qos_profile->avoid_ros_namespace_conventions = avoid_ros_namespace_conventions != 0;
 
   return RCL_RET_OK;
+}
+
+int32_t native_rcl_create_timer_handle(void **timer_handle, void *clock_handle, int64_t period, rcl_timer_callback_t callback) {
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  rcl_timer_t *timer = malloc(sizeof(rcl_timer_t));
+  rcl_clock_t *clock = (rcl_clock_t *)clock_handle;
+
+  rcl_ret_t ret = rcl_timer_init(timer, clock, &context, period, callback, allocator);
+  
+  *timer_handle = (void *)timer;
+  return ret;
+}
+
+int32_t native_rcl_destroy_timer_handle(void *timer_handle) {
+  rcl_timer_t *timer = (rcl_timer_t *)timer_handle;
+
+  rcl_ret_t ret = rcl_timer_fini(timer);
+  free(timer);
+
+  return ret;
 }

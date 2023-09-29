@@ -61,10 +61,12 @@ set(CS_SOURCES
   SafeRequestIdHandle.cs
   SafeServiceHandle.cs
   SafeSubscriptionHandle.cs
+  SafeTimerHandle.cs
   SafeWaitSetHandle.cs
   Service.cs
   ServiceDefinitionStaticMemberCache.cs
   Subscription.cs
+  Timer.cs
 )
 
 find_package(rcldotnet_common REQUIRED)
