@@ -14,6 +14,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using builtin_interfaces.msg;
 using ROS2.Utils;
@@ -59,11 +60,14 @@ namespace ROS2
         SystemTimeNoChange = 4
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public struct TimeJump
     {
         public ClockChange clockChange;
         public Duration delta;
     }
+
+    internal delegate void JumpCallbackInternal(IntPtr timeJumpPtr, bool beforeJump);
 
     public delegate void JumpCallback(TimeJump timeJump, bool beforeJump);
 
@@ -106,6 +110,7 @@ namespace ROS2
         }
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public struct Duration
     {
         public long nanoseconds;
@@ -113,6 +118,15 @@ namespace ROS2
         public Duration(double seconds)
         {
             nanoseconds = (long)(seconds * TimeConstants.SECONDS_TO_NANOSECONDS);
+        }
+
+        public double Seconds => (double)nanoseconds / TimeConstants.SECONDS_TO_NANOSECONDS;
+    }
+
+    public class CallbackAlreadyRegisteredException : Exception
+    {
+        public CallbackAlreadyRegisteredException(string message) : base(message)
+        {
         }
     }
 
@@ -138,12 +152,12 @@ namespace ROS2
         internal static NativeRCLSetRosTimeOverrideType native_rcl_set_ros_time_override = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate RCLRet NativeRCLAddJumpCallbackType(SafeClockHandle clockHandle, JumpThreshold threshold, JumpCallback callback);
+        internal delegate RCLRet NativeRCLAddJumpCallbackType(SafeClockHandle clockHandle, JumpThreshold threshold, JumpCallbackInternal callback);
 
         internal static NativeRCLAddJumpCallbackType native_rcl_clock_add_jump_callback = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate RCLRet NativeRCLRemoveJumpCallbackType(SafeClockHandle clockHandle, JumpCallback callback);
+        internal delegate RCLRet NativeRCLRemoveJumpCallbackType(SafeClockHandle clockHandle, JumpCallbackInternal callback);
 
         internal static NativeRCLRemoveJumpCallbackType native_rcl_clock_remove_jump_callback = null;
 
@@ -163,6 +177,7 @@ namespace ROS2
 
     public sealed class Clock
     {
+        private readonly Dictionary<JumpCallback, JumpCallbackInternal> _registeredJumpCallbacks = new Dictionary<JumpCallback, JumpCallbackInternal>();
 
         internal Clock(SafeClockHandle handle)
         {
@@ -209,16 +224,30 @@ namespace ROS2
 
         public void AddJumpCallback(JumpThreshold threshold, JumpCallback callback)
         {
-            RCLRet ret = ClockDelegates.native_rcl_clock_add_jump_callback(Handle, threshold, callback);
+            if (_registeredJumpCallbacks.ContainsKey(callback))
+            {
+                throw new CallbackAlreadyRegisteredException("Provided jump callback was already registered!");
+            }
+
+            JumpCallbackInternal callbackInternal = (timeJumpPtr, beforeJump) =>
+                callback(Marshal.PtrToStructure<TimeJump>(timeJumpPtr), beforeJump);
+
+            RCLRet ret = ClockDelegates.native_rcl_clock_add_jump_callback(Handle, threshold, callbackInternal);
 
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClockDelegates.native_rcl_clock_add_jump_callback)}() failed.");
+
+            _registeredJumpCallbacks.Add(callback, callbackInternal);
         }
 
-        public void RemoveJumpCallback(JumpCallback callback)
+        public bool RemoveJumpCallback(JumpCallback callback)
         {
-            RCLRet ret = ClockDelegates.native_rcl_clock_remove_jump_callback(Handle, callback);
+            if (!_registeredJumpCallbacks.TryGetValue(callback, out JumpCallbackInternal callbackInternal)) return false;
+
+            RCLRet ret = ClockDelegates.native_rcl_clock_remove_jump_callback(Handle, callbackInternal);
 
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClockDelegates.native_rcl_clock_remove_jump_callback)}() failed.");
+
+            return _registeredJumpCallbacks.Remove(callback);
         }
     }
 }
