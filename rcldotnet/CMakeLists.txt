@@ -95,6 +95,7 @@ add_library(${PROJECT_NAME}_native SHARED
   rcldotnet_guard_condition.c
   rcldotnet_node.c
   rcldotnet_publisher.c
+  rcldotnet_timer.c
   rcldotnet.c
 )
 

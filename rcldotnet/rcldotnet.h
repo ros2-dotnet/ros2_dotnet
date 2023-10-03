@@ -115,6 +115,9 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index);
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_timer_ready(void *wait_set_handle, int32_t index);
+
+RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index);
 
 RCLDOTNET_EXPORT

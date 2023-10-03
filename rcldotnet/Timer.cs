@@ -13,11 +13,32 @@
  * limitations under the License.
  */
 
+using System;
+using System.Runtime.InteropServices;
+using ROS2.Utils;
+
 namespace ROS2
 {
-    internal delegate void TimerCallback(SafeTimerHandle timer, Duration elapsed);
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    internal delegate void TimerCallback(IntPtr timer, Duration elapsed);
 
-    public class Timer
+    internal static class TimerDelegates
+    {
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLTimerFunctionType(SafeTimerHandle timerHandle);
+
+        internal static NativeRCLTimerFunctionType native_rcl_timer_call = null;
+
+        static TimerDelegates()
+        {
+            var dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
+            IntPtr nativeLibrary = dllLoadUtils.LoadLibrary("rcldotnet");
+
+            dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_timer_call), out native_rcl_timer_call);
+        }
+    }
+
+    public sealed class Timer
     {
         internal Timer(SafeTimerHandle handle)
         {
@@ -25,5 +46,11 @@ namespace ROS2
         }
 
         internal SafeTimerHandle Handle { get; }
+
+        internal void Call()
+        {
+            RCLRet ret = TimerDelegates.native_rcl_timer_call(Handle);
+            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(TimerDelegates.native_rcl_timer_call)}() failed.");
+        }
     }
 }

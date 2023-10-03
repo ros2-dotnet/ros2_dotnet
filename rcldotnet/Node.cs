@@ -307,7 +307,12 @@ namespace ROS2
         {
             var timerHandle = new SafeTimerHandle();
 
-            RCLRet ret = RCLdotnetDelegates.native_rcl_create_timer_handle(ref timerHandle, Clock.Handle, period, (handle, elapsed) => { callback?.Invoke(); });
+            TimerCallback callbackInternal = (handle, elapsed) =>
+            {
+                callback?.Invoke();
+            };
+
+            RCLRet ret = RCLdotnetDelegates.native_rcl_create_timer_handle(ref timerHandle, Clock.Handle, period, callbackInternal);
 
             if (ret != RCLRet.Ok)
             {

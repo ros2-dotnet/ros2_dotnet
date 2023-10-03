@@ -316,6 +316,18 @@ int32_t native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index) {
   return result ? 1 : 0;
 }
 
+int32_t native_rcl_wait_set_timer_ready(void *wait_set_handle, int32_t index) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+
+  if (index >= wait_set->size_of_timers)
+  {
+    return false;
+  }
+
+  bool result = wait_set->timers[index] != NULL;
+  return result ? 1 : 0;
+}
+
 int32_t native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
 
