@@ -303,13 +303,13 @@ namespace ROS2
             return client;
         }
 
-        public Timer CreateTimer(Duration period, Action callback)
+        public Timer CreateTimer(Duration period, Action<Duration> callback)
         {
             var timerHandle = new SafeTimerHandle();
 
             TimerCallback callbackInternal = (handle, elapsed) =>
             {
-                callback?.Invoke();
+                callback?.Invoke(elapsed);
             };
 
             RCLRet ret = RCLdotnetDelegates.native_rcl_create_timer_handle(ref timerHandle, Clock.Handle, period, callbackInternal);

@@ -22,7 +22,7 @@ namespace ConsoleApplication
             _timer = _node.CreateTimer(new Duration(1.0), PublishChatter);
         }
 
-        private void PublishChatter()
+        private void PublishChatter(Duration elapsed)
         {
             _msg.Data = $"Hello World: {_i}";
             Console.WriteLine($"Publishing: \"{_msg.Data}\"");
