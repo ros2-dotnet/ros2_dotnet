@@ -765,6 +765,8 @@ int32_t native_rcl_write_to_qos_profile_handle(
 int32_t native_rcl_create_timer_handle(void **timer_handle, void *clock_handle, int64_t period, rcl_timer_callback_t callback) {
   rcl_allocator_t allocator = rcl_get_default_allocator();
   rcl_timer_t *timer = malloc(sizeof(rcl_timer_t));
+  *timer = rcl_get_zero_initialized_timer();
+  
   rcl_clock_t *clock = (rcl_clock_t *)clock_handle;
 
   rcl_ret_t ret = rcl_timer_init(timer, clock, &context, period, callback, allocator);
