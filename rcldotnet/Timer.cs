@@ -40,12 +40,17 @@ namespace ROS2
 
     public sealed class Timer
     {
-        internal Timer(SafeTimerHandle handle)
+        // The garbage collector will eventually try to clean up the delegate if nothing on the .NET side is holding on to it.
+        private readonly TimerCallback _callback;
+
+        internal Timer(SafeTimerHandle handle, TimerCallback callback)
         {
             Handle = handle;
+            _callback = callback;
         }
 
         internal SafeTimerHandle Handle { get; }
+
 
         internal void Call()
         {
