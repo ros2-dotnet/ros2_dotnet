@@ -211,6 +211,11 @@ namespace ROS2
         public static QosProfile DefaultProfile { get; } = CreateDefaultProfile();
 
         /// <summary>
+        /// Profile for a clock topic.
+        /// </summary>
+        public static QosProfile ClockProfile { get; } = CreateClockProfile();
+
+        /// <summary>
         /// The history policy.
         /// </summary>
         public QosHistoryPolicy History { get; }
@@ -503,6 +508,23 @@ namespace ROS2
                 avoidRosNamespaceConventions: false);
 
             return result;
+        }
+
+        private static QosProfile CreateClockProfile()
+        {
+            // Values from https://docs.ros.org/en/rolling/p/rclcpp/generated/classrclcpp_1_1ClockQoS.html
+            // Only available in versions of rclcpp >= Galactic
+            return new QosProfile(
+                history: QosHistoryPolicy.KeepLast,
+                depth: 1,
+                reliability: QosReliabilityPolicy.BestEffort,
+                durability: QosDurabilityPolicy.Volatile,
+                deadline: TimeSpan.Zero,
+                lifespan: TimeSpan.Zero,
+                liveliness: QosLivelinessPolicy.SystemDefault,
+                livelinessLeaseDuration: TimeSpan.Zero,
+                avoidRosNamespaceConventions: false
+            );
         }
 
         internal static SafeQosProfileHandle CreateQosProfileHandle()
