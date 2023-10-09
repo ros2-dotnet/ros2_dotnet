@@ -303,7 +303,7 @@ namespace ROS2
             return client;
         }
 
-        public Timer CreateTimer(Duration period, Action<Duration> callback)
+        public Timer CreateTimer(TimeSpan period, Action<TimeSpan> callback)
         {
             Timer timer = new Timer(Clock, period, callback);
             _timers.Add(timer);

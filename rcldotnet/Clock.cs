@@ -23,7 +23,10 @@ namespace ROS2
 {
     public static class TimeConstants
     {
-        public const long SECONDS_TO_NANOSECONDS = 1000L * 1000L * 1000L;
+        public const long NanosecondsPerSecond = 1000L * 1000L * 1000L;
+        public const long NanosecondsPerMillisecond = 1000000L;
+
+        public const long NanosecondsPerTimespanTick = NanosecondsPerMillisecond / TimeSpan.TicksPerMillisecond; // ~= 100.
     }
 
     /// <summary>
@@ -60,40 +63,58 @@ namespace ROS2
         SystemTimeNoChange = 4
     }
 
+    // Internal as TimeSpan should be user-facing.
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct Duration
+    {
+        public long nanoseconds;
+
+        public TimeSpan AsTimespan => new TimeSpan(nanoseconds / TimeConstants.NanosecondsPerTimespanTick);
+
+        public Duration(TimeSpan timeSpan)
+        {
+            nanoseconds = (long)(timeSpan.TotalMilliseconds * TimeConstants.NanosecondsPerMillisecond);
+        }
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     public struct TimeJump
     {
         public ClockChange clockChange;
-        public Duration delta;
+        internal Duration delta;
+
+        public TimeSpan Delta => delta.AsTimespan;
     }
 
     internal delegate void JumpCallbackInternal(IntPtr timeJumpPtr, bool beforeJump);
 
     public delegate void JumpCallback(TimeJump timeJump, bool beforeJump);
 
+    [StructLayout(LayoutKind.Sequential)]
     public struct JumpThreshold
     {
         public bool onClockChange;
-        public Duration minForward;
-        public Duration minBackward;
+        internal Duration minForward;
+        internal Duration minBackward;
 
-        public JumpThreshold(bool onClockChange, double minForwardSeconds, double minBackwardSeconds)
+        public JumpThreshold(bool onClockChange, TimeSpan minForward, TimeSpan minBackward)
         {
             this.onClockChange = onClockChange;
-            minForward = new Duration(minForwardSeconds);
-            minBackward = new Duration(minBackwardSeconds);
+            this.minForward = new Duration(minForward);
+            this.minBackward = new Duration(minBackward);
         }
     }
 
-    public struct TimePoint
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct TimePoint
     {
 
-        public long nanoseconds;
+        internal long nanoseconds;
 
-        public Time ToMsg()
+        internal Time ToMsg()
         {
-            long sec = nanoseconds / TimeConstants.SECONDS_TO_NANOSECONDS;
-            long nanosec = nanoseconds - (sec * TimeConstants.SECONDS_TO_NANOSECONDS);
+            long sec = nanoseconds / TimeConstants.NanosecondsPerSecond;
+            long nanosec = nanoseconds - (sec * TimeConstants.NanosecondsPerSecond);
             return new Time
             {
                 Sec = (int)sec,
@@ -101,26 +122,13 @@ namespace ROS2
             };
         }
 
-        public static TimePoint FromMsg(Time message)
+        internal static TimePoint FromMsg(Time message)
         {
             return new TimePoint
             {
-                nanoseconds = message.Sec * TimeConstants.SECONDS_TO_NANOSECONDS + message.Nanosec
+                nanoseconds = message.Sec * TimeConstants.NanosecondsPerSecond + message.Nanosec
             };
         }
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct Duration
-    {
-        public long nanoseconds;
-
-        public Duration(double seconds)
-        {
-            nanoseconds = (long)(seconds * TimeConstants.SECONDS_TO_NANOSECONDS);
-        }
-
-        public double Seconds => (double)nanoseconds / TimeConstants.SECONDS_TO_NANOSECONDS;
     }
 
     public class CallbackAlreadyRegisteredException : Exception

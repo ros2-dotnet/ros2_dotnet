@@ -7,10 +7,9 @@ namespace ConsoleApplication
     {
         private readonly Node _node;
         private readonly Publisher<std_msgs.msg.String> _chatterPub;
-        private readonly Timer _timer;
 
         private int _i = 0;
-        std_msgs.msg.String _msg = new();
+        private readonly std_msgs.msg.String _msg = new();
 
         private RCLDotnetTalker()
         {
@@ -19,10 +18,10 @@ namespace ConsoleApplication
 
             _chatterPub = _node.CreatePublisher<std_msgs.msg.String>("chatter");
 
-            _timer = _node.CreateTimer(new Duration(1.0), PublishChatter);
+            _node.CreateTimer(TimeSpan.FromSeconds(1.0), PublishChatter);
         }
 
-        private void PublishChatter(Duration elapsed)
+        private void PublishChatter(TimeSpan elapsed)
         {
             _msg.Data = $"Hello World: {_i}";
             Console.WriteLine($"Publishing: \"{_msg.Data}\"");

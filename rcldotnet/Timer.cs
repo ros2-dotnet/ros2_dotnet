@@ -40,18 +40,18 @@ namespace ROS2
 
     public sealed class Timer
     {
-        private readonly Action<Duration> _callback;
+        private readonly Action<TimeSpan> _callback;
 
         // The garbage collector will eventually try to clean up the delegate if nothing on the .NET side is holding on to it.
         private readonly TimerCallback _internalCallback;
 
-        internal Timer(Clock clock, Duration period, Action<Duration> callback)
+        internal Timer(Clock clock, TimeSpan period, Action<TimeSpan> callback)
         {
             _callback = callback;
 
             SafeTimerHandle handle = new SafeTimerHandle();
             _internalCallback = OnTimer;
-            RCLRet ret = RCLdotnetDelegates.native_rcl_create_timer_handle(ref handle, clock.Handle, period, _internalCallback);
+            RCLRet ret = RCLdotnetDelegates.native_rcl_create_timer_handle(ref handle, clock.Handle, new Duration(period), _internalCallback);
 
             if (ret != RCLRet.Ok)
             {
@@ -72,7 +72,7 @@ namespace ROS2
 
         private void OnTimer(IntPtr handle, Duration elapsed)
         {
-            _callback?.Invoke(elapsed);
+            _callback?.Invoke(elapsed.AsTimespan);
         }
     }
 }
