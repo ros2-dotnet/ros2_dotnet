@@ -213,7 +213,7 @@ namespace ROS2
 
             if (useSimulatedTime)
             {
-                ClockSubscription = CreateSubscription<rosgraph_msgs.msg.Clock>("/clock", OnClockMessage, QosProfile.DefaultProfile.WithKeepLast(1));
+                ClockSubscription = CreateSubscription<rosgraph_msgs.msg.Clock>("/clock", OnClockMessage, QosProfile.ClockProfile);
                 _clock.EnableRosTimeOverride();
             }
             else
