@@ -305,20 +305,7 @@ namespace ROS2
 
         public Timer CreateTimer(Duration period, Action<Duration> callback)
         {
-            var timerHandle = new SafeTimerHandle();
-
-            TimerCallback callbackInternal = (_, elapsed) => callback?.Invoke(elapsed);
-
-            RCLRet ret = RCLdotnetDelegates.native_rcl_create_timer_handle(ref timerHandle, Clock.Handle, period, callbackInternal);
-
-            if (ret != RCLRet.Ok)
-            {
-                timerHandle.Dispose();
-                throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_create_timer_handle)}() failed.");
-            }
-
-            var timer = new Timer(timerHandle, callbackInternal);
-
+            Timer timer = new Timer(Clock, period, callback);
             _timers.Add(timer);
             return timer;
         }
