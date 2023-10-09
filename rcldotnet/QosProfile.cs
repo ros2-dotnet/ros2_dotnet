@@ -14,10 +14,33 @@
  */
 
 using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace ROS2
 {
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct RmwTime
+    {
+        public ulong Sec;
+        public ulong NSec;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct RmwQosProfile
+    {
+        public QosHistoryPolicy History;
+        public UIntPtr Depth; // size_t is properly represented by UIntPtr
+        public QosReliabilityPolicy Reliability;
+        public QosDurabilityPolicy Durability;
+        public RmwTime Deadline;
+        public RmwTime Lifespan;
+        public QosLivelinessPolicy Liveliness;
+        public RmwTime LivelinessLeaseDuration;
+        [MarshalAs(UnmanagedType.U1)]
+        public bool AvoidRosNamespaceConventions;
+    }
+
     /// <summary>
     /// The `HISTORY` DDS QoS policy.
     ///
@@ -208,12 +231,37 @@ namespace ROS2
         /// <summary>
         /// The default QoS profile.
         /// </summary>
-        public static QosProfile DefaultProfile { get; } = CreateDefaultProfile();
+        public static QosProfile DefaultProfile { get; } = ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_default());
 
         /// <summary>
-        /// Profile for a clock topic.
+        /// Profile for clock messages.
         /// </summary>
         public static QosProfile ClockProfile { get; } = CreateClockProfile();
+
+        /// <summary>
+        /// Profile for parameter event messages.
+        /// </summary>
+        public static QosProfile ParameterEventsProfile { get; } = ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_parameter_events());
+
+        /// <summary>
+        /// Profile for parameter messages.
+        /// </summary>
+        public static QosProfile ParametersProfile { get; } = ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_parameters());
+
+        /// <summary>
+        /// Profile for sensor messages.
+        /// </summary>
+        public static QosProfile SensorDataProfile { get; } = ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_sensor_data());
+
+        /// <summary>
+        /// Profile for services.
+        /// </summary>
+        public static QosProfile ServicesProfile { get; } = ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_services_default());
+
+        /// <summary>
+        /// The system default (null) profile.
+        /// </summary>
+        public static QosProfile SystemDefaultProfile { get; } = ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_system_default());
 
         /// <summary>
         /// The history policy.
@@ -491,25 +539,6 @@ namespace ROS2
             return result;
         }
 
-        private static QosProfile CreateDefaultProfile()
-        {
-            // taken from rmw_qos_profile_default
-            // TODO: (sh) read values from rmw layer instead of hardcoding them here.
-
-            var result = new QosProfile(
-                history: QosHistoryPolicy.KeepLast,
-                depth: 10,
-                reliability: QosReliabilityPolicy.Reliable,
-                durability: QosDurabilityPolicy.Volatile,
-                deadline: TimeSpan.Zero,
-                lifespan: TimeSpan.Zero,
-                liveliness: QosLivelinessPolicy.SystemDefault,
-                livelinessLeaseDuration: TimeSpan.Zero,
-                avoidRosNamespaceConventions: false);
-
-            return result;
-        }
-
         private static QosProfile CreateClockProfile()
         {
             // Values from https://docs.ros.org/en/rolling/p/rclcpp/generated/classrclcpp_1_1ClockQoS.html
@@ -583,6 +612,31 @@ namespace ROS2
 
             sec = (ulong)seconds;
             nsec = (ulong)(ticksInsideSecond * NanosecondsPerTick);
+        }
+
+        private static TimeSpan FromRmwTime(RmwTime time)
+        {
+            if (time.Sec == 9223372036 && time.NSec == 854775807)
+            {
+                // see RMW_DURATION_INFINITE and comment on QosProfile.InfiniteDuration above.
+                return InfiniteDuration;
+            }
+
+            const long NanosecondsPerTick = 1000000 / TimeSpan.TicksPerMillisecond; // ~= 100.
+            ulong ticks = time.Sec * TimeSpan.TicksPerSecond;
+            ticks += time.NSec / NanosecondsPerTick;
+            return new TimeSpan((long)ticks);
+        }
+
+        private static QosProfile ToQosProfile(RmwQosProfile rmwProfile)
+        {
+            return new QosProfile(
+                rmwProfile.History, (int)rmwProfile.Depth, rmwProfile.Reliability, rmwProfile.Durability,
+                FromRmwTime(rmwProfile.Deadline),
+                FromRmwTime(rmwProfile.Lifespan),
+                rmwProfile.Liveliness,
+                FromRmwTime(rmwProfile.LivelinessLeaseDuration),
+                rmwProfile.AvoidRosNamespaceConventions);
         }
     }
 }

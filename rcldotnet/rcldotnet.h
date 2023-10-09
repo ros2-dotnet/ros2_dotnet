@@ -249,6 +249,24 @@ int32_t RCLDOTNET_CDECL native_rcl_write_to_qos_profile_handle(
     int32_t /* bool */ avoid_ros_namespace_conventions);
 
 RCLDOTNET_EXPORT
+const rmw_qos_profile_t RCLDOTNET_CDECL native_rcl_qos_get_profile_default();
+
+RCLDOTNET_EXPORT
+const rmw_qos_profile_t RCLDOTNET_CDECL native_rcl_qos_get_profile_parameter_events();
+
+RCLDOTNET_EXPORT
+const rmw_qos_profile_t RCLDOTNET_CDECL native_rcl_qos_get_profile_parameters();
+
+RCLDOTNET_EXPORT
+const rmw_qos_profile_t RCLDOTNET_CDECL native_rcl_qos_get_profile_sensor_data();
+
+RCLDOTNET_EXPORT
+const rmw_qos_profile_t RCLDOTNET_CDECL native_rcl_qos_get_profile_services_default();
+
+RCLDOTNET_EXPORT
+const rmw_qos_profile_t RCLDOTNET_CDECL native_rcl_qos_get_profile_system_default();
+
+RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_create_timer_handle(void **timer_handle, void *clock_handle, int64_t period, rcl_timer_callback_t callback);
 
 RCLDOTNET_EXPORT
