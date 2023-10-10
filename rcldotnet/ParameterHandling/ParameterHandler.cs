@@ -158,6 +158,12 @@ namespace ROS2
             _publisherEvent.Publish(parameterEvent);
         }
 
+        private bool TryGetParameterOverride(string name, out Parameter parameterOverride)
+        {
+            parameterOverride = null;
+            return false;
+        }
+
         private void DeclareParameter(string name, Type type, Action<ParameterValue> assignDefaultCallback, ParameterDescriptor descriptor = null)
         {
             if (!_typeToParameterType.TryGetValue(type, out byte typeCode))
@@ -187,11 +193,14 @@ namespace ROS2
                 return;
             }
 
-            Parameter declaredParameter = new Parameter { Name = name, Value = { Type = typeCode } };
+            if (!TryGetParameterOverride(name, out Parameter declaredParameter))
+            {
+                declaredParameter = new Parameter { Name = name, Value = { Type = typeCode } };
+                assignDefaultCallback?.Invoke(declaredParameter.Value);
+            }
+
             _parameters.Add(name, declaredParameter);
             _descriptors.Add(name, descriptor);
-
-            assignDefaultCallback?.Invoke(declaredParameter.Value);
 
             PublishParametersDeclaredEvent(new List<Parameter> { declaredParameter });
         }

@@ -17,6 +17,7 @@ using System;
 using System.Runtime.InteropServices;
 using action_msgs.msg;
 using action_msgs.srv;
+using ROS2.ParameterHandling;
 using ROS2.Utils;
 
 namespace ROS2
@@ -46,6 +47,16 @@ namespace ROS2
         internal delegate int NativeRCLOkType();
 
         internal static NativeRCLOkType native_rcl_ok = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLArgumentsGetParamOverridesType(ref SafeRclParamsHandle parameterOverrides);
+
+        internal static NativeRCLArgumentsGetParamOverridesType native_rcl_arguments_get_param_overrides = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate void NativeRCLDestroyRclParamsType(IntPtr paramsHandle);
+
+        internal static NativeRCLDestroyRclParamsType native_rcl_destroy_rcl_params = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         internal delegate RCLRet NativeRCLCreateNodeHandleType(
@@ -729,6 +740,8 @@ namespace ROS2
                 (NativeRCLWriteToQosProfileHandleType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_write_to_qos_profile_handle_ptr, typeof(NativeRCLWriteToQosProfileHandleType));
 
+            _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_arguments_get_param_overrides), out native_rcl_arguments_get_param_overrides);
+
             _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_create_clock_handle), out native_rcl_create_clock_handle);
             _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_destroy_clock_handle), out native_rcl_destroy_clock_handle);
             _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_create_timer_handle), out native_rcl_create_timer_handle);
@@ -741,6 +754,8 @@ namespace ROS2
     {
         private static bool initialized = false;
         private static readonly object syncLock = new object();
+
+        internal static SafeRclParamsHandle GlobalParamsHandle { get; private set; }
 
         public static bool Ok()
         {
@@ -1479,6 +1494,18 @@ namespace ROS2
                     string[] args = System.Environment.GetCommandLineArgs();
                     RCLRet ret = RCLdotnetDelegates.native_rcl_init(args.Length, args);
                     RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_init)}() failed.");
+
+                    SafeRclParamsHandle globalParamsHandle = new SafeRclParamsHandle();
+                    ret = RCLdotnetDelegates.native_rcl_arguments_get_param_overrides(ref globalParamsHandle);
+
+                    if (ret != RCLRet.Ok)
+                    {
+                        globalParamsHandle.Dispose();
+                        throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_arguments_get_param_overrides)}() failed.");
+                    }
+
+                    GlobalParamsHandle = globalParamsHandle;
+
                     initialized = true;
                 }
             }

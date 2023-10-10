@@ -21,6 +21,15 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_init(int argc, const char *argv[]);
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_arguments_get_param_overrides(void **parameter_overrides);
+
+RCLDOTNET_EXPORT
+void RCLDOTNET_CDECL native_rcl_destroy_rcl_params(void *rcl_params);
+
+RCLDOTNET_EXPORT
+bool RCLDOTNET_CDECL native_rcl_try_get_parameter(void *param_value_handle, const void *params_handle, const void *node_handle, const char *name);
+
+RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_create_clock_handle(void **clock_handle, int32_t clock_type);
 
 RCLDOTNET_EXPORT
