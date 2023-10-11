@@ -19,13 +19,9 @@
 #include <rcl/node.h>
 #include <rcl/rcl.h>
 #include <rcl_action/rcl_action.h>
-#include <rcl_yaml_param_parser/parser.h>
 #include <rmw/rmw.h>
 
 #include "rosidl_runtime_c/message_type_support_struct.h"
-
-#include <rcl_interfaces/msg/parameter_value.h>
-#include <rcl_interfaces/msg/parameter_type.h>
 
 #include "rcldotnet.h"
 
@@ -51,82 +47,6 @@ int32_t native_rcl_arguments_get_param_overrides(void **parameter_overrides) {
   rcl_params_t **global_parameter_overrides = (rcl_params_t **)parameter_overrides;
   rcl_ret_t ret = rcl_arguments_get_param_overrides(&context.global_arguments, global_parameter_overrides);
   return ret;
-}
-
-void native_rcl_destroy_rcl_params(void *rcl_params) {
-  rcl_yaml_node_struct_fini((rcl_params_t *)rcl_params);
-}
-
-bool native_rcl_try_get_parameter(void *param_value_handle, const void *params_handle, const void *node_handle, const char *name) {
-  const rcl_params_t *rcl_params = (const rcl_params_t *)params_handle;
-  const rcl_node_t *node = (const rcl_node_t *)node_handle;
-  const char *node_name = rcl_node_get_name(node);
-
-  int node_index = 0;
-  for (; node_index < rcl_params->num_nodes; node_index++) {
-    if (strcmp(node_name, rcl_params->node_names[node_index])) {
-      break;
-    }
-  }
-
-  if (node_index >= rcl_params->num_nodes) {
-    return false;
-  }
-  
-  const rcl_node_params_t *node_params = &rcl_params->params[node_index];
-
-  int param_index = 0;
-  for (; node_index < node_params->num_params; param_index++) {
-    if (strcmp(name, node_params->parameter_names[param_index])) {
-      break;
-    }
-  }
-
-  if (param_index >= node_params->num_params) {
-    return false;
-  }
-
-  rcl_variant_t *rcl_param_value = &node_params->parameter_values[param_index];
-
-  rcl_interfaces__msg__ParameterValue *param_value = (rcl_interfaces__msg__ParameterValue *)param_value_handle;
-  switch (param_value->type) {
-    case rcl_interfaces__msg__ParameterType__PARAMETER_BOOL:
-      param_value->bool_value = *rcl_param_value->bool_value;
-    break;
-    case rcl_interfaces__msg__ParameterType__PARAMETER_INTEGER:
-      param_value->integer_value = *rcl_param_value->integer_value;
-    break;
-    case rcl_interfaces__msg__ParameterType__PARAMETER_DOUBLE:
-      param_value->double_value = *rcl_param_value->double_value;
-    break;
-    case rcl_interfaces__msg__ParameterType__PARAMETER_STRING:
-    {
-      size_t length = strlen(rcl_param_value->string_value);
-      size_t capacity = sizeof(char) * length;
-      param_value->string_value.size = length;
-      param_value->string_value.capacity = capacity;
-      param_value->string_value.data = malloc(capacity);
-      strncpy(param_value->string_value.data, rcl_param_value->string_value, length);
-      break;
-    }
-    case rcl_interfaces__msg__ParameterType__PARAMETER_BYTE_ARRAY:
-      //TODO
-    break;
-    case rcl_interfaces__msg__ParameterType__PARAMETER_BOOL_ARRAY:
-      //TODO
-    break;
-    case rcl_interfaces__msg__ParameterType__PARAMETER_INTEGER_ARRAY:
-      //TODO
-    break;
-    case rcl_interfaces__msg__ParameterType__PARAMETER_DOUBLE_ARRAY:
-      //TODO
-    break;
-    case rcl_interfaces__msg__ParameterType__PARAMETER_STRING_ARRAY:
-      //TODO
-    break;
-  }
-
-  return true;
 }
 
 int32_t native_rcl_create_clock_handle(void **clock_handle, int32_t clock_type) {

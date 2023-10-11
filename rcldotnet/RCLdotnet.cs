@@ -53,11 +53,6 @@ namespace ROS2
 
         internal static NativeRCLArgumentsGetParamOverridesType native_rcl_arguments_get_param_overrides = null;
 
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate void NativeRCLDestroyRclParamsType(IntPtr paramsHandle);
-
-        internal static NativeRCLDestroyRclParamsType native_rcl_destroy_rcl_params = null;
-
         [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         internal delegate RCLRet NativeRCLCreateNodeHandleType(
             ref SafeNodeHandle nodeHandle, [MarshalAs(UnmanagedType.LPStr)] string nodeName, [MarshalAs(UnmanagedType.LPStr)] string nodeNamespace);
@@ -755,7 +750,8 @@ namespace ROS2
         private static bool initialized = false;
         private static readonly object syncLock = new object();
 
-        internal static SafeRclParamsHandle GlobalParamsHandle { get; private set; }
+        internal static bool HasGlobalParameterOverrides { get; private set; }
+        internal static SafeRclParamsHandle GlobalParameterOverrideHandle { get; private set; }
 
         public static bool Ok()
         {
@@ -1504,7 +1500,8 @@ namespace ROS2
                         throw RCLExceptionHelper.CreateFromReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_arguments_get_param_overrides)}() failed.");
                     }
 
-                    GlobalParamsHandle = globalParamsHandle;
+                    HasGlobalParameterOverrides = !globalParamsHandle.IsInvalid;
+                    GlobalParameterOverrideHandle = globalParamsHandle;
 
                     initialized = true;
                 }

@@ -15,8 +15,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using rcl_interfaces.msg;
 using rcl_interfaces.srv;
+using ROS2.ParameterHandling;
 using ROS2.ParameterHandling.Exceptions;
 
 namespace ROS2
@@ -137,11 +139,12 @@ namespace ROS2
             };
         }
 
-        private void PublishParametersDeclaredEvent(IEnumerable<Parameter> parameters)
+        private void PublishParametersDeclaredEvent(List<Parameter> parameters)
         {
             ParameterEvent parameterEvent = GenerateParameterEventMessage();
             parameterEvent.NewParameters.AddRange(parameters);
             _publisherEvent.Publish(parameterEvent);
+            _onSetParameterCallback?.Invoke(parameters);
         }
 
         private void PublishParametersChangedEvent(IEnumerable<Parameter> parameters)
@@ -158,10 +161,20 @@ namespace ROS2
             _publisherEvent.Publish(parameterEvent);
         }
 
-        private bool TryGetParameterOverride(string name, out Parameter parameterOverride)
+        private bool TryGetParameterOverride(string name, ref ParameterValue parameterOverride)
         {
-            parameterOverride = null;
-            return false;
+            if (!RCLdotnet.HasGlobalParameterOverrides) return false;
+
+            bool overrideExists = false;
+
+            using (SafeHandle messageHandle = MessageStaticMemberCache<ParameterValue>.CreateMessageHandle())
+            {
+                RCLdotnet.WriteToMessageHandle(parameterOverride, messageHandle);
+                overrideExists = ParameterDelegates.native_rcl_try_get_parameter(messageHandle, RCLdotnet.GlobalParameterOverrideHandle, _node.Handle, name);
+                RCLdotnet.ReadFromMessageHandle(parameterOverride, messageHandle);
+            }
+
+            return overrideExists;
         }
 
         private void DeclareParameter(string name, Type type, Action<ParameterValue> assignDefaultCallback, ParameterDescriptor descriptor = null)
@@ -193,9 +206,10 @@ namespace ROS2
                 return;
             }
 
-            if (!TryGetParameterOverride(name, out Parameter declaredParameter))
+            ParameterValue declaredValue = new ParameterValue { Type = typeCode };
+            Parameter declaredParameter = new Parameter { Name = name, Value = declaredValue };
+            if (!TryGetParameterOverride(name, ref declaredValue))
             {
-                declaredParameter = new Parameter { Name = name, Value = { Type = typeCode } };
                 assignDefaultCallback?.Invoke(declaredParameter.Value);
             }
 

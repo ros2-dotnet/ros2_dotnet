@@ -25,7 +25,7 @@ namespace ROS2.ParameterHandling
 
         protected override bool ReleaseHandle()
         {
-            RCLdotnetDelegates.native_rcl_destroy_rcl_params(handle);
+            ParameterDelegates.native_rcl_destroy_rcl_params(handle);
             return true;
         }
     }

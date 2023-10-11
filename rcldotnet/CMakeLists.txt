@@ -69,6 +69,7 @@ set(CS_SOURCES
   ServiceDefinitionStaticMemberCache.cs
   Subscription.cs
   Timer.cs
+  ParameterHandling/ParameterDelegates.cs
   ParameterHandling/ParameterHandler.cs
   ParameterHandling/SafeRclParamsHandle.cs
   ParameterHandling/Exceptions/InvalidParameterTypeException.cs
@@ -108,6 +109,7 @@ add_library(${PROJECT_NAME}_native SHARED
   rcldotnet_publisher.c
   rcldotnet_timer.c
   rcldotnet_qos_profile.c
+  rcldotnet_params.c
   rcldotnet.c
 )
 
