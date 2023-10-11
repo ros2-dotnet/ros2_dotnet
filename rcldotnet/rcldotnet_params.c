@@ -100,26 +100,7 @@ void copy_yaml_string_array_to_parameter_string_array(rosidl_runtime_c__String__
   }
 }
 
-bool native_rcl_try_get_parameter(void *param_value_handle, const void *params_handle, const void *node_handle, const char *name) {
-  if (params_handle == NULL) return false;
-
-  const rcl_params_t *rcl_params = (const rcl_params_t *)params_handle;
-  const rcl_node_t *node = (const rcl_node_t *)node_handle;
-  const char *node_name = rcl_node_get_name(node);
-
-  int node_index = 0;
-  for (; node_index < rcl_params->num_nodes; node_index++) {
-    if (strcmp(node_name, rcl_params->node_names[node_index])) {
-      break;
-    }
-  }
-
-  if (node_index >= rcl_params->num_nodes) {
-    return false;
-  }
-  
-  const rcl_node_params_t *node_params = &rcl_params->params[node_index];
-
+bool try_get_parameter_from_node_params(const rcl_node_params_t *node_params, const char *name, rcl_interfaces__msg__ParameterValue *param_value) {
   int param_index = 0;
   for (; param_index < node_params->num_params; param_index++) {
     if (strcmp(name, node_params->parameter_names[param_index]) == 0) {
@@ -133,7 +114,6 @@ bool native_rcl_try_get_parameter(void *param_value_handle, const void *params_h
 
   rcl_variant_t *rcl_param_value = &node_params->parameter_values[param_index];
 
-  rcl_interfaces__msg__ParameterValue *param_value = (rcl_interfaces__msg__ParameterValue *)param_value_handle;
   switch (param_value->type) {
     case rcl_interfaces__msg__ParameterType__PARAMETER_BOOL:
       param_value->bool_value = *rcl_param_value->bool_value;
@@ -164,6 +144,33 @@ bool native_rcl_try_get_parameter(void *param_value_handle, const void *params_h
       copy_yaml_string_array_to_parameter_string_array(&param_value->string_array_value, rcl_param_value->string_array_value);
     break;
   }
+}
 
-  return true;
+bool native_rcl_try_get_parameter(void *param_value_handle, const void *params_handle, const void *node_handle, const char *name) {
+  if (params_handle == NULL) return false;
+
+  rcl_interfaces__msg__ParameterValue *param_value = (rcl_interfaces__msg__ParameterValue *)param_value_handle;
+  const rcl_params_t *rcl_params = (const rcl_params_t *)params_handle;
+  const rcl_node_t *node = (const rcl_node_t *)node_handle;
+  const char *node_name = rcl_node_get_fully_qualified_name(node);
+
+  // First check if there is an override which matches the fully qualified node name.
+  for (int i = 0; i < rcl_params->num_nodes; i++) {
+    if (strcmp(node_name, rcl_params->node_names[i]) == 0) {
+      if (try_get_parameter_from_node_params(&rcl_params->params[i], name, param_value)) {
+        return true;
+      }
+    }
+  }
+  
+  // Then check if there is a global override.
+  for (int i = 0; i < rcl_params->num_nodes; i++) {
+    if (strcmp("/**", rcl_params->node_names[i]) == 0) {
+      if (try_get_parameter_from_node_params(&rcl_params->params[i], name, param_value)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
