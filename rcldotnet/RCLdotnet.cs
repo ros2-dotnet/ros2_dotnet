@@ -354,7 +354,7 @@ namespace ROS2
         internal delegate IntPtr NativeRCLGetStringType(SafeHandle handle);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate RmwQosProfile NativeRCLGetQosProfileType();
+        internal delegate IntPtr NativeRCLGetQosProfileType();
         internal static NativeRCLGetQosProfileType native_rcl_qos_get_profile_default = null;
         internal static NativeRCLGetQosProfileType native_rcl_qos_get_profile_parameter_events = null;
         internal static NativeRCLGetQosProfileType native_rcl_qos_get_profile_parameters = null;

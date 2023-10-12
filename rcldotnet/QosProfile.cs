@@ -37,6 +37,7 @@ namespace ROS2
         public RmwTime Lifespan;
         public QosLivelinessPolicy Liveliness;
         public RmwTime LivelinessLeaseDuration;
+        // TODO: Windows uses a 32-bit bool representation. Confirm this works in Windows...
         [MarshalAs(UnmanagedType.U1)]
         public bool AvoidRosNamespaceConventions;
     }
@@ -231,37 +232,37 @@ namespace ROS2
         /// <summary>
         /// The default QoS profile.
         /// </summary>
-        public static QosProfile DefaultProfile { get; } = ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_default());
+        public static QosProfile DefaultProfile => ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_default());
 
         /// <summary>
         /// Profile for clock messages.
         /// </summary>
-        public static QosProfile ClockProfile { get; } = CreateClockProfile();
+        public static QosProfile ClockProfile => CreateClockProfile();
 
         /// <summary>
         /// Profile for parameter event messages.
         /// </summary>
-        public static QosProfile ParameterEventsProfile { get; } = ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_parameter_events());
+        public static QosProfile ParameterEventsProfile => ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_parameter_events());
 
         /// <summary>
         /// Profile for parameter messages.
         /// </summary>
-        public static QosProfile ParametersProfile { get; } = ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_parameters());
+        public static QosProfile ParametersProfile => ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_parameters());
 
         /// <summary>
         /// Profile for sensor messages.
         /// </summary>
-        public static QosProfile SensorDataProfile { get; } = ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_sensor_data());
+        public static QosProfile SensorDataProfile => ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_sensor_data());
 
         /// <summary>
         /// Profile for services.
         /// </summary>
-        public static QosProfile ServicesProfile { get; } = ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_services_default());
+        public static QosProfile ServicesProfile => ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_services_default());
 
         /// <summary>
         /// The system default (null) profile.
         /// </summary>
-        public static QosProfile SystemDefaultProfile { get; } = ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_system_default());
+        public static QosProfile SystemDefaultProfile => ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_system_default());
 
         /// <summary>
         /// The history policy.
@@ -628,15 +629,16 @@ namespace ROS2
             return new TimeSpan((long)ticks);
         }
 
-        private static QosProfile ToQosProfile(RmwQosProfile rmwProfile)
+        private static QosProfile ToQosProfile(IntPtr rmwProfile)
         {
+            RmwQosProfile native = Marshal.PtrToStructure<RmwQosProfile>(rmwProfile);
             return new QosProfile(
-                rmwProfile.History, (int)rmwProfile.Depth, rmwProfile.Reliability, rmwProfile.Durability,
-                FromRmwTime(rmwProfile.Deadline),
-                FromRmwTime(rmwProfile.Lifespan),
-                rmwProfile.Liveliness,
-                FromRmwTime(rmwProfile.LivelinessLeaseDuration),
-                rmwProfile.AvoidRosNamespaceConventions);
+                native.History, (int)native.Depth, native.Reliability, native.Durability,
+                FromRmwTime(native.Deadline),
+                FromRmwTime(native.Lifespan),
+                native.Liveliness,
+                FromRmwTime(native.LivelinessLeaseDuration),
+                native.AvoidRosNamespaceConventions);
         }
     }
 }
