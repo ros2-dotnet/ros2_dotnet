@@ -35,7 +35,7 @@ void native_rcl_destroy_rcl_params(void *rcl_params) {
   rcl_yaml_node_struct_fini((rcl_params_t *)rcl_params);
 }
 
-void copy_to_rosidl_runtime_c__String(rosidl_runtime_c__String *dest, const char * src) {
+void rcldotnet_params_copy_to_rosidl_runtime_c__String(rosidl_runtime_c__String *dest, const char * src) {
   size_t length = strlen(src);
   size_t capacity = sizeof(char) * (length + 1);
   dest->size = length;
@@ -52,7 +52,7 @@ void copy_to_rosidl_runtime_c__String(rosidl_runtime_c__String *dest, const char
   memcpy(dest->data, src, capacity);
 }
 
-void copy_yaml_array_to_parameter_array(rosidl_runtime_c__void__Sequence *dest, const rcl_void_array_t *src, size_t element_size) {
+void rcldotnet_params_copy_yaml_array_to_parameter_array(rosidl_runtime_c__void__Sequence *dest, const rcl_void_array_t *src, size_t element_size) {
   size_t length = src->size;
   size_t length_bytes = length * element_size;
   dest->size = length;
@@ -69,7 +69,7 @@ void copy_yaml_array_to_parameter_array(rosidl_runtime_c__void__Sequence *dest, 
   memcpy(dest->data, src->values, length_bytes);
 }
 
-void copy_yaml_string_array_to_parameter_string_array(rosidl_runtime_c__String__Sequence *dest, rcutils_string_array_t *src) {
+void rcldotnet_params_copy_yaml_string_array_to_parameter_string_array(rosidl_runtime_c__String__Sequence *dest, rcutils_string_array_t *src) {
   size_t length = src->size;
 
   if (dest->capacity != length) {
@@ -96,11 +96,11 @@ void copy_yaml_string_array_to_parameter_string_array(rosidl_runtime_c__String__
 
   for (int i = 0; i < length; i++) {
     rosidl_runtime_c__String *dest_element = &dest->data[i];
-    copy_to_rosidl_runtime_c__String(&(dest->data[i]), src->data[i]);
+    rcldotnet_params_copy_to_rosidl_runtime_c__String(&(dest->data[i]), src->data[i]);
   }
 }
 
-bool try_get_parameter_from_node_params(const rcl_node_params_t *node_params, const char *name, rcl_interfaces__msg__ParameterValue *param_value) {
+bool rcldotnet_params_try_get_parameter_from_node_params(const rcl_node_params_t *node_params, const char *name, rcl_interfaces__msg__ParameterValue *param_value) {
   int param_index = 0;
   for (; param_index < node_params->num_params; param_index++) {
     if (strcmp(name, node_params->parameter_names[param_index]) == 0) {
@@ -125,28 +125,30 @@ bool try_get_parameter_from_node_params(const rcl_node_params_t *node_params, co
       param_value->double_value = *rcl_param_value->double_value;
     break;
     case rcl_interfaces__msg__ParameterType__PARAMETER_STRING:
-      copy_to_rosidl_runtime_c__String(&param_value->string_value, rcl_param_value->string_value);
+      rcldotnet_params_copy_to_rosidl_runtime_c__String(&param_value->string_value, rcl_param_value->string_value);
     break;
     case rcl_interfaces__msg__ParameterType__PARAMETER_BYTE_ARRAY:
       // Byte array parameter loading from YAML not implemented in RCL.
-      //copy_yaml_array_to_parameter_array((rosidl_runtime_c__void__Sequence *)&param_value->byte_array_value, (rcl_void_array_t *)rcl_param_value->byte_array_value, sizeof(char));
+      //rcldotnet_params_copy_yaml_array_to_parameter_array((rosidl_runtime_c__void__Sequence *)&param_value->byte_array_value, (rcl_void_array_t *)rcl_param_value->byte_array_value, sizeof(char));
     break;
     case rcl_interfaces__msg__ParameterType__PARAMETER_BOOL_ARRAY:
-      copy_yaml_array_to_parameter_array((rosidl_runtime_c__void__Sequence *)&param_value->bool_array_value, (rcl_void_array_t *)rcl_param_value->bool_array_value, sizeof(bool));
+      rcldotnet_params_copy_yaml_array_to_parameter_array((rosidl_runtime_c__void__Sequence *)&param_value->bool_array_value, (rcl_void_array_t *)rcl_param_value->bool_array_value, sizeof(bool));
     break;
     case rcl_interfaces__msg__ParameterType__PARAMETER_INTEGER_ARRAY:
-      copy_yaml_array_to_parameter_array((rosidl_runtime_c__void__Sequence *)&param_value->integer_array_value, (rcl_void_array_t *)rcl_param_value->integer_array_value, sizeof(int64_t));
+      rcldotnet_params_copy_yaml_array_to_parameter_array((rosidl_runtime_c__void__Sequence *)&param_value->integer_array_value, (rcl_void_array_t *)rcl_param_value->integer_array_value, sizeof(int64_t));
     break;
     case rcl_interfaces__msg__ParameterType__PARAMETER_DOUBLE_ARRAY:
-      copy_yaml_array_to_parameter_array((rosidl_runtime_c__void__Sequence *)&param_value->double_array_value, (rcl_void_array_t *)rcl_param_value->double_array_value, sizeof(double));
+      rcldotnet_params_copy_yaml_array_to_parameter_array((rosidl_runtime_c__void__Sequence *)&param_value->double_array_value, (rcl_void_array_t *)rcl_param_value->double_array_value, sizeof(double));
     break;
     case rcl_interfaces__msg__ParameterType__PARAMETER_STRING_ARRAY:
-      copy_yaml_string_array_to_parameter_string_array(&param_value->string_array_value, rcl_param_value->string_array_value);
+      rcldotnet_params_copy_yaml_string_array_to_parameter_string_array(&param_value->string_array_value, rcl_param_value->string_array_value);
     break;
   }
+
+  return true;
 }
 
-bool native_rcl_try_get_parameter(void *param_value_handle, const void *params_handle, const void *node_handle, const char *name) {
+int32_t /* bool */ native_rcl_try_get_parameter(void *param_value_handle, const void *params_handle, const void *node_handle, const char *name) {
   if (params_handle == NULL) return false;
 
   rcl_interfaces__msg__ParameterValue *param_value = (rcl_interfaces__msg__ParameterValue *)param_value_handle;
@@ -157,7 +159,7 @@ bool native_rcl_try_get_parameter(void *param_value_handle, const void *params_h
   // First check if there is an override which matches the fully qualified node name.
   for (int i = 0; i < rcl_params->num_nodes; i++) {
     if (strcmp(node_name, rcl_params->node_names[i]) == 0) {
-      if (try_get_parameter_from_node_params(&rcl_params->params[i], name, param_value)) {
+      if (rcldotnet_params_try_get_parameter_from_node_params(&rcl_params->params[i], name, param_value)) {
         return true;
       }
     }
@@ -166,7 +168,7 @@ bool native_rcl_try_get_parameter(void *param_value_handle, const void *params_h
   // Then check if there is a global override.
   for (int i = 0; i < rcl_params->num_nodes; i++) {
     if (strcmp("/**", rcl_params->node_names[i]) == 0) {
-      if (try_get_parameter_from_node_params(&rcl_params->params[i], name, param_value)) {
+      if (rcldotnet_params_try_get_parameter_from_node_params(&rcl_params->params[i], name, param_value)) {
         return true;
       }
     }

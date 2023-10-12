@@ -29,9 +29,9 @@ namespace ROS2.ParameterHandling {
         internal static NativeRCLDestroyRclParamsType native_rcl_destroy_rcl_params = null;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-        internal delegate bool NativeRCLTrGetParameterType(SafeHandle parameterValueHandle, SafeRclParamsHandle paramsHandle, SafeNodeHandle nodeHandle, [MarshalAs(UnmanagedType.LPStr)] string name);
+        internal delegate int NativeRCLTryGetParameterType(SafeHandle parameterValueHandle, SafeRclParamsHandle paramsHandle, SafeNodeHandle nodeHandle, [MarshalAs(UnmanagedType.LPStr)] string name);
 
-        internal static NativeRCLTrGetParameterType native_rcl_try_get_parameter = null;
+        internal static NativeRCLTryGetParameterType native_rcl_try_get_parameter = null;
 
         static ParameterDelegates()
         {

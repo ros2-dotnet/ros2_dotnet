@@ -21,6 +21,6 @@ RCLDOTNET_EXPORT
 void RCLDOTNET_CDECL native_rcl_destroy_rcl_params(void *rcl_params);
 
 RCLDOTNET_EXPORT
-bool RCLDOTNET_CDECL native_rcl_try_get_parameter(void *param_value_handle, const void *params_handle, const void *node_handle, const char *name);
+int32_t /* bool */ RCLDOTNET_CDECL native_rcl_try_get_parameter(void *param_value_handle, const void *params_handle, const void *node_handle, const char *name);
 
 #endif // RCLDOTNET_PARAMS_H

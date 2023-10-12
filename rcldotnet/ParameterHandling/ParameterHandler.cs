@@ -170,7 +170,7 @@ namespace ROS2
             using (SafeHandle messageHandle = MessageStaticMemberCache<ParameterValue>.CreateMessageHandle())
             {
                 RCLdotnet.WriteToMessageHandle(parameterOverride, messageHandle);
-                overrideExists = ParameterDelegates.native_rcl_try_get_parameter(messageHandle, RCLdotnet.GlobalParameterOverrideHandle, _node.Handle, name);
+                overrideExists = ParameterDelegates.native_rcl_try_get_parameter(messageHandle, RCLdotnet.GlobalParameterOverrideHandle, _node.Handle, name) != 0;
                 RCLdotnet.ReadFromMessageHandle(parameterOverride, messageHandle);
             }
 
