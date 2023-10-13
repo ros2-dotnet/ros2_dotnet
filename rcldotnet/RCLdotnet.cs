@@ -738,13 +738,6 @@ namespace ROS2
                 (NativeRCLWriteToQosProfileHandleType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_write_to_qos_profile_handle_ptr, typeof(NativeRCLWriteToQosProfileHandleType));
 
-            _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_qos_get_profile_default), out native_rcl_qos_get_profile_default);
-            _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_qos_get_profile_parameter_events), out native_rcl_qos_get_profile_parameter_events);
-            _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_qos_get_profile_parameters), out native_rcl_qos_get_profile_parameters);
-            _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_qos_get_profile_sensor_data), out native_rcl_qos_get_profile_sensor_data);
-            _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_qos_get_profile_services_default), out native_rcl_qos_get_profile_services_default);
-            _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_qos_get_profile_system_default), out native_rcl_qos_get_profile_system_default);
-
             _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_create_clock_handle), out native_rcl_create_clock_handle);
             _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_destroy_clock_handle), out native_rcl_destroy_clock_handle);
             _dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_create_timer_handle), out native_rcl_create_timer_handle);

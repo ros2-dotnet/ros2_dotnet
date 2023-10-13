@@ -14,34 +14,11 @@
  */
 
 using System;
-using System.Runtime.InteropServices;
 using System.Threading;
+using ROS2.Qos;
 
 namespace ROS2
 {
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct RmwTime
-    {
-        public ulong Sec;
-        public ulong NSec;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct RmwQosProfile
-    {
-        public QosHistoryPolicy History;
-        public UIntPtr Depth; // size_t is properly represented by UIntPtr
-        public QosReliabilityPolicy Reliability;
-        public QosDurabilityPolicy Durability;
-        public RmwTime Deadline;
-        public RmwTime Lifespan;
-        public QosLivelinessPolicy Liveliness;
-        public RmwTime LivelinessLeaseDuration;
-        // TODO: Windows uses a 32-bit bool representation. Confirm this works in Windows...
-        [MarshalAs(UnmanagedType.U1)]
-        public bool AvoidRosNamespaceConventions;
-    }
-
     /// <summary>
     /// The `HISTORY` DDS QoS policy.
     ///
@@ -232,7 +209,7 @@ namespace ROS2
         /// <summary>
         /// The default QoS profile.
         /// </summary>
-        public static QosProfile DefaultProfile => ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_default());
+        public static QosProfile DefaultProfile => ReadConstQoSProfile(QosProfileDelegates.native_rcl_qos_get_const_profile_default);
 
         /// <summary>
         /// Profile for clock messages.
@@ -242,27 +219,27 @@ namespace ROS2
         /// <summary>
         /// Profile for parameter event messages.
         /// </summary>
-        public static QosProfile ParameterEventsProfile => ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_parameter_events());
+        public static QosProfile ParameterEventsProfile => ReadConstQoSProfile(QosProfileDelegates.native_rcl_qos_get_const_profile_parameter_events);
 
         /// <summary>
         /// Profile for parameter messages.
         /// </summary>
-        public static QosProfile ParametersProfile => ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_parameters());
+        public static QosProfile ParametersProfile => ReadConstQoSProfile(QosProfileDelegates.native_rcl_qos_get_const_profile_parameters);
 
         /// <summary>
         /// Profile for sensor messages.
         /// </summary>
-        public static QosProfile SensorDataProfile => ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_sensor_data());
+        public static QosProfile SensorDataProfile => ReadConstQoSProfile(QosProfileDelegates.native_rcl_qos_get_const_profile_sensor_data);
 
         /// <summary>
-        /// Profile for services.
+        /// Default profile for services.
         /// </summary>
-        public static QosProfile ServicesProfile => ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_services_default());
+        public static QosProfile ServicesDefaultProfile => ReadConstQoSProfile(QosProfileDelegates.native_rcl_qos_get_const_profile_services_default);
 
         /// <summary>
         /// The system default (null) profile.
         /// </summary>
-        public static QosProfile SystemDefaultProfile => ToQosProfile(RCLdotnetDelegates.native_rcl_qos_get_profile_system_default());
+        public static QosProfile SystemDefaultProfile => ReadConstQoSProfile(QosProfileDelegates.native_rcl_qos_get_const_profile_system_default);
 
         /// <summary>
         /// The history policy.
@@ -615,30 +592,21 @@ namespace ROS2
             nsec = (ulong)(ticksInsideSecond * NanosecondsPerTick);
         }
 
-        private static TimeSpan FromRmwTime(RmwTime time)
+        // This method is intended only for reading from a const rmw_qos_profile_t * - it will perform no memory management on the pointer!
+        private static QosProfile ReadConstQoSProfile(QosProfileDelegates.NativeRCLGetConstQosProfileHandleType nativeDelegate)
         {
-            if (time.Sec == 9223372036 && time.NSec == 854775807)
-            {
-                // see RMW_DURATION_INFINITE and comment on QosProfile.InfiniteDuration above.
-                return InfiniteDuration;
-            }
+            IntPtr nativeProfileConst = nativeDelegate();
 
-            const long NanosecondsPerTick = 1000000 / TimeSpan.TicksPerMillisecond; // ~= 100.
-            ulong ticks = time.Sec * TimeSpan.TicksPerSecond;
-            ticks += time.NSec / NanosecondsPerTick;
-            return new TimeSpan((long)ticks);
-        }
-
-        private static QosProfile ToQosProfile(IntPtr rmwProfile)
-        {
-            RmwQosProfile native = Marshal.PtrToStructure<RmwQosProfile>(rmwProfile);
             return new QosProfile(
-                native.History, (int)native.Depth, native.Reliability, native.Durability,
-                FromRmwTime(native.Deadline),
-                FromRmwTime(native.Lifespan),
-                native.Liveliness,
-                FromRmwTime(native.LivelinessLeaseDuration),
-                native.AvoidRosNamespaceConventions);
+                QosProfileDelegates.native_rcl_qos_profile_read_history(nativeProfileConst),
+                QosProfileDelegates.native_rcl_qos_profile_read_depth(nativeProfileConst),
+                QosProfileDelegates.native_rcl_qos_profile_read_reliability(nativeProfileConst),
+                QosProfileDelegates.native_rcl_qos_profile_read_durability(nativeProfileConst),
+                new RmwTime(QosProfileDelegates.native_rcl_qos_profile_read_deadline, nativeProfileConst).AsTimespan(),
+                new RmwTime(QosProfileDelegates.native_rcl_qos_profile_read_lifespan, nativeProfileConst).AsTimespan(),
+                QosProfileDelegates.native_rcl_qos_profile_read_liveliness(nativeProfileConst),
+                new RmwTime(QosProfileDelegates.native_rcl_qos_profile_read_liveliness_lease_duration, nativeProfileConst).AsTimespan(),
+                QosProfileDelegates.native_rcl_qos_profile_read_avoid_ros_namespace_conventions(nativeProfileConst) != 0);
         }
     }
 }

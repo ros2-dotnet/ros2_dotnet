@@ -762,30 +762,6 @@ int32_t native_rcl_write_to_qos_profile_handle(
   return RCL_RET_OK;
 }
 
-const rmw_qos_profile_t native_rcl_qos_get_profile_default() {
-  return rmw_qos_profile_default;
-}
-
-const rmw_qos_profile_t native_rcl_qos_get_profile_parameter_events() {
-  return rmw_qos_profile_parameter_events;
-}
-
-const rmw_qos_profile_t native_rcl_qos_get_profile_parameters() {
-  return rmw_qos_profile_parameters;
-}
-
-const rmw_qos_profile_t native_rcl_qos_get_profile_sensor_data() {
-  return rmw_qos_profile_sensor_data;
-}
-
-const rmw_qos_profile_t native_rcl_qos_get_profile_services_default() {
-  return rmw_qos_profile_services_default;
-}
-
-const rmw_qos_profile_t native_rcl_qos_get_profile_system_default() {
-  return rmw_qos_profile_system_default;
-}
-
 int32_t native_rcl_create_timer_handle(void **timer_handle, void *clock_handle, int64_t period, rcl_timer_callback_t callback) {
   rcl_allocator_t allocator = rcl_get_default_allocator();
   rcl_timer_t *timer = malloc(sizeof(rcl_timer_t));
