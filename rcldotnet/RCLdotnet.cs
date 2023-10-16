@@ -1463,7 +1463,7 @@ namespace ROS2
             }
         }
 
-        internal static string GetStringFromNativeDelegate<T>(RCLdotnetDelegates.NativeRCLGetStringType nativeDelegate, T safeHandle) where T : SafeHandle
+        internal static string GetStringFromNativeDelegate(RCLdotnetDelegates.NativeRCLGetStringType nativeDelegate, SafeHandle safeHandle)
         {
             bool mustRelease = false;
             try
