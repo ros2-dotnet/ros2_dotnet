@@ -240,3 +240,21 @@ int32_t native_rcl_action_destroy_server_handle(void *action_server_handle, void
 
   return ret;
 }
+
+const char * native_rcl_node_get_name_handle(void *node_handle) {
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+  
+  return rcl_node_get_name(node);
+}
+
+const char * native_rcl_node_get_namespace_handle(void *node_handle) {
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+  
+  return rcl_node_get_namespace(node);
+}
+
+const char * native_rcl_node_get_fully_qualified_name_handle(void *node_handle) {
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+  
+  return rcl_node_get_fully_qualified_name(node);
+}

@@ -96,6 +96,12 @@ namespace ROS2
 
         internal static NativeRCLActionDestroyServerHandleType native_rcl_action_destroy_server_handle = null;
 
+        internal static RCLdotnetDelegates.NativeRCLGetStringType native_rcl_node_get_name_handle = null;
+
+        internal static RCLdotnetDelegates.NativeRCLGetStringType native_rcl_node_get_namespace_handle = null;
+
+        internal static RCLdotnetDelegates.NativeRCLGetStringType native_rcl_node_get_fully_qualified_name_handle = null;
+
         static NodeDelegates()
         {
             _dllLoadUtils = DllLoadUtilsFactory.GetDllLoadUtils();
@@ -182,6 +188,24 @@ namespace ROS2
             NodeDelegates.native_rcl_action_destroy_server_handle =
                 (NativeRCLActionDestroyServerHandleType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_action_destroy_server_handle_ptr, typeof(NativeRCLActionDestroyServerHandleType));
+
+            IntPtr native_rcl_node_get_name_handle_ptr = _dllLoadUtils.GetProcAddress(
+                nativeLibrary, "native_rcl_node_get_name_handle");
+            NodeDelegates.native_rcl_node_get_name_handle =
+                (RCLdotnetDelegates.NativeRCLGetStringType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_node_get_name_handle_ptr, typeof(RCLdotnetDelegates.NativeRCLGetStringType));
+
+            IntPtr native_rcl_node_get_namespace_handle_ptr = _dllLoadUtils.GetProcAddress(
+                nativeLibrary, "native_rcl_node_get_namespace_handle");
+            NodeDelegates.native_rcl_node_get_namespace_handle =
+                (RCLdotnetDelegates.NativeRCLGetStringType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_node_get_namespace_handle_ptr, typeof(RCLdotnetDelegates.NativeRCLGetStringType));
+
+            IntPtr native_rcl_node_get_fully_qualified_name_handle_ptr = _dllLoadUtils.GetProcAddress(
+                nativeLibrary, "native_rcl_node_get_fully_qualified_name_handle");
+            NodeDelegates.native_rcl_node_get_fully_qualified_name_handle =
+                (RCLdotnetDelegates.NativeRCLGetStringType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_node_get_fully_qualified_name_handle_ptr, typeof(RCLdotnetDelegates.NativeRCLGetStringType));
         }
     }
 
@@ -209,6 +233,12 @@ namespace ROS2
             _actionClients = new List<ActionClient>();
             _actionServers = new List<ActionServer>();
         }
+
+        public string Name => RCLdotnet.GetStringFromNativeDelegate(NodeDelegates.native_rcl_node_get_name_handle, Handle);
+
+        public string Namespace => RCLdotnet.GetStringFromNativeDelegate(NodeDelegates.native_rcl_node_get_namespace_handle, Handle);
+
+        public string FullyQualifiedName => RCLdotnet.GetStringFromNativeDelegate(NodeDelegates.native_rcl_node_get_fully_qualified_name_handle, Handle);
 
         public IList<Subscription> Subscriptions => _subscriptions;
 

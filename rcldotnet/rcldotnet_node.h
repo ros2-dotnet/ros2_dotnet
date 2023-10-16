@@ -71,4 +71,13 @@ int32_t RCLDOTNET_CDECL native_rcl_action_create_server_handle(void **action_ser
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_action_destroy_server_handle(void *action_server_handle, void *node_handle);
 
+RCLDOTNET_EXPORT
+const char * RCLDOTNET_CDECL native_rcl_node_get_name_handle(void *node_handle);
+
+RCLDOTNET_EXPORT
+const char * RCLDOTNET_CDECL native_rcl_node_get_namespace_handle(void *node_handle);
+
+RCLDOTNET_EXPORT
+const char * RCLDOTNET_CDECL native_rcl_node_get_fully_qualified_name_handle(void *node_handle);
+
 #endif // RCLDOTNET_NODE_H

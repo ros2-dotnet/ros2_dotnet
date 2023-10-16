@@ -28,9 +28,7 @@
 static rcl_context_t context;
 static rcl_clock_t clock;
 
-int32_t native_rcl_init() {
-  // TODO(esteve): parse args
-  int num_args = 0;
+int32_t native_rcl_init(int argc, const char *argv[]) {
   context = rcl_get_zero_initialized_context();
   rcl_allocator_t allocator = rcl_get_default_allocator();
   rcl_init_options_t init_options = rcl_get_zero_initialized_init_options();
@@ -38,8 +36,7 @@ int32_t native_rcl_init() {
   if (RCL_RET_OK != ret) {
     return ret;
   }
-  const char ** arg_values = NULL;
-  ret = rcl_init(num_args, arg_values, &init_options, &context);
+  ret = rcl_init(argc, argv, &init_options, &context);
   if (ret != RCL_RET_OK) {
     return ret;
   }

@@ -26,7 +26,8 @@ namespace ROS2
         internal static readonly DllLoadUtils _dllLoadUtils;
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate RCLRet NativeRCLInitType();
+        internal delegate RCLRet NativeRCLInitType(
+            int argc, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.LPStr)] string[] argv);
 
         internal static NativeRCLInitType native_rcl_init = null;
 
@@ -350,6 +351,9 @@ namespace ROS2
             int avoidRosNamespaceConventions);
 
         internal static NativeRCLWriteToQosProfileHandleType native_rcl_write_to_qos_profile_handle = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate IntPtr NativeRCLGetStringType(SafeHandle handle);
 
         static RCLdotnetDelegates()
         {
@@ -1396,7 +1400,8 @@ namespace ROS2
             {
                 if (!initialized)
                 {
-                    RCLRet ret = RCLdotnetDelegates.native_rcl_init();
+                    string[] args = System.Environment.GetCommandLineArgs();
+                    RCLRet ret = RCLdotnetDelegates.native_rcl_init(args.Length, args);
                     RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_init)}() failed.");
                     initialized = true;
                 }
@@ -1454,6 +1459,25 @@ namespace ROS2
                 if (mustRelease)
                 {
                     messageHandle.DangerousRelease();
+                }
+            }
+        }
+
+        internal static string GetStringFromNativeDelegate(RCLdotnetDelegates.NativeRCLGetStringType nativeDelegate, SafeHandle safeHandle)
+        {
+            bool mustRelease = false;
+            try
+            {
+                // This avoids accessing a invalid/freed pointer if some other thread disposes the SafeNodeHandle.
+                safeHandle.DangerousAddRef(ref mustRelease);
+                IntPtr namePtr = nativeDelegate(safeHandle);
+                return Marshal.PtrToStringAnsi(namePtr);
+            }
+            finally
+            {
+                if (mustRelease)
+                {
+                    safeHandle.DangerousRelease();
                 }
             }
         }
