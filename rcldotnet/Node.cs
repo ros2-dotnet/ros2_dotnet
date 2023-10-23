@@ -211,6 +211,8 @@ namespace ROS2
 
     public sealed class Node
     {
+        private readonly Clock _clock;
+
         private readonly IList<Subscription> _subscriptions;
 
         private readonly IList<Service> _services;
@@ -226,6 +228,9 @@ namespace ROS2
         internal Node(SafeNodeHandle handle)
         {
             Handle = handle;
+
+            _clock = RCLdotnet.CreateClock();
+
             _subscriptions = new List<Subscription>();
             _services = new List<Service>();
             _clients = new List<Client>();
@@ -239,6 +244,8 @@ namespace ROS2
         public string Namespace => RCLdotnet.GetStringFromNativeDelegate(NodeDelegates.native_rcl_node_get_namespace_handle, Handle);
 
         public string FullyQualifiedName => RCLdotnet.GetStringFromNativeDelegate(NodeDelegates.native_rcl_node_get_fully_qualified_name_handle, Handle);
+
+        public Clock Clock => _clock;
 
         public IList<Subscription> Subscriptions => _subscriptions;
 
