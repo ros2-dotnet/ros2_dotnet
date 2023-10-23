@@ -208,9 +208,11 @@ int32_t native_rcl_action_destroy_client_handle(void *action_client_handle, void
 
 int32_t native_rcl_action_create_server_handle(void **action_server_handle,
                                                void *node_handle,
+                                               void *clock_handle,
                                                const char *action_name,
                                                void *typesupport) {
   rcl_node_t *node = (rcl_node_t *)node_handle;
+  rcl_clock_t *clock = (rcl_clock_t *)clock_handle;
 
   rosidl_action_type_support_t *ts =
     (rosidl_action_type_support_t *)typesupport;
@@ -221,7 +223,6 @@ int32_t native_rcl_action_create_server_handle(void **action_server_handle,
   rcl_action_server_options_t action_server_ops =
     rcl_action_server_get_default_options();
 
-  rcl_clock_t *clock = native_rcl_get_default_clock();
 
   rcl_ret_t ret =
     rcl_action_server_init(action_server, node, clock, ts, action_name, &action_server_ops);
