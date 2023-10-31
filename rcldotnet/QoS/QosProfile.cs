@@ -208,36 +208,132 @@ namespace ROS2
 
         /// <summary>
         /// The default QoS profile.
+        /// 
+        /// Unlikely to change but valid as at 2023-10-31.
+        /// https://github.com/ros2/rmw/blob/rolling/rmw/include/rmw/qos_profiles.h
+        /// 
+        /// | --------------- | --------------- |
+        /// | History         | KEEP_LAST       |
+        /// | Depth           | 10              |
+        /// | Reliability     | RELIABLE        |
+        /// | Durability      | VOLATILE        |
+        /// | Deadline        | DEFAULT         |
+        /// | Lifespan        | DEFAULT         |
+        /// | Liveliness      | SYSTEM_DEFAULT  |
+        /// | Lease Duration  | DEFAULT         |
+        /// | Avoid Namespace | false           |
         /// </summary>
         public static QosProfile DefaultProfile => ReadConstQoSProfile(QosProfileDelegates.native_rcl_qos_get_const_profile_default);
 
         /// <summary>
         /// Profile for clock messages.
+        /// See CreateClockProfile for more details.
+        /// 
+        /// | --------------- | --------------- |
+        /// | History         | KEEP_LAST       |
+        /// | Depth           | 1               |
+        /// | Reliability     | BEST_EFFORT     |
+        /// | Durability      | VOLATILE        |
+        /// | Deadline        | DEFAULT         |
+        /// | Lifespan        | DEFAULT         |
+        /// | Liveliness      | SYSTEM_DEFAULT  |
+        /// | Lease Duration  | DEFAULT         |
+        /// | Avoid Namespace | false           |
         /// </summary>
         public static QosProfile ClockProfile => CreateClockProfile();
 
         /// <summary>
         /// Profile for parameter event messages.
+        /// 
+        /// Unlikely to change but valid as at 2023-10-31.
+        /// https://github.com/ros2/rmw/blob/rolling/rmw/include/rmw/qos_profiles.h
+        /// 
+        /// | --------------- | --------------- |
+        /// | History         | KEEP_LAST       |
+        /// | Depth           | 1000            |
+        /// | Reliability     | RELIABLE        |
+        /// | Durability      | VOLATILE        |
+        /// | Deadline        | DEFAULT         |
+        /// | Lifespan        | DEFAULT         |
+        /// | Liveliness      | SYSTEM_DEFAULT  |
+        /// | Lease Duration  | DEFAULT         |
+        /// | Avoid Namespace | false           |
         /// </summary>
         public static QosProfile ParameterEventsProfile => ReadConstQoSProfile(QosProfileDelegates.native_rcl_qos_get_const_profile_parameter_events);
 
         /// <summary>
         /// Profile for parameter messages.
+        /// 
+        /// Unlikely to change but valid as at 2023-10-31.
+        /// https://github.com/ros2/rmw/blob/rolling/rmw/include/rmw/qos_profiles.h
+        /// 
+        /// | --------------- | --------------- |
+        /// | History         | KEEP_LAST       |
+        /// | Depth           | 1000            |
+        /// | Reliability     | RELIABLE        |
+        /// | Durability      | VOLATILE        |
+        /// | Deadline        | DEFAULT         |
+        /// | Lifespan        | DEFAULT         |
+        /// | Liveliness      | SYSTEM_DEFAULT  |
+        /// | Lease Duration  | DEFAULT         |
+        /// | Avoid Namespace | false           |
         /// </summary>
         public static QosProfile ParametersProfile => ReadConstQoSProfile(QosProfileDelegates.native_rcl_qos_get_const_profile_parameters);
 
         /// <summary>
         /// Profile for sensor messages.
+        /// 
+        /// Unlikely to change but valid as at 2023-10-31.
+        /// https://github.com/ros2/rmw/blob/rolling/rmw/include/rmw/qos_profiles.h
+        /// 
+        /// | --------------- | --------------- |
+        /// | History         | KEEP_LAST       |
+        /// | Depth           | 5               |
+        /// | Reliability     | BEST_EFFORT     |
+        /// | Durability      | VOLATILE        |
+        /// | Deadline        | DEFAULT         |
+        /// | Lifespan        | DEFAULT         |
+        /// | Liveliness      | SYSTEM_DEFAULT  |
+        /// | Lease Duration  | DEFAULT         |
+        /// | Avoid Namespace | false           |
         /// </summary>
         public static QosProfile SensorDataProfile => ReadConstQoSProfile(QosProfileDelegates.native_rcl_qos_get_const_profile_sensor_data);
 
         /// <summary>
         /// Default profile for services.
+        /// 
+        /// Unlikely to change but valid as at 2023-10-31.
+        /// https://github.com/ros2/rmw/blob/rolling/rmw/include/rmw/qos_profiles.h
+        /// 
+        /// | --------------- | --------------- |
+        /// | History         | KEEP_LAST       |
+        /// | Depth           | 10              |
+        /// | Reliability     | RELIABLE        |
+        /// | Durability      | VOLATILE        |
+        /// | Deadline        | DEFAULT         |
+        /// | Lifespan        | DEFAULT         |
+        /// | Liveliness      | SYSTEM_DEFAULT  |
+        /// | Lease Duration  | DEFAULT         |
+        /// | Avoid Namespace | false           |
         /// </summary>
         public static QosProfile ServicesDefaultProfile => ReadConstQoSProfile(QosProfileDelegates.native_rcl_qos_get_const_profile_services_default);
 
         /// <summary>
         /// The system default (null) profile.
+        /// 
+        /// Unlikely to change but valid as at 2023-10-31.
+        /// https://github.com/ros2/rmw/blob/rolling/rmw/include/rmw/qos_profiles.h
+        /// 
+        /// | --------------- | --------------- |
+        /// | History         | SYSTEM_DEFAULT  |
+        /// | Depth           | SYSTEM_DEFAULT  |
+        /// | Reliability     | SYSTEM_DEFAULT  |
+        /// | Durability      | SYSTEM_DEFAULT  |
+        /// | Deadline        | DEFAULT         |
+        /// | Lifespan        | DEFAULT         |
+        /// | Liveliness      | SYSTEM_DEFAULT  |
+        /// | Lease Duration  | DEFAULT         |
+        /// | Avoid Namespace | false           |
         /// </summary>
         public static QosProfile SystemDefaultProfile => ReadConstQoSProfile(QosProfileDelegates.native_rcl_qos_get_const_profile_system_default);
 
@@ -521,6 +617,7 @@ namespace ROS2
         {
             // Values from https://docs.ros.org/en/rolling/p/rclcpp/generated/classrclcpp_1_1ClockQoS.html
             // Only available in versions of rclcpp >= Galactic
+            // If changed, update comment at top of file also.
             return new QosProfile(
                 history: QosHistoryPolicy.KeepLast,
                 depth: 1,
