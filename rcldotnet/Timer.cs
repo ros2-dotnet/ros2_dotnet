@@ -72,7 +72,7 @@ namespace ROS2
 
         private void OnTimer(IntPtr handle, Duration elapsed)
         {
-            _callback?.Invoke(elapsed.AsTimespan);
+            _callback?.Invoke(elapsed.AsTimespan());
         }
     }
 }

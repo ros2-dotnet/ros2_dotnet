@@ -21,7 +21,7 @@ using ROS2.Utils;
 
 namespace ROS2
 {
-    public static class TimeConstants
+    internal static class TimeConstants
     {
         public const long NanosecondsPerSecond = 1000L * 1000L * 1000L;
         public const long NanosecondsPerMillisecond = 1000000L;
@@ -43,10 +43,9 @@ namespace ROS2
     /// </summary>
     public enum ClockType
     {
-        ClockUninitialized = 0,
-        ROSTime,
-        SystemTime,
-        SteadyTime
+        ROSTime = 1,
+        SystemTime = 2,
+        SteadyTime = 3
     }
 
     /// Enumeration to describe the type of time jump.
@@ -69,21 +68,31 @@ namespace ROS2
     {
         public long nanoseconds;
 
-        public TimeSpan AsTimespan => new TimeSpan(nanoseconds / TimeConstants.NanosecondsPerTimespanTick);
-
         public Duration(TimeSpan timeSpan)
         {
             nanoseconds = (long)(timeSpan.TotalMilliseconds * TimeConstants.NanosecondsPerMillisecond);
         }
+
+        public TimeSpan AsTimespan()
+        {
+            return new TimeSpan(nanoseconds / TimeConstants.NanosecondsPerTimespanTick);
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct TimeJump
+    public readonly struct TimeJump
     {
-        public ClockChange clockChange;
-        internal Duration delta;
+        private readonly ClockChange _clockChange;
+        private readonly Duration _delta;
 
-        public TimeSpan Delta => delta.AsTimespan;
+        internal TimeJump(ClockChange clockChange, Duration delta)
+        {
+            _clockChange = clockChange;
+            _delta = delta;
+        }
+
+        public ClockChange ClockChange => _clockChange;
+        public TimeSpan Delta => _delta.AsTimespan();
     }
 
     internal delegate void JumpCallbackInternal(IntPtr timeJumpPtr, bool beforeJump);
@@ -91,18 +100,22 @@ namespace ROS2
     public delegate void JumpCallback(TimeJump timeJump, bool beforeJump);
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct JumpThreshold
+    public readonly struct JumpThreshold
     {
-        public bool onClockChange;
-        internal Duration minForward;
-        internal Duration minBackward;
+        internal readonly bool _onClockChange;
+        internal readonly Duration _minForward;
+        internal readonly Duration _minBackward;
 
         public JumpThreshold(bool onClockChange, TimeSpan minForward, TimeSpan minBackward)
         {
-            this.onClockChange = onClockChange;
-            this.minForward = new Duration(minForward);
-            this.minBackward = new Duration(minBackward);
+            _onClockChange = onClockChange;
+            _minForward = new Duration(minForward);
+            _minBackward = new Duration(minBackward);
         }
+
+        public bool OnClockChange => _onClockChange;
+        public TimeSpan MinForward => _minForward.AsTimespan();
+        public TimeSpan MinBackward => _minBackward.AsTimespan();
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -187,6 +200,8 @@ namespace ROS2
     {
         private readonly Dictionary<JumpCallback, JumpCallbackInternal> _registeredJumpCallbacks = new Dictionary<JumpCallback, JumpCallbackInternal>();
 
+        private readonly object _lock = new object();
+
         internal Clock(SafeClockHandle handle)
         {
             Handle = handle;
@@ -205,7 +220,11 @@ namespace ROS2
 
         internal RCLRet EnableRosTimeOverride()
         {
-            RCLRet ret = ClockDelegates.native_rcl_enable_ros_time_override(Handle);
+            RCLRet ret;
+            lock (_lock)
+            {
+                ret = ClockDelegates.native_rcl_enable_ros_time_override(Handle);
+            }
 
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClockDelegates.native_rcl_enable_ros_time_override)}() failed.");
 
@@ -214,7 +233,11 @@ namespace ROS2
 
         internal RCLRet DisableRosTimeOverride()
         {
-            RCLRet ret = ClockDelegates.native_rcl_disable_ros_time_override(Handle);
+            RCLRet ret;
+            lock (_lock)
+            {
+                ret = ClockDelegates.native_rcl_disable_ros_time_override(Handle);
+            }
 
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClockDelegates.native_rcl_disable_ros_time_override)}() failed.");
 
@@ -223,7 +246,11 @@ namespace ROS2
 
         internal RCLRet SetRosTimeOverride(long timePointValue)
         {
-            RCLRet ret = ClockDelegates.native_rcl_set_ros_time_override(Handle, timePointValue);
+            RCLRet ret;
+            lock (_lock)
+            {
+                ret = ClockDelegates.native_rcl_set_ros_time_override(Handle, timePointValue);
+            }
 
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClockDelegates.native_rcl_set_ros_time_override)}() failed.");
 
@@ -240,7 +267,11 @@ namespace ROS2
             JumpCallbackInternal callbackInternal = (timeJumpPtr, beforeJump) =>
                 callback(Marshal.PtrToStructure<TimeJump>(timeJumpPtr), beforeJump);
 
-            RCLRet ret = ClockDelegates.native_rcl_clock_add_jump_callback(Handle, threshold, callbackInternal);
+            RCLRet ret;
+            lock (_lock)
+            {
+                ret = ClockDelegates.native_rcl_clock_add_jump_callback(Handle, threshold, callbackInternal);
+            }
 
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClockDelegates.native_rcl_clock_add_jump_callback)}() failed.");
 
@@ -251,7 +282,11 @@ namespace ROS2
         {
             if (!_registeredJumpCallbacks.TryGetValue(callback, out JumpCallbackInternal callbackInternal)) return false;
 
-            RCLRet ret = ClockDelegates.native_rcl_clock_remove_jump_callback(Handle, callbackInternal);
+            RCLRet ret;
+            lock (_lock)
+            {
+                ret = ClockDelegates.native_rcl_clock_remove_jump_callback(Handle, callbackInternal);
+            }
 
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClockDelegates.native_rcl_clock_remove_jump_callback)}() failed.");
 
