@@ -64,18 +64,18 @@ namespace ROS2
 
     // Internal as TimeSpan should be user-facing.
     [StructLayout(LayoutKind.Sequential)]
-    internal struct Duration
+    internal readonly struct Duration
     {
-        public long nanoseconds;
+        private readonly long _nanoseconds;
 
         public Duration(TimeSpan timeSpan)
         {
-            nanoseconds = (long)(timeSpan.TotalMilliseconds * TimeConstants.NanosecondsPerMillisecond);
+            _nanoseconds = checked(timeSpan.Ticks * TimeConstants.NanosecondsPerTimespanTick);
         }
 
         public TimeSpan AsTimespan()
         {
-            return new TimeSpan(nanoseconds / TimeConstants.NanosecondsPerTimespanTick);
+            return new TimeSpan(_nanoseconds / TimeConstants.NanosecondsPerTimespanTick);
         }
     }
 
