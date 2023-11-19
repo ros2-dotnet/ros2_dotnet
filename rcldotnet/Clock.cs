@@ -97,7 +97,8 @@ namespace ROS2
 
     internal delegate void JumpCallbackInternal(IntPtr timeJumpPtr, bool beforeJump);
 
-    public delegate void JumpCallback(TimeJump timeJump, bool beforeJump);
+    public delegate void PreJumpCallback();
+    public delegate void PostJumpCallback(TimeJump timeJump);
 
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct JumpThreshold
@@ -198,7 +199,7 @@ namespace ROS2
 
     public sealed class Clock
     {
-        private readonly Dictionary<JumpCallback, JumpCallbackInternal> _registeredJumpCallbacks = new Dictionary<JumpCallback, JumpCallbackInternal>();
+        private readonly HashSet<JumpCallbackInternal> _registeredJumpCallbacks = new HashSet<JumpCallbackInternal>();
 
         private readonly object _lock = new object();
 
@@ -257,40 +258,120 @@ namespace ROS2
             return ret;
         }
 
-        public void AddJumpCallback(JumpThreshold threshold, JumpCallback callback)
+        /// <summary>
+        /// Add a callback to be called when a time jump exceeds a threshold.
+        /// </summary>
+        /// <param name="threshold">Callbacks will be triggered if the time jump is greater then the threshold.</param>
+        /// <param name="preJumpCallback">Callback to be called before new time is set.</param>
+        /// <param name="postJumpCallback">Callback to be called after new time is set.</param>
+        /// <returns>A disposable object that can be used to remove the callbacks from the clock.</returns>
+        public IDisposable CreateJumpCallback(JumpThreshold threshold, PreJumpCallback preJumpCallback, PostJumpCallback postJumpCallback)
         {
-            if (_registeredJumpCallbacks.ContainsKey(callback))
-            {
-                throw new CallbackAlreadyRegisteredException("Provided jump callback was already registered!");
-            }
+            JumpHandler jumpHandler = new JumpHandler(this, preJumpCallback, postJumpCallback);
 
-            JumpCallbackInternal callbackInternal = (timeJumpPtr, beforeJump) =>
-                callback(Marshal.PtrToStructure<TimeJump>(timeJumpPtr), beforeJump);
-
-            RCLRet ret;
             lock (_lock)
             {
-                ret = ClockDelegates.native_rcl_clock_add_jump_callback(Handle, threshold, callbackInternal);
+                RCLRet ret = ClockDelegates.native_rcl_clock_add_jump_callback(Handle, threshold, jumpHandler.JumpCallback);
+                RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClockDelegates.native_rcl_clock_add_jump_callback)}() failed.");
+
+                // Save a reference to the JumpCallback that was passed down to
+                // the native side. The PInvoke interop does create a stub that
+                // get's passed down so that the delegate can be called via a
+                // native function pointer. This stub does not get reallocated
+                // by the CG, so no extra pinning is needed, but it will get
+                // deallocated once the delegate object gets collected. So we
+                // need to make shure to have a strong reference to the
+                // delegate, otherwise the native side would call a function
+                // pointer that points to the deallocated stub.
+                // rcl_clock_add_jump_callback only adds the provided callback
+                // to it's list if it returned OK, so we don't need to worry
+                // about references to the delegate from the native side in this
+                // case.
+                _registeredJumpCallbacks.Add(jumpHandler.JumpCallback);
             }
 
-            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClockDelegates.native_rcl_clock_add_jump_callback)}() failed.");
-
-            _registeredJumpCallbacks.Add(callback, callbackInternal);
+            return jumpHandler;
         }
 
-        public bool RemoveJumpCallback(JumpCallback callback)
+        internal void RemoveJumpCallback(JumpHandler jumpHandler, ref bool jumpHandlerDisposed)
         {
-            if (!_registeredJumpCallbacks.TryGetValue(callback, out JumpCallbackInternal callbackInternal)) return false;
-
-            RCLRet ret;
             lock (_lock)
             {
-                ret = ClockDelegates.native_rcl_clock_remove_jump_callback(Handle, callbackInternal);
+                if (jumpHandlerDisposed)
+                    return;
+
+                RCLRet ret = ClockDelegates.native_rcl_clock_remove_jump_callback(Handle, jumpHandler.JumpCallback);
+
+                // Calling Dispose multiple times should not throw errors.
+                // rcl_clock_remove_jump_callback failues:
+                // - The null-checks can't fail as it is ensured that we always
+                //   pass valid object references down.
+                // - We track if a JumpHandler is disposed via a flag, so the
+                //   "jump callback was not found" error can't happen.
+                // - Only failues for allocation and internal errors in
+                //   rcldotnet could cause exceptions.
+                //
+                // So we should be save to throw exceptions here, the user of
+                // the library should have no way to trigger it. 
+                RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClockDelegates.native_rcl_clock_remove_jump_callback)}() failed.");
+
+                jumpHandlerDisposed = true;
+                _registeredJumpCallbacks.Remove(jumpHandler.JumpCallback);
             }
+        }
+    }
 
-            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(ClockDelegates.native_rcl_clock_remove_jump_callback)}() failed.");
+    internal sealed class JumpHandler : IDisposable
+    {
+        private readonly Clock _clock;
+        private readonly PreJumpCallback _preJumpCallback;
+        private readonly PostJumpCallback _postJumpCallback;
 
-            return _registeredJumpCallbacks.Remove(callback);
+        private bool _disposed;
+
+        public JumpHandler(Clock clock, PreJumpCallback preJumpCallback, PostJumpCallback postJumpCallback)
+        {
+            _clock = clock;
+            _preJumpCallback = preJumpCallback;
+            _postJumpCallback = postJumpCallback;
+
+            // Only create the delegate once and cache in instance
+            // so the same instance is avaliable to deregister.
+            JumpCallback = new JumpCallbackInternal(OnJump);
+        }
+
+        internal JumpCallbackInternal JumpCallback { get; }
+
+        public void Dispose()
+        {
+            // fast return without look
+            if (_disposed)
+                return;
+
+            _clock.RemoveJumpCallback(this, ref _disposed);
+        }
+
+        private void OnJump(IntPtr timeJumpPtr, bool beforeJump)
+        {
+            try
+            {
+                if (beforeJump)
+                {
+                    _preJumpCallback?.Invoke();
+                }
+                else
+                {
+                    _postJumpCallback?.Invoke(Marshal.PtrToStructure<TimeJump>(timeJumpPtr));
+                }
+            }
+            catch
+            {
+                // Catch all exceptions, as on non-windows plattforms exceptions
+                // that are propageted to native code can cause crashes.
+                // see https://learn.microsoft.com/en-us/dotnet/standard/native-interop/exceptions-interoperability
+
+                // TODO: (sh) Add error handling/logging.
+            }
         }
     }
 }
