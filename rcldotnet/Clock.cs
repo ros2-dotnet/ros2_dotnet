@@ -43,7 +43,7 @@ namespace ROS2
     /// </summary>
     public enum ClockType
     {
-        ROSTime = 1,
+        RosTime = 1,
         SystemTime = 2,
         SteadyTime = 3
     }

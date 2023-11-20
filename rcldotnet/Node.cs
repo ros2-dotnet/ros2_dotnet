@@ -310,7 +310,7 @@ namespace ROS2
             return timer;
         }
 
-        public bool DestroyTimer(Timer timer)
+        internal bool DestroyTimer(Timer timer)
         {
             if (!_timers.Contains(timer)) return false;
 

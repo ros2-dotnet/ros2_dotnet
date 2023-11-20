@@ -774,7 +774,7 @@ namespace ROS2
             }
         }
 
-        public static Clock CreateClock(ClockType type = ClockType.ROSTime)
+        public static Clock CreateClock(ClockType type = ClockType.RosTime)
         {
             var clockHandle = new SafeClockHandle();
             RCLRet ret = RCLdotnetDelegates.native_rcl_create_clock_handle(ref clockHandle, (int)type);
