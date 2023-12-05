@@ -26,7 +26,6 @@
 #include "rcldotnet.h"
 
 static rcl_context_t context;
-static rcl_clock_t clock;
 
 int32_t native_rcl_init(int argc, const char *argv[]) {
   context = rcl_get_zero_initialized_context();
@@ -41,12 +40,26 @@ int32_t native_rcl_init(int argc, const char *argv[]) {
     return ret;
   }
 
-  ret = rcl_clock_init(RCL_STEADY_TIME, &clock, &allocator);
   return ret;
 }
 
-rcl_clock_t *native_rcl_get_default_clock() {
-  return &clock;
+int32_t native_rcl_create_clock_handle(void **clock_handle, int32_t clock_type) {
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  rcl_clock_t *clock = malloc(sizeof(rcl_clock_t));
+
+  rcl_ret_t ret = rcl_clock_init((rcl_clock_type_t)clock_type, clock, &allocator);
+  
+  *clock_handle = (void *)clock;
+  return ret;
+}
+
+int32_t native_rcl_destroy_clock_handle(void *clock_handle) {
+  rcl_clock_t *clock = (rcl_clock_t *)clock_handle;
+
+  rcl_ret_t ret = rcl_clock_fini(clock);
+  free(clock);
+
+  return ret;
 }
 
 const char *native_rcl_get_rmw_identifier() {
@@ -174,6 +187,14 @@ int32_t native_rcl_wait_set_add_client(void *wait_set_handle, void *client_handl
   return ret;
 }
 
+int32_t native_rcl_wait_set_add_timer(void *wait_set_handle, void *timer_handle) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+  rcl_timer_t *timer = (rcl_timer_t *)timer_handle;
+  rcl_ret_t ret = rcl_wait_set_add_timer(wait_set, timer, NULL);
+
+  return ret;
+}
+
 int32_t native_rcl_wait_set_add_guard_condition(void *wait_set_handle, void *guard_condition_handle) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
   rcl_guard_condition_t *guard_condition = (rcl_guard_condition_t *)guard_condition_handle;
@@ -292,6 +313,18 @@ int32_t native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index) {
   }
 
   bool result = wait_set->clients[index] != NULL;
+  return result ? 1 : 0;
+}
+
+int32_t native_rcl_wait_set_timer_ready(void *wait_set_handle, int32_t index) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+
+  if (index >= wait_set->size_of_timers)
+  {
+    return false;
+  }
+
+  bool result = wait_set->timers[index] != NULL;
   return result ? 1 : 0;
 }
 
@@ -727,4 +760,26 @@ int32_t native_rcl_write_to_qos_profile_handle(
   qos_profile->avoid_ros_namespace_conventions = avoid_ros_namespace_conventions != 0;
 
   return RCL_RET_OK;
+}
+
+int32_t native_rcl_create_timer_handle(void **timer_handle, void *clock_handle, int64_t period, rcl_timer_callback_t callback) {
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  rcl_timer_t *timer = malloc(sizeof(rcl_timer_t));
+  *timer = rcl_get_zero_initialized_timer();
+  
+  rcl_clock_t *clock = (rcl_clock_t *)clock_handle;
+
+  rcl_ret_t ret = rcl_timer_init(timer, clock, &context, period, callback, allocator);
+  
+  *timer_handle = (void *)timer;
+  return ret;
+}
+
+int32_t native_rcl_destroy_timer_handle(void *timer_handle) {
+  rcl_timer_t *timer = (rcl_timer_t *)timer_handle;
+
+  rcl_ret_t ret = rcl_timer_fini(timer);
+  free(timer);
+
+  return ret;
 }

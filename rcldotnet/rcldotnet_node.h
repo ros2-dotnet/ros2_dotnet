@@ -65,6 +65,7 @@ int32_t RCLDOTNET_CDECL native_rcl_action_destroy_client_handle(void *action_cli
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_action_create_server_handle(void **action_server_handle,
                                                                void *node_handle,
+                                                               void *clock_handle,
                                                                const char *action_name,
                                                                void *typesupport);
 
