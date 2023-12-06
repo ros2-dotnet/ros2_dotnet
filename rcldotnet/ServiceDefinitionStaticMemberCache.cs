@@ -49,10 +49,10 @@ namespace ROS2
 
         public static IntPtr GetTypeSupport()
         {
-            // mehtod because it could throw.
+            // method because it could throw.
             if (s_typeSupport == IntPtr.Zero)
             {
-                throw new InvalidOperationException($"Type '{typeof(TService).FullName}' did not define a correct __GetTypeSupport mehtod.");
+                throw new InvalidOperationException($"Type '{typeof(TService).FullName}' did not define a correct __GetTypeSupport method.");
             }
 
             return s_typeSupport;
