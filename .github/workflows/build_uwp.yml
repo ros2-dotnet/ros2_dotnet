@@ -32,7 +32,7 @@ jobs:
       run: |
         md \dev\ament\src
         cd \dev\ament
-        copy ${{github.workspace}}\ament_dotnet_uwp.repos .
+        copy ${{github.workspace}}\.github\workflows\uwp_ament.repos .
         vcs import src < ament_dotnet_uwp.repos
         vcs branch
       shell: cmd
@@ -47,7 +47,7 @@ jobs:
       run: |
         md \dev\ros2\src
         cd \dev\ros2
-        copy ${{github.workspace}}\ros2_dotnet_uwp.repos .
+        copy ${{github.workspace}}\.github\workflows\uwp_ros2_dotnet.repos .
         vcs import src < ros2_dotnet_uwp.repos
         rd /s /q src\ros2_dotnet\ros2_dotnet
         xcopy /e /i ${{github.workspace}} src\ros2_dotnet\ros2_dotnet
