@@ -26,7 +26,7 @@
 
 #include "rosidl_runtime_c/message_type_support_struct.h"
 
-#include "rcldotnet_client.h"
+#include "rcldotnet_action_client.h"
 
 int32_t native_rcl_action_send_goal_request(void *action_client_handle, void *goal_request_handle, int64_t *sequence_number) {
   rcl_action_client_t * action_client = (rcl_action_client_t *)action_client_handle;
