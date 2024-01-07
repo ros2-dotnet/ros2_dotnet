@@ -231,10 +231,10 @@ namespace ROS2
             [DllImport("kernel32.dll", EntryPoint = "LoadLibraryA", SetLastError = true, ExactSpelling = true)]
             private static extern IntPtr LoadLibraryA(string fileName, int reserved = 0);
 
-            [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+            [DllImport("kernel32.dll", EntryPoint = "FreeLibrary", SetLastError = true, ExactSpelling = true)]
             private static extern int FreeLibraryWin(IntPtr handle);
 
-            [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+            [DllImport("kernel32.dll", EntryPoint = "GetProcAddress", SetLastError = true, ExactSpelling = true)]
             private static extern IntPtr GetProcAddressWin(IntPtr handle, string procedureName);
 
             public override void FreeLibrary(IntPtr handle) => FreeLibraryWin(handle);
