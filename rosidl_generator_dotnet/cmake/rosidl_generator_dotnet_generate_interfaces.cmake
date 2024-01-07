@@ -140,7 +140,8 @@ set_property(
 if(_generated_cs_files)
   add_custom_command(
     OUTPUT ${_generated_cs_files} ${_generated_h_files} ${_generated_c_ts_files}
-    COMMAND ${PYTHON_EXECUTABLE} ${rosidl_generator_dotnet_BIN}
+    COMMAND Python3::Interpreter
+    ARGS ${rosidl_generator_dotnet_BIN}
     --generator-arguments-file "${generator_arguments_file}"
     --typesupport-impls "${_typesupport_impls}"
     DEPENDS ${target_dependencies}
@@ -215,9 +216,15 @@ if(_generated_c_ts_files)
     ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_c
     ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_dotnet
   )
+  
+  set(ros2_distro "$ENV{ROS_DISTRO}")
 
-  rosidl_target_interfaces(${_target_name}
-    ${rosidl_generate_interfaces_TARGET} rosidl_typesupport_c)
+  if(ros2_distro STREQUAL "humble" OR ros2_distro STREQUAL "rolling")
+    rosidl_get_typesupport_target(c_typesupport_target "${rosidl_generate_interfaces_TARGET}" "rosidl_typesupport_c")
+    target_link_libraries(${_target_name} "${c_typesupport_target}")
+  else()
+    rosidl_target_interfaces(${_target_name} ${rosidl_generate_interfaces_TARGET} rosidl_typesupport_c)
+  endif()
 
   ament_target_dependencies(${_target_name}
     "rosidl_runtime_c"
