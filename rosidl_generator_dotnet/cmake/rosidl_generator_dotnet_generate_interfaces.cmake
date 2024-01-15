@@ -35,6 +35,15 @@ set(_output_path
 set(_generated_cs_files "")
 set(_generated_c_ts_files "")
 set(_generated_h_files "")
+set(ros2_distro "$ENV{ROS_DISTRO}")
+set(humble_distro_and_newer humble iron rolling)
+
+
+if(ros2_distro IN_LIST humble_distro_and_newer) 
+set(PYTHON_COMMAND ${PYTHON_EXECUTABLE})
+else
+set(PYTHON_COMMAND Python3::Interpreter)
+endif()
 
 foreach(_abs_idl_file ${rosidl_generate_interfaces_ABS_IDL_FILES})
   get_filename_component(_parent_folder "${_abs_idl_file}" DIRECTORY)
@@ -140,7 +149,8 @@ set_property(
 if(_generated_cs_files)
   add_custom_command(
     OUTPUT ${_generated_cs_files} ${_generated_h_files} ${_generated_c_ts_files}
-    COMMAND ${PYTHON_EXECUTABLE} ${rosidl_generator_dotnet_BIN}
+    COMMAND ${PYTHON_COMMAND}
+    ARGS ${rosidl_generator_dotnet_BIN}
     --generator-arguments-file "${generator_arguments_file}"
     --typesupport-impls "${_typesupport_impls}"
     DEPENDS ${target_dependencies}
@@ -215,9 +225,13 @@ if(_generated_c_ts_files)
     ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_c
     ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_dotnet
   )
-
-  rosidl_target_interfaces(${_target_name}
-    ${rosidl_generate_interfaces_TARGET} rosidl_typesupport_c)
+  
+  if(ros2_distro IN_LIST humble_distro_and_newer)
+    rosidl_get_typesupport_target(c_typesupport_target "${rosidl_generate_interfaces_TARGET}" "rosidl_typesupport_c")
+    target_link_libraries(${_target_name} "${c_typesupport_target}")
+  else()
+    rosidl_target_interfaces(${_target_name} ${rosidl_generate_interfaces_TARGET} rosidl_typesupport_c)
+  endif()
 
   ament_target_dependencies(${_target_name}
     "rosidl_runtime_c"
