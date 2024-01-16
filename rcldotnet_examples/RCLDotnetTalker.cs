@@ -1,5 +1,4 @@
 using System;
-using rcl_interfaces.msg;
 using ROS2;
 
 namespace ConsoleApplication

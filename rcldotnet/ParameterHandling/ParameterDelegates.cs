@@ -15,7 +15,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using rcl_interfaces.msg;
 using ROS2.Utils;
 
 namespace ROS2.ParameterHandling {
