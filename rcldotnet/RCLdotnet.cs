@@ -354,15 +354,6 @@ namespace ROS2
         internal delegate IntPtr NativeRCLGetStringType(SafeHandle handle);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate IntPtr NativeRCLGetQosProfileType();
-        internal static NativeRCLGetQosProfileType native_rcl_qos_get_profile_default = null;
-        internal static NativeRCLGetQosProfileType native_rcl_qos_get_profile_parameter_events = null;
-        internal static NativeRCLGetQosProfileType native_rcl_qos_get_profile_parameters = null;
-        internal static NativeRCLGetQosProfileType native_rcl_qos_get_profile_sensor_data = null;
-        internal static NativeRCLGetQosProfileType native_rcl_qos_get_profile_services_default = null;
-        internal static NativeRCLGetQosProfileType native_rcl_qos_get_profile_system_default = null;
-
-        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal delegate RCLRet NativeRCLCreateClockHandleType(ref SafeClockHandle clockHandle, int clockType);
 
         internal static NativeRCLCreateClockHandleType native_rcl_create_clock_handle = null;
