@@ -20,22 +20,22 @@
 // The below profile getters are intentionally provided as const pointers to avoid construction of copies.
 
 RCLDOTNET_EXPORT
-const rmw_qos_profile_t * RCLDOTNET_CDECL native_rcl_qos_get_profile_default();
+const rmw_qos_profile_t * RCLDOTNET_CDECL native_rcl_qos_get_const_profile_default();
 
 RCLDOTNET_EXPORT
-const rmw_qos_profile_t * RCLDOTNET_CDECL native_rcl_qos_get_profile_parameter_events();
+const rmw_qos_profile_t * RCLDOTNET_CDECL native_rcl_qos_get_const_profile_parameter_events();
 
 RCLDOTNET_EXPORT
-const rmw_qos_profile_t * RCLDOTNET_CDECL native_rcl_qos_get_profile_parameters();
+const rmw_qos_profile_t * RCLDOTNET_CDECL native_rcl_qos_get_const_profile_parameters();
 
 RCLDOTNET_EXPORT
-const rmw_qos_profile_t * RCLDOTNET_CDECL native_rcl_qos_get_profile_sensor_data();
+const rmw_qos_profile_t * RCLDOTNET_CDECL native_rcl_qos_get_const_profile_sensor_data();
 
 RCLDOTNET_EXPORT
-const rmw_qos_profile_t * RCLDOTNET_CDECL native_rcl_qos_get_profile_services_default();
+const rmw_qos_profile_t * RCLDOTNET_CDECL native_rcl_qos_get_const_profile_services_default();
 
 RCLDOTNET_EXPORT
-const rmw_qos_profile_t * RCLDOTNET_CDECL native_rcl_qos_get_profile_system_default();
+const rmw_qos_profile_t * RCLDOTNET_CDECL native_rcl_qos_get_const_profile_system_default();
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_qos_profile_read_history(void *qos_profile_handle);
