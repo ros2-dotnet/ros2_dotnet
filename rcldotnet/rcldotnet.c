@@ -43,6 +43,12 @@ int32_t native_rcl_init(int argc, const char *argv[]) {
   return ret;
 }
 
+int32_t native_rcl_arguments_get_param_overrides(void **parameter_overrides) {
+  rcl_params_t **global_parameter_overrides = (rcl_params_t **)parameter_overrides;
+  rcl_ret_t ret = rcl_arguments_get_param_overrides(&context.global_arguments, global_parameter_overrides);
+  return ret;
+}
+
 int32_t native_rcl_create_clock_handle(void **clock_handle, int32_t clock_type) {
   rcl_allocator_t allocator = rcl_get_default_allocator();
   rcl_clock_t *clock = malloc(sizeof(rcl_clock_t));
