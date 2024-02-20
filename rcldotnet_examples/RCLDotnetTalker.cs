@@ -7,28 +7,37 @@ namespace ConsoleApplication
 {
     public class RCLDotnetTalker
     {
-        public static void Main(string[] args)
+        private readonly Node _node;
+        private readonly Publisher<std_msgs.msg.String> _chatterPub;
+
+        private int _i = 0;
+        private readonly std_msgs.msg.String _msg = new();
+
+        private RCLDotnetTalker()
         {
             RCLdotnet.Init();
+            _node = RCLdotnet.CreateNode("talker");
 
-            Node node = RCLdotnet.CreateNode("talker");
+            _chatterPub = _node.CreatePublisher<std_msgs.msg.String>("chatter");
 
-            Publisher<std_msgs.msg.String> chatterPub = node.CreatePublisher<std_msgs.msg.String>("chatter");
+            _node.CreateTimer(TimeSpan.FromSeconds(1.0), PublishChatter);
+        }
 
-            std_msgs.msg.String msg = new std_msgs.msg.String();
+        private void PublishChatter(TimeSpan elapsed)
+        {
+            _msg.Data = $"Hello World: {_i}";
+            Console.WriteLine($"Publishing: \"{_msg.Data}\"");
+            _chatterPub.Publish(_msg);
 
-            int i = 1;
+            _i++;
+        }
 
-            while (RCLdotnet.Ok())
-            {
-                msg.Data = "Hello World: " + i;
-                i++;
-                Console.WriteLine("Publishing: \"" + msg.Data + "\"");
-                chatterPub.Publish(msg);
+        private void Spin() => RCLdotnet.Spin(_node);
 
-                // Sleep a little bit between each message
-                Thread.Sleep(1000);
-            }
+        public static void Main(string[] args)
+        {
+            RCLDotnetTalker talker = new RCLDotnetTalker();
+            talker.Spin();
         }
     }
 }

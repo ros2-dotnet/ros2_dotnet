@@ -1,14 +1,12 @@
 ROS2 for .NET
 =============
 
-Build status
-------------
-
 | Target | Status |
 |----------|--------|
-| **Universal Windows Platform (x86/x64)** | ![Build (UWP)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(UWP)/badge.svg) |
-| **Windows Desktop (x64)** | ![Build (Desktop)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(Desktop)/badge.svg) |
-| **Linux** | ![Build (Desktop)](https://github.com/ros2-dotnet/ros2_dotnet/workflows/Build%20(Linux)/badge.svg) |
+| **Linux** | [![Build (Linux)](https://github.com/ros2-dotnet/ros2_dotnet/actions/workflows/build_linux.yml/badge.svg)](https://github.com/ros2-dotnet/ros2_dotnet/actions/workflows/build_linux.yml) |
+| **Windows Desktop** | [![Build (Desktop)](https://github.com/ros2-dotnet/ros2_dotnet/actions/workflows/build_desktop.yml/badge.svg)](https://github.com/ros2-dotnet/ros2_dotnet/actions/workflows/build_desktop.yml) |
+
+_Windows UWP CI Builds are currently disabled, see [this issue](https://github.com/ros2-dotnet/ros2_dotnet/issues/92) for more information._
 
 Introduction
 ------------
@@ -23,6 +21,7 @@ The current set of features include:
 - Generation of all builtin ROS types
 - Support for publishers and subscriptions
 - Support for clients and services
+- Support action clients and servers
 - Cross-platform support (Linux, Windows, Windows IoT Core, UWP)
 
 What's missing?
@@ -32,7 +31,6 @@ Lots of things!
 - Unicode types
 - String constants (specifically BoundedString)
 - Component nodes
-- Actions
 - Tests
 - Documentation
 - More examples (e.g. IoT, VB, UWP, HoloLens, etc.)
@@ -46,12 +44,12 @@ see the relevant section below): https://github.com/ros2/ros2/wiki/Installation#
 
 Next make sure you've either installed .Net Core (preferred)
 https://www.microsoft.com/net/learn/get-started or Mono
-https://www.mono-project.com/. (**NOTE**: For building unit tests, .NET 2.1 is
+https://www.mono-project.com/. (**NOTE**: For building unit tests, .NET 6 is
 required).
 
 For running on Linux or Windows Desktop, one can build `ros2_dotnet` (along with
 all desired packages containing interface definitions) as an overlay on top
-of an existing ROS2 installation. The `ros2_dotnet.repos` contains all
+of an existing ROS2 installation. The `ros2_dotnet_foxy.repos` contains all
 necessary repositories to build the core `ros2_dotnet` project along with all
 standard ROS2 interface packages. If you are using other packages which provide
 interface definitions, those must also be included in the `ros2_dotnet` workspace
@@ -64,7 +62,7 @@ core of ROS2 must be compiled for UWP compatibility.
 Windows (Desktop)
 -----------------
 Assuming you've installed ROS2 (pre-built binary packages) to the directory
-c:\dev\ros2_eloquent per the official [installation instructions](https://index.ros.org/doc/ros2/Installation/Eloquent/Windows-Install-Binary/),
+c:\dev\ros2_foxy per the official [installation instructions](https://index.ros.org/doc/ros2/Installation/Foxy/Windows-Install-Binary/),
 run the following from an Administrator Visual Studio 2019 Developer Command
 Prompt:
 
@@ -75,25 +73,25 @@ This is done for you below in the line preceding `colcon build`. This step
 can/should be omitted if building on top of a built-from-source ROS2 workspace)
 
 ```
-call \dev\ros2_eloquent\local_setup.bat
+call \dev\ros2_foxy\local_setup.bat
 md \dev\ros2_dotnet_ws\src
 cd \dev\ros2_dotnet_ws
-curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet.repos -o ros2_dotnet.repos
-vcs import \dev\ros2_dotnet_ws\src < ros2_dotnet.repos
-git clone --branch eloquent https://github.com/ros2/rosidl src\ros2\rosidl
+curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/main/ros2_dotnet_foxy.repos -o ros2_dotnet_foxy.repos
+vcs import \dev\ros2_dotnet_ws\src < ros2_dotnet_foxy.repos
+git clone --branch foxy https://github.com/ros2/rosidl src\ros2\rosidl
 colcon build --merge-install
 ```
 
 
 Linux
 -----
-Assuming ROS2 eloquent installed to the standard location, run the following commands:
+Assuming ROS2 foxy installed to the standard location, run the following commands:
 ```
-source /opt/ros/eloquent/setup.bash
+source /opt/ros/foxy/setup.bash
 mkdir -p ~/ros2_dotnet_ws/src
 cd ~/ros2_dotnet_ws
-wget https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet.repos
-vcs import ~/ros2_dotnet_ws/src < ros2_dotnet.repos
+wget https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/main/ros2_dotnet_foxy.repos
+vcs import ~/ros2_dotnet_ws/src < ros2_dotnet_foxy.repos
 colcon build
 ```
 
@@ -113,7 +111,7 @@ ament
 ```
 md \dev\ament\src
 cd \dev\ament
-curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ament_dotnet_uwp.repos -o ament_dotnet_uwp.repos
+curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/main/ament_dotnet_uwp.repos -o ament_dotnet_uwp.repos
 vcs import src < ament_dotnet_uwp.repos
 colcon build --merge-install
 call install\local_setup.bat
@@ -127,7 +125,7 @@ Replace `%TARGET_ARCH%` with Win32 or x64
 ```
 md \dev\ros2\src
 cd \dev\ros2
-curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/master/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
+curl -sk https://raw.githubusercontent.com/ros2-dotnet/ros2_dotnet/main/ros2_dotnet_uwp.repos -o ros2_dotnet_uwp.repos
 vcs import src < ros2_dotnet_uwp.repos
 cd \dev\ament
 call install\local_setup.bat

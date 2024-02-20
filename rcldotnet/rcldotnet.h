@@ -18,9 +18,13 @@
 #include "rcldotnet_macros.h"
 
 RCLDOTNET_EXPORT
-int32_t RCLDOTNET_CDECL native_rcl_init();
+int32_t RCLDOTNET_CDECL native_rcl_init(int argc, const char *argv[]);
 
-rcl_clock_t *native_rcl_get_default_clock();
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_create_clock_handle(void **clock_handle, int32_t clock_type);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_destroy_clock_handle(void *clock_handle);
 
 RCLDOTNET_EXPORT
 const char * RCLDOTNET_CDECL native_rcl_get_rmw_identifier();
@@ -72,6 +76,9 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_client(void *wait_set_handle, void *client_handle);
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_timer(void *wait_set_handle, void *timer_handle);
+
+RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_guard_condition_handle(void *wait_set_handle, void *guard_condition_handle);
 
 RCLDOTNET_EXPORT
@@ -106,6 +113,9 @@ int32_t RCLDOTNET_CDECL native_rcl_wait_set_subscription_ready(void *wait_set_ha
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_timer_ready(void *wait_set_handle, int32_t index);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_service_ready(void *wait_set_handle, int32_t index);
@@ -237,5 +247,11 @@ int32_t RCLDOTNET_CDECL native_rcl_write_to_qos_profile_handle(
     uint64_t liveliness_lease_duration_sec,
     uint64_t liveliness_lease_duration_nsec,
     int32_t /* bool */ avoid_ros_namespace_conventions);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_create_timer_handle(void **timer_handle, void *clock_handle, int64_t period, rcl_timer_callback_t callback);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_destroy_timer_handle(void *timer_handle);
 
 #endif // RCLDOTNET_H

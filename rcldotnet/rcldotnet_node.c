@@ -208,9 +208,11 @@ int32_t native_rcl_action_destroy_client_handle(void *action_client_handle, void
 
 int32_t native_rcl_action_create_server_handle(void **action_server_handle,
                                                void *node_handle,
+                                               void *clock_handle,
                                                const char *action_name,
                                                void *typesupport) {
   rcl_node_t *node = (rcl_node_t *)node_handle;
+  rcl_clock_t *clock = (rcl_clock_t *)clock_handle;
 
   rosidl_action_type_support_t *ts =
     (rosidl_action_type_support_t *)typesupport;
@@ -239,4 +241,22 @@ int32_t native_rcl_action_destroy_server_handle(void *action_server_handle, void
   free(action_server);
 
   return ret;
+}
+
+const char * native_rcl_node_get_name_handle(void *node_handle) {
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+  
+  return rcl_node_get_name(node);
+}
+
+const char * native_rcl_node_get_namespace_handle(void *node_handle) {
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+  
+  return rcl_node_get_namespace(node);
+}
+
+const char * native_rcl_node_get_fully_qualified_name_handle(void *node_handle) {
+  rcl_node_t *node = (rcl_node_t *)node_handle;
+  
+  return rcl_node_get_fully_qualified_name(node);
 }

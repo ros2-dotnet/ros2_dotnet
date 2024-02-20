@@ -41,6 +41,7 @@ set(CS_SOURCES
   ActionServer.cs
   ActionServerGoalHandle.cs
   Client.cs
+  Clock.cs
   GuardCondition.cs
   GuidExtensions.cs
   MessageStaticMemberCache.cs
@@ -54,6 +55,7 @@ set(CS_SOURCES
   SafeActionGoalHandle.cs
   SafeActionServerHandle.cs
   SafeClientHandle.cs
+  SafeClockHandle.cs
   SafeGuardConditionHandle.cs
   SafeNodeHandle.cs
   SafePublisherHandle.cs
@@ -61,10 +63,12 @@ set(CS_SOURCES
   SafeRequestIdHandle.cs
   SafeServiceHandle.cs
   SafeSubscriptionHandle.cs
+  SafeTimerHandle.cs
   SafeWaitSetHandle.cs
   Service.cs
   ServiceDefinitionStaticMemberCache.cs
   Subscription.cs
+  Timer.cs
 )
 
 find_package(rcldotnet_common REQUIRED)
@@ -91,9 +95,11 @@ ament_export_assemblies_dll("lib/${PROJECT_NAME}/dotnet/${PROJECT_NAME}_assembli
 add_library(${PROJECT_NAME}_native SHARED
   rcldotnet_action_client.c
   rcldotnet_client.c
+  rcldotnet_clock.c
   rcldotnet_guard_condition.c
   rcldotnet_node.c
   rcldotnet_publisher.c
+  rcldotnet_timer.c
   rcldotnet.c
 )
 
@@ -135,8 +141,19 @@ if(BUILD_TESTING)
       ${test_msgs_ASSEMBLIES_DLL}
   )
 
+  # Used by CI to test the different target frameworks in a matrix.
+  if(DEFINED ENV{RCLDOTNET_TEST_TARGET_FRAMEWORK})
+    set(RCLDOTNET_TEST_TARGET_FRAMEWORK $ENV{RCLDOTNET_TEST_TARGET_FRAMEWORK})
+  else()
+    set(RCLDOTNET_TEST_TARGET_FRAMEWORK "net6.0")
+  endif()
+
   add_dotnet_test(test_messages
+    TARGET_FRAMEWORK
+    ${RCLDOTNET_TEST_TARGET_FRAMEWORK}
+    SOURCES
     ${CS_SOURCES}
+    test/test_actions.cs
     test/test_guard_conditions.cs
     test/test_messages.cs
     test/test_services.cs

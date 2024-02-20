@@ -1,5 +1,9 @@
 name: Build (Desktop)
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build-desktop:
@@ -11,10 +15,10 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v3
     - name: Setup ROS2
-      uses: ros-tooling/setup-ros@v0.3
+      uses: ros-tooling/setup-ros@v0.6
       with:
         required-ros-distributions: foxy
-    - uses: ros-tooling/action-ros-ci@0.2.4
+    - uses: ros-tooling/action-ros-ci@v0.3
       with:
         package-name: rcldotnet_examples
         target-ros2-distro: foxy

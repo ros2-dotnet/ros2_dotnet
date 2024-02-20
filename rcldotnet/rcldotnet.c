@@ -28,9 +28,7 @@
 static rcl_context_t context;
 static rcl_clock_t clock;
 
-int32_t native_rcl_init() {
-  // TODO(esteve): parse args
-  int num_args = 0;
+int32_t native_rcl_init(int argc, const char *argv[]) {
   context = rcl_get_zero_initialized_context();
   rcl_allocator_t allocator = rcl_get_default_allocator();
   rcl_init_options_t init_options = rcl_get_zero_initialized_init_options();
@@ -38,8 +36,7 @@ int32_t native_rcl_init() {
   if (RCL_RET_OK != ret) {
     return ret;
   }
-  const char ** arg_values = NULL;
-  ret = rcl_init(num_args, arg_values, &init_options, &context);
+  ret = rcl_init(argc, argv, &init_options, &context);
   if (ret != RCL_RET_OK) {
     return ret;
   }
@@ -48,8 +45,23 @@ int32_t native_rcl_init() {
   return ret;
 }
 
-rcl_clock_t *native_rcl_get_default_clock() {
-  return &clock;
+int32_t native_rcl_create_clock_handle(void **clock_handle, int32_t clock_type) {
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  rcl_clock_t *clock = malloc(sizeof(rcl_clock_t));
+
+  rcl_ret_t ret = rcl_clock_init((rcl_clock_type_t)clock_type, clock, &allocator);
+  
+  *clock_handle = (void *)clock;
+  return ret;
+}
+
+int32_t native_rcl_destroy_clock_handle(void *clock_handle) {
+  rcl_clock_t *clock = (rcl_clock_t *)clock_handle;
+
+  rcl_ret_t ret = rcl_clock_fini(clock);
+  free(clock);
+
+  return ret;
 }
 
 const char *native_rcl_get_rmw_identifier() {
@@ -177,6 +189,14 @@ int32_t native_rcl_wait_set_add_client(void *wait_set_handle, void *client_handl
   return ret;
 }
 
+int32_t native_rcl_wait_set_add_timer(void *wait_set_handle, void *timer_handle) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+  rcl_timer_t *timer = (rcl_timer_t *)timer_handle;
+  rcl_ret_t ret = rcl_wait_set_add_timer(wait_set, timer, NULL);
+
+  return ret;
+}
+
 int32_t native_rcl_wait_set_add_guard_condition(void *wait_set_handle, void *guard_condition_handle) {
   rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
   rcl_guard_condition_t *guard_condition = (rcl_guard_condition_t *)guard_condition_handle;
@@ -295,6 +315,18 @@ int32_t native_rcl_wait_set_client_ready(void *wait_set_handle, int32_t index) {
   }
 
   bool result = wait_set->clients[index] != NULL;
+  return result ? 1 : 0;
+}
+
+int32_t native_rcl_wait_set_timer_ready(void *wait_set_handle, int32_t index) {
+  rcl_wait_set_t *wait_set = (rcl_wait_set_t *)wait_set_handle;
+
+  if (index >= wait_set->size_of_timers)
+  {
+    return false;
+  }
+
+  bool result = wait_set->timers[index] != NULL;
   return result ? 1 : 0;
 }
 
@@ -708,18 +740,48 @@ int32_t native_rcl_write_to_qos_profile_handle(
 {
   rmw_qos_profile_t *qos_profile = (rmw_qos_profile_t *)qos_profile_handle;
 
-  qos_profile->history = (enum rmw_qos_history_policy_t)history;
+  // Can't name the enums for both Foxy and Humble the in code.
+  // So use implicit conversions for now...
+  // This breaking change was introduced in https://github.com/ros2/rmw/commit/05f973575e8e93454e39f51da6227509061ff189
+  // In Foxy they are defined as `enum rmw_qos_history_policy_t { ... };
+  //   -> so the type is called `enum rmw_qos_history_policy_t`
+  // In Humble tey are defined as `typedef enum rmw_qos_history_policy_e { ... } rmw_qos_history_policy_t;
+  //   -> so the type is called `rmw_qos_history_policy_t`
+
+  qos_profile->history = /* (rmw_qos_history_policy_t) */ history;
   qos_profile->depth = (size_t)depth;
-  qos_profile->reliability = (enum rmw_qos_reliability_policy_t)reliability;
-  qos_profile->durability = (enum rmw_qos_durability_policy_t)durability;
+  qos_profile->reliability = /* (rmw_qos_reliability_policy_t) */ reliability;
+  qos_profile->durability = /* (rmw_qos_durability_policy_t) */ durability;
   qos_profile->deadline.sec = deadline_sec;
   qos_profile->deadline.nsec = deadline_nsec;
   qos_profile->lifespan.sec = lifespan_sec;
   qos_profile->lifespan.nsec = lifespan_nsec;
-  qos_profile->liveliness = (enum rmw_qos_liveliness_policy_t)liveliness;
+  qos_profile->liveliness = /* (rmw_qos_liveliness_policy_t) */ liveliness;
   qos_profile->liveliness_lease_duration.sec = liveliness_lease_duration_sec;
   qos_profile->liveliness_lease_duration.nsec = liveliness_lease_duration_nsec;
   qos_profile->avoid_ros_namespace_conventions = avoid_ros_namespace_conventions != 0;
 
   return RCL_RET_OK;
+}
+
+int32_t native_rcl_create_timer_handle(void **timer_handle, void *clock_handle, int64_t period, rcl_timer_callback_t callback) {
+  rcl_allocator_t allocator = rcl_get_default_allocator();
+  rcl_timer_t *timer = malloc(sizeof(rcl_timer_t));
+  *timer = rcl_get_zero_initialized_timer();
+  
+  rcl_clock_t *clock = (rcl_clock_t *)clock_handle;
+
+  rcl_ret_t ret = rcl_timer_init(timer, clock, &context, period, callback, allocator);
+  
+  *timer_handle = (void *)timer;
+  return ret;
+}
+
+int32_t native_rcl_destroy_timer_handle(void *timer_handle) {
+  rcl_timer_t *timer = (rcl_timer_t *)timer_handle;
+
+  rcl_ret_t ret = rcl_timer_fini(timer);
+  free(timer);
+
+  return ret;
 }

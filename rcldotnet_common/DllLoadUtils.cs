@@ -59,10 +59,10 @@ namespace ROS2
             [DllImport("kernel32.dll", EntryPoint = "FreeLibrary", SetLastError = true, ExactSpelling = true)]
             private static extern int FreeLibraryDesktop(IntPtr handle);
 
-            [DllImport("libdl.so", EntryPoint = "dlopen")]
+            [DllImport("libdl.so.2", EntryPoint = "dlopen")]
             private static extern IntPtr dlopen_unix(string fileName, int flags);
 
-            [DllImport("libdl.so", EntryPoint = "dlclose")]
+            [DllImport("libdl.so.2", EntryPoint = "dlclose")]
             private static extern int dlclose_unix(IntPtr handle);
 
             [DllImport("libdl.dylib", EntryPoint = "dlopen")]
@@ -123,7 +123,7 @@ namespace ROS2
             {
                 try
                 {
-                    IntPtr ptr = dlopen_unix("libdl.so", RTLD_NOW);
+                    IntPtr ptr = dlopen_unix("libdl.so.2", RTLD_NOW);
                     dlclose_unix(ptr);
                     return true;
                 }
@@ -177,34 +177,46 @@ namespace ROS2
             IntPtr LoadLibrary(string fileName);
             void FreeLibrary(IntPtr handle);
             IntPtr GetProcAddress(IntPtr dllHandle, string name);
+            void RegisterNativeFunction<FunctionType>(IntPtr dllHandle, string nativeFunctionName,
+                out FunctionType functionDelegate) where FunctionType : Delegate;
         }
 
-        public class DllLoadUtilsUWP : DllLoadUtils
+        public abstract class DllLoadUtilsAbs : DllLoadUtils
+        {
+            public abstract IntPtr LoadLibrary(string fileName);
+
+            public abstract void FreeLibrary(IntPtr handle);
+
+            public abstract IntPtr GetProcAddress(IntPtr dllHandle, string name);
+
+            public void RegisterNativeFunction<FunctionType>(IntPtr nativeLibrary, string nativeFunctionName,
+                out FunctionType functionDelegate) where FunctionType : Delegate
+            {
+                IntPtr nativeFunctionPointer = GetProcAddress(nativeLibrary, nativeFunctionName);
+                functionDelegate = (FunctionType)Marshal.GetDelegateForFunctionPointer(nativeFunctionPointer, typeof(FunctionType));
+            }
+        }
+
+        public class DllLoadUtilsUWP : DllLoadUtilsAbs
         {
 
             [DllImport("api-ms-win-core-libraryloader-l2-1-0.dll", SetLastError = true, ExactSpelling = true)]
-            private static extern IntPtr LoadPackagedLibrary([MarshalAs(UnmanagedType.LPWStr)] string fileName, int reserved = 0);
+            private static extern IntPtr LoadPackagedLibraryUWP([MarshalAs(UnmanagedType.LPWStr)] string fileName, int reserved = 0);
 
             [DllImport("api-ms-win-core-libraryloader-l1-2-0.dll", SetLastError = true, ExactSpelling = true)]
-            private static extern int FreeLibrary(IntPtr handle);
+            private static extern int FreeLibraryUWP(IntPtr handle);
 
             [DllImport("api-ms-win-core-libraryloader-l1-2-0.dll", SetLastError = true, ExactSpelling = true)]
-            private static extern IntPtr GetProcAddress(IntPtr handle, string procedureName);
+            private static extern IntPtr GetProcAddressUWP(IntPtr handle, string procedureName);
 
-            void DllLoadUtils.FreeLibrary(IntPtr handle)
-            {
-                FreeLibrary(handle);
-            }
+            public override void FreeLibrary(IntPtr handle) => FreeLibraryUWP(handle);
 
-            IntPtr DllLoadUtils.GetProcAddress(IntPtr dllHandle, string name)
-            {
-                return GetProcAddress(dllHandle, name);
-            }
+            public override IntPtr GetProcAddress(IntPtr dllHandle, string name) => GetProcAddressUWP(dllHandle, name);
 
-            IntPtr DllLoadUtils.LoadLibrary(string fileName)
+            public override IntPtr LoadLibrary(string fileName)
             {
                 string libraryName = fileName + "_native.dll";
-                IntPtr ptr = LoadPackagedLibrary(libraryName);
+                IntPtr ptr = LoadPackagedLibraryUWP(libraryName);
                 if (ptr == IntPtr.Zero)
                 {
                     throw new UnsatisfiedLinkError(libraryName);
@@ -213,29 +225,23 @@ namespace ROS2
             }
         }
 
-        public class DllLoadUtilsWindowsDesktop : DllLoadUtils
+        public class DllLoadUtilsWindowsDesktop : DllLoadUtilsAbs
         {
 
             [DllImport("kernel32.dll", EntryPoint = "LoadLibraryA", SetLastError = true, ExactSpelling = true)]
             private static extern IntPtr LoadLibraryA(string fileName, int reserved = 0);
 
             [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-            private static extern int FreeLibrary(IntPtr handle);
+            private static extern int FreeLibraryWin(IntPtr handle);
 
             [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-            private static extern IntPtr GetProcAddress(IntPtr handle, string procedureName);
+            private static extern IntPtr GetProcAddressWin(IntPtr handle, string procedureName);
 
-            void DllLoadUtils.FreeLibrary(IntPtr handle)
-            {
-                FreeLibrary(handle);
-            }
+            public override void FreeLibrary(IntPtr handle) => FreeLibraryWin(handle);
 
-            IntPtr DllLoadUtils.GetProcAddress(IntPtr dllHandle, string name)
-            {
-                return GetProcAddress(dllHandle, name);
-            }
+            public override IntPtr GetProcAddress(IntPtr dllHandle, string name) => GetProcAddressWin(dllHandle, name);
 
-            IntPtr DllLoadUtils.LoadLibrary(string fileName)
+            public override IntPtr LoadLibrary(string fileName)
             {
                 string libraryName = fileName + "_native.dll";
                 IntPtr ptr = LoadLibraryA(libraryName);
@@ -247,29 +253,26 @@ namespace ROS2
             }
         }
 
-        internal class DllLoadUtilsUnix : DllLoadUtils
+        internal class DllLoadUtilsUnix : DllLoadUtilsAbs
         {
 
-            [DllImport("libdl.so", ExactSpelling = true)]
+            [DllImport("libdl.so.2", ExactSpelling = true)]
             private static extern IntPtr dlopen(string fileName, int flags);
 
-            [DllImport("libdl.so", ExactSpelling = true)]
+            [DllImport("libdl.so.2", ExactSpelling = true)]
             private static extern IntPtr dlsym(IntPtr handle, string symbol);
 
-            [DllImport("libdl.so", ExactSpelling = true)]
+            [DllImport("libdl.so.2", ExactSpelling = true)]
             private static extern int dlclose(IntPtr handle);
 
-            [DllImport("libdl.so", ExactSpelling = true)]
+            [DllImport("libdl.so.2", ExactSpelling = true)]
             private static extern IntPtr dlerror();
 
             private const int RTLD_NOW = 2;
 
-            public void FreeLibrary(IntPtr handle)
-            {
-                dlclose(handle);
-            }
+            public override void FreeLibrary(IntPtr handle) => dlclose(handle);
 
-            public IntPtr GetProcAddress(IntPtr dllHandle, string name)
+            public override IntPtr GetProcAddress(IntPtr dllHandle, string name)
             {
                 // clear previous errors if any
                 dlerror();
@@ -282,7 +285,7 @@ namespace ROS2
                 return res;
             }
 
-            public IntPtr LoadLibrary(string fileName)
+            public override IntPtr LoadLibrary(string fileName)
             {
                 string libraryName = "lib" + fileName + "_native.so";
                 IntPtr ptr = dlopen(libraryName, RTLD_NOW);
@@ -294,7 +297,7 @@ namespace ROS2
             }
         }
 
-        internal class DllLoadUtilsMacOSX : DllLoadUtils
+        internal class DllLoadUtilsMacOSX : DllLoadUtilsAbs
         {
 
             [DllImport("libdl.dylib", ExactSpelling = true)]
@@ -311,12 +314,12 @@ namespace ROS2
 
             private const int RTLD_NOW = 2;
 
-            public void FreeLibrary(IntPtr handle)
+            public override void FreeLibrary(IntPtr handle)
             {
                 dlclose(handle);
             }
 
-            public IntPtr GetProcAddress(IntPtr dllHandle, string name)
+            public override IntPtr GetProcAddress(IntPtr dllHandle, string name)
             {
                 // clear previous errors if any
                 dlerror();
@@ -329,7 +332,7 @@ namespace ROS2
                 return res;
             }
 
-            public IntPtr LoadLibrary(string fileName)
+            public override IntPtr LoadLibrary(string fileName)
             {
                 string libraryName = "lib" + fileName + "_native.dylib";
                 IntPtr ptr = dlopen(libraryName, RTLD_NOW);
