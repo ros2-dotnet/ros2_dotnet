@@ -28,7 +28,7 @@ namespace ROS2
     /// of the subscription handle and node handle. This also applies to publisher, service and client handles,
     /// which point to a rcl_publisher_t, rcl_service_t or rcl_client_t.
     /// </summary>
-    internal sealed class SafeSubscriptionHandle : SafeHandleZeroOrMinusOneIsInvalid
+    public sealed class SafeSubscriptionHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
         // Trick with parent handles taken from https://github.com/dotnet/corefx/pull/6366
         // Commit from early 2016, but still in current .NET as of september 2021:

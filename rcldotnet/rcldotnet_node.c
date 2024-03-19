@@ -223,7 +223,6 @@ int32_t native_rcl_action_create_server_handle(void **action_server_handle,
   rcl_action_server_options_t action_server_ops =
     rcl_action_server_get_default_options();
 
-
   rcl_ret_t ret =
     rcl_action_server_init(action_server, node, clock, ts, action_name, &action_server_ops);
 
