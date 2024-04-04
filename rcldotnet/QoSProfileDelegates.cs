@@ -17,7 +17,7 @@ using System;
 using System.Runtime.InteropServices;
 using ROS2.Utils;
 
-namespace ROS2.Qos
+namespace ROS2
 {
     internal struct RmwTime
     {

@@ -45,6 +45,8 @@ set(CS_SOURCES
   MessageStaticMemberCache.cs
   Node.cs
   Publisher.cs
+  QosProfile.cs
+  QoSProfileDelegates.cs
   RCLdotnet.cs
   RCLExceptionHelper.cs
   RCLRet.cs
@@ -66,8 +68,6 @@ set(CS_SOURCES
   ServiceDefinitionStaticMemberCache.cs
   Subscription.cs
   Timer.cs
-  QoS/QosProfile.cs
-  QoS/QoSProfileDelegates.cs
 )
 
 find_package(rcldotnet_common REQUIRED)

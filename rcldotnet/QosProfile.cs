@@ -15,7 +15,6 @@
 
 using System;
 using System.Threading;
-using ROS2.Qos;
 
 namespace ROS2
 {
@@ -208,10 +207,10 @@ namespace ROS2
 
         /// <summary>
         /// The default QoS profile.
-        /// 
+        ///
         /// Unlikely to change but valid as at 2023-10-31.
         /// https://github.com/ros2/rmw/blob/rolling/rmw/include/rmw/qos_profiles.h
-        /// 
+        ///
         /// | --------------- | --------------- |
         /// | History         | KEEP_LAST       |
         /// | Depth           | 10              |
@@ -228,7 +227,7 @@ namespace ROS2
         /// <summary>
         /// Profile for clock messages.
         /// See CreateClockProfile for more details.
-        /// 
+        ///
         /// | --------------- | --------------- |
         /// | History         | KEEP_LAST       |
         /// | Depth           | 1               |
@@ -244,10 +243,10 @@ namespace ROS2
 
         /// <summary>
         /// Profile for parameter event messages.
-        /// 
+        ///
         /// Unlikely to change but valid as at 2023-10-31.
         /// https://github.com/ros2/rmw/blob/rolling/rmw/include/rmw/qos_profiles.h
-        /// 
+        ///
         /// | --------------- | --------------- |
         /// | History         | KEEP_LAST       |
         /// | Depth           | 1000            |
@@ -263,10 +262,10 @@ namespace ROS2
 
         /// <summary>
         /// Profile for parameter messages.
-        /// 
+        ///
         /// Unlikely to change but valid as at 2023-10-31.
         /// https://github.com/ros2/rmw/blob/rolling/rmw/include/rmw/qos_profiles.h
-        /// 
+        ///
         /// | --------------- | --------------- |
         /// | History         | KEEP_LAST       |
         /// | Depth           | 1000            |
@@ -282,10 +281,10 @@ namespace ROS2
 
         /// <summary>
         /// Profile for sensor messages.
-        /// 
+        ///
         /// Unlikely to change but valid as at 2023-10-31.
         /// https://github.com/ros2/rmw/blob/rolling/rmw/include/rmw/qos_profiles.h
-        /// 
+        ///
         /// | --------------- | --------------- |
         /// | History         | KEEP_LAST       |
         /// | Depth           | 5               |
@@ -301,10 +300,10 @@ namespace ROS2
 
         /// <summary>
         /// Default profile for services.
-        /// 
+        ///
         /// Unlikely to change but valid as at 2023-10-31.
         /// https://github.com/ros2/rmw/blob/rolling/rmw/include/rmw/qos_profiles.h
-        /// 
+        ///
         /// | --------------- | --------------- |
         /// | History         | KEEP_LAST       |
         /// | Depth           | 10              |
@@ -320,10 +319,10 @@ namespace ROS2
 
         /// <summary>
         /// The system default (null) profile.
-        /// 
+        ///
         /// Unlikely to change but valid as at 2023-10-31.
         /// https://github.com/ros2/rmw/blob/rolling/rmw/include/rmw/qos_profiles.h
-        /// 
+        ///
         /// | --------------- | --------------- |
         /// | History         | SYSTEM_DEFAULT  |
         /// | Depth           | SYSTEM_DEFAULT  |
