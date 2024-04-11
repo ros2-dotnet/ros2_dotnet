@@ -1221,6 +1221,14 @@ namespace ROS2
                     WaitSetAddGuardCondition(waitSetHandle, guardCondition.Handle);
                 }
 
+                // Add timers to WaitSet before action clients and servers.
+                // As ActionClient and ActionServer also register timers internally,
+                // the order of adding them to the WaitSet has to match the execution order 
+                foreach (var timer in node.Timers)
+                {
+                    WaitSetAddTimer(waitSetHandle, timer.Handle);
+                }
+
                 foreach (var actionClient in node.ActionClients)
                 {
                     WaitSetAddActionClient(waitSetHandle, actionClient.Handle);
@@ -1229,11 +1237,6 @@ namespace ROS2
                 foreach (var actionServer in node.ActionServers)
                 {
                     WaitSetAddActionServer(waitSetHandle, actionServer.Handle);
-                }
-
-                foreach (var timer in node.Timers)
-                {
-                    WaitSetAddTimer(waitSetHandle, timer.Handle);
                 }
 
                 bool ready = Wait(waitSetHandle, timeout);
