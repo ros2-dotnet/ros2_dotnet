@@ -1221,6 +1221,17 @@ namespace ROS2
                     WaitSetAddGuardCondition(waitSetHandle, guardCondition.Handle);
                 }
 
+                foreach (var timer in node.Timers)
+                {
+                    WaitSetAddTimer(waitSetHandle, timer.Handle);
+                }
+
+                // Action clients and servers need to be registerd after all the
+                // others that are handled by
+                // RCLdotnetDelegates.native_rcl_wait_set_*_ready methods, as
+                // they track indexes of the given waitables. Adding action
+                // clients and action servers before will get those indexes
+                // mixed up.
                 foreach (var actionClient in node.ActionClients)
                 {
                     WaitSetAddActionClient(waitSetHandle, actionClient.Handle);
@@ -1229,11 +1240,6 @@ namespace ROS2
                 foreach (var actionServer in node.ActionServers)
                 {
                     WaitSetAddActionServer(waitSetHandle, actionServer.Handle);
-                }
-
-                foreach (var timer in node.Timers)
-                {
-                    WaitSetAddTimer(waitSetHandle, timer.Handle);
                 }
 
                 bool ready = Wait(waitSetHandle, timeout);
