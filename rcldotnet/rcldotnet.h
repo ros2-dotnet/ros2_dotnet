@@ -79,7 +79,7 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_timer(void *wait_set_handle, void *timer_handle);
 
 RCLDOTNET_EXPORT
-int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_guard_condition_handle(void *wait_set_handle, void *guard_condition_handle);
+int32_t RCLDOTNET_CDECL native_rcl_wait_set_add_guard_condition(void *wait_set_handle, void *guard_condition_handle);
 
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_action_client_wait_set_get_num_entries(
