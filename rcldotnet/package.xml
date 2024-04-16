@@ -23,6 +23,7 @@
   <build_depend>rcl_action</build_depend>
   <build_depend>rmw</build_depend>
   <build_depend>action_msgs</build_depend>
+  <build_depend>rosgraph_msgs</build_depend>
   <build_depend>builtin_interfaces</build_depend>
   <build_depend>unique_identifier_msgs</build_depend>
 
@@ -30,6 +31,7 @@
   <exec_depend>rcl_interfaces</exec_depend>
   <exec_depend>rcl_action</exec_depend>
   <exec_depend>action_msgs</exec_depend>
+  <exec_depend>rosgraph_msgs</exec_depend>
   <exec_depend>builtin_interfaces</exec_depend>
   <exec_depend>unique_identifier_msgs</exec_depend>
 

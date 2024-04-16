@@ -16,6 +16,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using rcl_interfaces.msg;
 using ROS2.Utils;
 
 namespace ROS2
@@ -127,6 +128,8 @@ namespace ROS2
 
     public sealed class Node
     {
+        private const string ParameterNameSimulatedTime = "use_sim_time";
+
         private readonly Clock _clock;
 
         private readonly IList<Subscription> _subscriptions;
@@ -143,6 +146,8 @@ namespace ROS2
 
         private readonly IList<Timer> _timers;
 
+        private readonly ParameterHandler _parameterHandler;
+
         internal Node(SafeNodeHandle handle)
         {
             Handle = handle;
@@ -156,6 +161,10 @@ namespace ROS2
             _actionClients = new List<ActionClient>();
             _actionServers = new List<ActionServer>();
             _timers = new List<Timer>();
+
+            _parameterHandler = new ParameterHandler(this);
+            _parameterHandler.AddOnSetParameterCallback(OnSetParameters);
+            _parameterHandler.DeclareParameter(ParameterNameSimulatedTime, false);
         }
 
         public string Name => RCLdotnet.GetStringFromNativeDelegate(NodeDelegates.native_rcl_node_get_name_handle, Handle);
@@ -189,6 +198,36 @@ namespace ROS2
         // By relying on the GC/Finalizer of SafeHandle the handle only gets
         // Disposed if the node is not live anymore.
         internal SafeNodeHandle Handle { get; }
+
+        private Subscription<rosgraph_msgs.msg.Clock> ClockSubscription { get; set; }
+
+        private void OnSetParameters(List<Parameter> parameters)
+        {
+            Parameter simulatedTimeParameter = parameters.Find(parameter => parameter.Name == ParameterNameSimulatedTime);
+            if (simulatedTimeParameter == null) return;
+
+            // Update clock setup if applicable.
+            bool subscribedToClock = ClockSubscription != null;
+            bool useSimulatedTime = simulatedTimeParameter.Value.BoolValue;
+            if (useSimulatedTime == subscribedToClock) return;
+
+            if (useSimulatedTime)
+            {
+                ClockSubscription = CreateSubscription<rosgraph_msgs.msg.Clock>("/clock", OnClockMessage, QosProfile.ClockProfile);
+                _clock.EnableRosTimeOverride();
+            }
+            else
+            {
+                DestroySubscription(ClockSubscription);
+                ClockSubscription = null;
+                _clock.DisableRosTimeOverride();
+            }
+        }
+
+        private void OnClockMessage(rosgraph_msgs.msg.Clock message)
+        {
+            _clock.SetRosTimeOverride(TimePoint.FromMsg(message.Clock_).nanoseconds);
+        }
 
         public Publisher<T> CreatePublisher<T>(string topic, QosProfile qosProfile = null) where T : IRosMessage
         {
@@ -257,6 +296,15 @@ namespace ROS2
             Subscription<T> subscription = new Subscription<T>(subscriptionHandle, callback);
             _subscriptions.Add(subscription);
             return subscription;
+        }
+
+        internal bool DestroySubscription(Subscription subscription)
+        {
+            if (!_subscriptions.Contains(subscription)) return false;
+
+            _subscriptions.Remove(subscription);
+            subscription.Handle.Dispose();
+            return true;
         }
 
         public Service<TService, TRequest, TResponse> CreateService<TService, TRequest, TResponse>(string serviceName, Action<TRequest, TResponse> callback)
@@ -414,5 +462,64 @@ namespace ROS2
         {
             return CancelResponse.Reject;
         }
+
+        #region Parameter Handling Passthroughs
+
+        public void DeclareParameter(string name, bool defaultValue = false, ParameterDescriptor descriptor = null) =>
+            _parameterHandler.DeclareParameter(name, defaultValue, descriptor);
+
+        public void DeclareParameter(string name, int defaultValue = 0, ParameterDescriptor descriptor = null) =>
+            _parameterHandler.DeclareParameter(name, defaultValue, descriptor);
+
+        public void DeclareParameter(string name, long defaultValue = 0L, ParameterDescriptor descriptor = null) =>
+            _parameterHandler.DeclareParameter(name, defaultValue, descriptor);
+
+        public void DeclareParameter(string name, float defaultValue = 0.0f, ParameterDescriptor descriptor = null) =>
+            _parameterHandler.DeclareParameter(name, defaultValue, descriptor);
+
+        public void DeclareParameter(string name, double defaultValue = 0.0, ParameterDescriptor descriptor = null) =>
+            _parameterHandler.DeclareParameter(name, defaultValue, descriptor);
+
+        public void DeclareParameter(string name, string defaultValue = "", ParameterDescriptor descriptor = null) =>
+            _parameterHandler.DeclareParameter(name, defaultValue, descriptor);
+
+        public void DeclareParameter(string name, IEnumerable<byte> defaultValue = null, ParameterDescriptor descriptor = null) =>
+            _parameterHandler.DeclareParameter(name, defaultValue, descriptor);
+
+        public void DeclareParameter(string name, IEnumerable<bool> defaultValue = null, ParameterDescriptor descriptor = null) =>
+            _parameterHandler.DeclareParameter(name, defaultValue, descriptor);
+
+        public void DeclareParameter(string name, IEnumerable<long> defaultValue = null, ParameterDescriptor descriptor = null) =>
+            _parameterHandler.DeclareParameter(name, defaultValue, descriptor);
+
+        public void DeclareParameter(string name, IEnumerable<double> defaultValue = null, ParameterDescriptor descriptor = null) =>
+            _parameterHandler.DeclareParameter(name, defaultValue, descriptor);
+
+        public void DeclareParameter(string name, IEnumerable<string> defaultValue = null, ParameterDescriptor descriptor = null) =>
+            _parameterHandler.DeclareParameter(name, defaultValue, descriptor);
+
+        public void UndeclareParameter(string name) => _parameterHandler.UndeclareParameter(name);
+
+        public List<ParameterValue> GetParameters(IEnumerable<string> names) => _parameterHandler.GetParameters(names);
+
+        public ParameterValue GetParameter(string name) => _parameterHandler.GetParameter(name);
+
+        public List<SetParametersResult> SetParameters(List<Parameter> parameters) =>
+            _parameterHandler.SetParameters(parameters);
+
+        public SetParametersResult SetParametersAtomically(List<Parameter> parameters) =>
+            _parameterHandler.SetParametersAtomically(parameters);
+
+        public SetParametersResult SetParameter(Parameter parameter) => _parameterHandler.SetParameter(parameter);
+
+        public bool HasParameter(string name) => _parameterHandler.HasParameter(name);
+
+        public void AddOnSetParameterCallback(Action<List<Parameter>> callback) =>
+            _parameterHandler.AddOnSetParameterCallback(callback);
+
+        public void RemoveOnSetParameterCallback(Action<List<Parameter>> callback) =>
+            _parameterHandler.RemoveOnSetParameterCallback(callback);
+
+        #endregion
     }
 }
