@@ -25,6 +25,14 @@ jobs:
         target-ros2-distro: foxy
         vcs-repo-file-url: ${{github.workspace}}/.github/workflows/ci.repos
         extra-cmake-args: -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -Wno-dev
+        colcon-defaults: |
+          {
+            "build": {
+              "event-handlers": [
+                  "console_direct+"
+              ]
+            }
+          }
     - uses: actions/upload-artifact@v4
       with:
         name: colcon-logs
