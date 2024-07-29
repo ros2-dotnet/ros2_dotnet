@@ -46,6 +46,7 @@ set(CS_SOURCES
   Node.cs
   Publisher.cs
   QosProfile.cs
+  QoSProfileDelegates.cs
   RCLdotnet.cs
   RCLExceptionHelper.cs
   RCLRet.cs
@@ -96,6 +97,7 @@ add_library(${PROJECT_NAME}_native SHARED
   rcldotnet_node.c
   rcldotnet_publisher.c
   rcldotnet_timer.c
+  rcldotnet_qos_profile.c
   rcldotnet.c
 )
 
