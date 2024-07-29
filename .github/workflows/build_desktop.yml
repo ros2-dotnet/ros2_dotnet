@@ -19,8 +19,22 @@ jobs:
       with:
         required-ros-distributions: foxy
     - uses: ros-tooling/action-ros-ci@v0.3
+      id: action_ros_ci_step
       with:
         package-name: rcldotnet_examples
         target-ros2-distro: foxy
         vcs-repo-file-url: ${{github.workspace}}/.github/workflows/ci.repos
         extra-cmake-args: -DCMAKE_SYSTEM_VERSION=10.0.19041.0 -Wno-dev
+        colcon-defaults: |
+          {
+            "build": {
+              "event-handlers": [
+                  "console_direct+"
+              ]
+            }
+          }
+    - uses: actions/upload-artifact@v4
+      with:
+        name: colcon-logs
+        path: ${{ steps.action_ros_ci_step.outputs.ros-workspace-directory-name }}/log
+      if: always() # upload the logs even when the build fails
