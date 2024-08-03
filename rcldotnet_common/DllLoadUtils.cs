@@ -16,6 +16,7 @@
 // Based on http://dimitry-i.blogspot.com.es/2013/01/mononet-how-to-dynamically-load-native.html
 
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace ROS2
@@ -195,6 +196,8 @@ namespace ROS2
                 IntPtr nativeFunctionPointer = GetProcAddress(nativeLibrary, nativeFunctionName);
                 functionDelegate = (FunctionType)Marshal.GetDelegateForFunctionPointer(nativeFunctionPointer, typeof(FunctionType));
             }
+
+            public const string AssemblyDirectory = "ros2";
         }
 
         public class DllLoadUtilsUWP : DllLoadUtilsAbs
@@ -215,7 +218,7 @@ namespace ROS2
 
             public override IntPtr LoadLibrary(string fileName)
             {
-                string libraryName = fileName + "_native.dll";
+                string libraryName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AssemblyDirectory, fileName + "_native.dll");
                 IntPtr ptr = LoadPackagedLibraryUWP(libraryName);
                 if (ptr == IntPtr.Zero)
                 {
@@ -227,6 +230,9 @@ namespace ROS2
 
         public class DllLoadUtilsWindowsDesktop : DllLoadUtilsAbs
         {
+
+            [DllImport("kernel32.dll", EntryPoint = "GetLastError", SetLastError = true, ExactSpelling = true)]
+            private static extern int GetLastError();
 
             [DllImport("kernel32.dll", EntryPoint = "LoadLibraryA", SetLastError = true, ExactSpelling = true)]
             private static extern IntPtr LoadLibraryA(string fileName, int reserved = 0);
@@ -243,7 +249,7 @@ namespace ROS2
 
             public override IntPtr LoadLibrary(string fileName)
             {
-                string libraryName = fileName + "_native.dll";
+                string libraryName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AssemblyDirectory, fileName + "_native.dll");
                 IntPtr ptr = LoadLibraryA(libraryName);
                 if (ptr == IntPtr.Zero)
                 {
@@ -287,7 +293,7 @@ namespace ROS2
 
             public override IntPtr LoadLibrary(string fileName)
             {
-                string libraryName = "lib" + fileName + "_native.so";
+                string libraryName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AssemblyDirectory, "lib" + fileName + "_native.so");
                 IntPtr ptr = dlopen(libraryName, RTLD_NOW);
                 if (ptr == IntPtr.Zero)
                 {
@@ -334,7 +340,7 @@ namespace ROS2
 
             public override IntPtr LoadLibrary(string fileName)
             {
-                string libraryName = "lib" + fileName + "_native.dylib";
+                string libraryName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AssemblyDirectory, "lib" + fileName + "_native.dylib");
                 IntPtr ptr = dlopen(libraryName, RTLD_NOW);
                 if (ptr == IntPtr.Zero)
                 {
