@@ -1517,17 +1517,43 @@ namespace ROS2
         public static object IMG_DATA_LOCK = new object();
         public static object POINTCLOUD_DATA_LOCK = new object();
 
-        public static byte[] GetLastPointCloudBytes(sensor_msgs.msg.PointCloud2 pointCloud2)
+
+        public static void GetLastPointCloudCopy(sensor_msgs.msg.PointCloud2 pointCloud2, ref byte[] pointCloudData)
         {
             lock (POINTCLOUD_DATA_LOCK)
             {
                 if (lastPointCloudsBytes.ContainsKey(pointCloud2))
                 {
-                    return lastPointCloudsBytes[pointCloud2];
+                    var cloudData = lastPointCloudsBytes[pointCloud2];
+
+                    // cloudData = lastPointCloudsBytes[pointCloud2];
+                    if(pointCloudData == null || pointCloudData.Length != cloudData.Length)
+                    {
+                        pointCloudData = new byte[lastPointCloudsBytes[pointCloud2].Length];
+                    }
+                    
+                    Buffer.BlockCopy(cloudData, 0, pointCloudData, 0, cloudData.Length);
+                    // Marshal.Copy(lastPointCloudsBytes[pointCloud2], 0, pointCloudData, cloudData.Length);
+                    
+                }
+                else
+                {
+                    pointCloudData = null;
                 }   
-                return null;
             }
         }
+
+        // public static byte[] GetLastPointCloudBytes(sensor_msgs.msg.PointCloud2 pointCloud2)
+        // {
+        //     lock (POINTCLOUD_DATA_LOCK)
+        //     {
+        //         if (lastPointCloudsBytes.ContainsKey(pointCloud2))
+        //         {
+        //             return lastPointCloudsBytes[pointCloud2];
+        //         }   
+        //         return null;
+        //     }
+        // }
 
         public static void HackedPointCloud__ReadFromHandle(Subscription subscription, global::System.IntPtr messageHandle, sensor_msgs.msg.PointCloud2 pointCloud2)
         {
