@@ -28,7 +28,7 @@ namespace @('.'.join(message.structure.namespaced_type.namespaces))
 {
 
 public class @(type_name) : global::ROS2.IRosMessage@(additional_interfaces_str) {
-    private static readonly DllLoadUtils dllLoadUtils;
+    public static readonly DllLoadUtils dllLoadUtils;
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array)]@
@@ -181,54 +181,54 @@ public class @(type_name) : global::ROS2.IRosMessage@(additional_interfaces_str)
     }
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr NativeGetTypeSupportType();
+    public delegate IntPtr NativeGetTypeSupportType();
 
-    private static NativeGetTypeSupportType native_get_typesupport = null;
-
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate Safe@(type_name)Handle NativeCreateNativeType();
-
-    private static NativeCreateNativeType native_create_native_message = null;
+    public static NativeGetTypeSupportType native_get_typesupport = null;
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void NativeDestroyNativeType(IntPtr messageHandle);
+    public delegate Safe@(type_name)Handle NativeCreateNativeType();
 
-    private static NativeDestroyNativeType native_destroy_native_message = null;
+    public static NativeCreateNativeType native_create_native_message = null;
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void NativeDestroyNativeType(IntPtr messageHandle);
+
+    public static NativeDestroyNativeType native_destroy_native_message = null;
 
 @[for member in message.structure.members]@
 @[    if isinstance(member.type, Array) or isinstance(member.type, AbstractSequence)]@
-    private static NativeGetField@(get_field_name(type_name, member.name))Type native_get_field_@(member.name)_message = null;
+    public static NativeGetField@(get_field_name(type_name, member.name))Type native_get_field_@(member.name)_message = null;
 @[        if isinstance(member.type, AbstractSequence)]@
-    private static NativeGetSizeField@(get_field_name(type_name, member.name))Type native_getsize_field_@(member.name)_message = null;
-    private static NativeInitSequenceField@(get_field_name(type_name, member.name))Type native_init_seqence_field_@(member.name)_message = null;
+    public static NativeGetSizeField@(get_field_name(type_name, member.name))Type native_getsize_field_@(member.name)_message = null;
+    public static NativeInitSequenceField@(get_field_name(type_name, member.name))Type native_init_seqence_field_@(member.name)_message = null;
 @[        end if]@
 @[        if isinstance(member.type.value_type, BasicType) or isinstance(member.type.value_type, AbstractString)]@
-    private static NativeWriteField@(get_field_name(type_name, member.name))Type native_write_field_@(member.name) = null;
-    private static NativeReadField@(get_field_name(type_name, member.name))Type native_read_field_@(member.name) = null;
+    public static NativeWriteField@(get_field_name(type_name, member.name))Type native_write_field_@(member.name) = null;
+    public static NativeReadField@(get_field_name(type_name, member.name))Type native_read_field_@(member.name) = null;
 @[        end if]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr NativeGetField@(get_field_name(type_name, member.name))Type(
+    public delegate IntPtr NativeGetField@(get_field_name(type_name, member.name))Type(
         IntPtr messageHandle, int index);
 @[        if isinstance(member.type, AbstractSequence)]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate int NativeGetSizeField@(get_field_name(type_name, member.name))Type(
+    public delegate int NativeGetSizeField@(get_field_name(type_name, member.name))Type(
         IntPtr messageHandle);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate bool NativeInitSequenceField@(get_field_name(type_name, member.name))Type(
+    public delegate bool NativeInitSequenceField@(get_field_name(type_name, member.name))Type(
         IntPtr messageHandle, int size);
 @[        end if]@
 @[            if isinstance(member.type.value_type, AbstractString)]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
+    public delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
         IntPtr messageHandle, [MarshalAs (UnmanagedType.LPStr)] string value);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        private delegate IntPtr NativeReadField@(get_field_name(type_name, member.name))Type(IntPtr messageHandle);
+        public delegate IntPtr NativeReadField@(get_field_name(type_name, member.name))Type(IntPtr messageHandle);
 @[            else]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate @(get_dotnet_type(member.type.value_type)) NativeReadField@(get_field_name(type_name, member.name))Type(
+    public delegate @(get_dotnet_type(member.type.value_type)) NativeReadField@(get_field_name(type_name, member.name))Type(
         IntPtr messageHandle);
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
+    public delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
         IntPtr messageHandle, @(get_dotnet_type(member.type.value_type)) value);
 @[            end if]@
 @[   elif isinstance(member.type, AbstractWString)]@
@@ -236,28 +236,28 @@ public class @(type_name) : global::ROS2.IRosMessage@(additional_interfaces_str)
 @[    elif isinstance(member.type, BasicType) or isinstance(member.type, AbstractString)]@
 @[        if isinstance(member.type, AbstractString)]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr NativeReadField@(get_field_name(type_name, member.name))Type(IntPtr messageHandle);
+    public delegate IntPtr NativeReadField@(get_field_name(type_name, member.name))Type(IntPtr messageHandle);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
+    public delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
         IntPtr messageHandle, [MarshalAs (UnmanagedType.LPStr)] string value);
 @[        else]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate @(get_dotnet_type(member.type)) NativeReadField@(get_field_name(type_name, member.name))Type(
+    public delegate @(get_dotnet_type(member.type)) NativeReadField@(get_field_name(type_name, member.name))Type(
         IntPtr messageHandle);
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
+    public delegate void NativeWriteField@(get_field_name(type_name, member.name))Type(
         IntPtr messageHandle, @(get_dotnet_type(member.type)) value);
 @[        end if]@
-    private static NativeReadField@(get_field_name(type_name, member.name))Type native_read_field_@(member.name) = null;
+    public static NativeReadField@(get_field_name(type_name, member.name))Type native_read_field_@(member.name) = null;
 
-    private static NativeWriteField@(get_field_name(type_name, member.name))Type native_write_field_@(member.name) = null;
+    public static NativeWriteField@(get_field_name(type_name, member.name))Type native_write_field_@(member.name) = null;
 @[    else]@
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    private delegate IntPtr NativeGetField@(get_field_name(type_name, member.name))Type(IntPtr messageHandle);
+    public delegate IntPtr NativeGetField@(get_field_name(type_name, member.name))Type(IntPtr messageHandle);
 
-    private static NativeGetField@(get_field_name(type_name, member.name))Type native_get_field_@(member.name)_HANDLE = null;
+    public static NativeGetField@(get_field_name(type_name, member.name))Type native_get_field_@(member.name)_HANDLE = null;
 @[    end if]@
 @[end for]@
 
@@ -407,7 +407,7 @@ public class @(type_name) : global::ROS2.IRosMessage@(additional_interfaces_str)
     }
 @[end if]@
 
-    private sealed class Safe@(type_name)Handle : global::System.Runtime.InteropServices.SafeHandle
+    public sealed class Safe@(type_name)Handle : global::System.Runtime.InteropServices.SafeHandle
     {
         public Safe@(type_name)Handle() : base(global::System.IntPtr.Zero, true) { }
 
