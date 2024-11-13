@@ -908,7 +908,7 @@ namespace ROS2
                         }
                         else if (message is sensor_msgs.msg.PointCloud2)
                         {
-                            Console.WriteLine("PointCloud2");
+                            // Console.WriteLine("PointCloud2");
                             HackedReadFromPointCloudMessageHandle(subscription, message, messageHandle);
                         }
                         else
@@ -1561,24 +1561,23 @@ namespace ROS2
             var sw = System.Diagnostics.Stopwatch.StartNew();
             lock(POINTCLOUD_DATA_LOCK)
             {
-            pointCloud2.Header.__ReadFromHandle(sensor_msgs.msg.PointCloud2.native_get_field_header_HANDLE(messageHandle));
-            pointCloud2.Height = sensor_msgs.msg.PointCloud2.native_read_field_height(messageHandle);
-            pointCloud2.Width = sensor_msgs.msg.PointCloud2.native_read_field_width(messageHandle);
-            pointCloud2.PointStep = sensor_msgs.msg.PointCloud2.native_read_field_point_step(messageHandle);
-            pointCloud2.RowStep = sensor_msgs.msg.PointCloud2.native_read_field_row_step(messageHandle);
-            pointCloud2.IsBigendian = sensor_msgs.msg.PointCloud2.native_read_field_is_bigendian(messageHandle);
-            {
-                int size = sensor_msgs.msg.PointCloud2.native_getsize_field_data_message(messageHandle);
-                HackedPointCloudMemoryCopy(subscription, messageHandle, pointCloud2, size);
-            }
-
+                pointCloud2.Header.__ReadFromHandle(sensor_msgs.msg.PointCloud2.native_get_field_header_HANDLE(messageHandle));
+                pointCloud2.Height = sensor_msgs.msg.PointCloud2.native_read_field_height(messageHandle);
+                pointCloud2.Width = sensor_msgs.msg.PointCloud2.native_read_field_width(messageHandle);
+                pointCloud2.PointStep = sensor_msgs.msg.PointCloud2.native_read_field_point_step(messageHandle);
+                pointCloud2.RowStep = sensor_msgs.msg.PointCloud2.native_read_field_row_step(messageHandle);
+                pointCloud2.IsBigendian = sensor_msgs.msg.PointCloud2.native_read_field_is_bigendian(messageHandle);
+                {
+                    int size = sensor_msgs.msg.PointCloud2.native_getsize_field_data_message(messageHandle);
+                    HackedPointCloudMemoryCopy(subscription, messageHandle, pointCloud2, size);
+                }
             }
         }
 
         public static void HackedImage__ReadFromHandle(Subscription subscription, global::System.IntPtr messageHandle, sensor_msgs.msg.Image image)  
         {
-            Debug.WriteLine("HackedImage__ReadFromHandle");
-            var sw = System.Diagnostics.Stopwatch.StartNew();
+            // Debug.WriteLine("HackedImage__ReadFromHandle");
+            // var sw = System.Diagnostics.Stopwatch.StartNew();
 
             lock(IMG_DATA_LOCK)
             {
@@ -1611,8 +1610,8 @@ namespace ROS2
                 }
             }
 
-            sw.Stop();
-            Debug.WriteLine($"HackedImage__ReadFromHandle END: {sw.ElapsedMilliseconds} ms");
+            // sw.Stop();
+            // Debug.WriteLine($"HackedImage__ReadFromHandle END: {sw.ElapsedMilliseconds} ms");
         }
 
         private static void HackedPointCloudMemoryCopy(Subscription subscription, IntPtr messageHandle, sensor_msgs.msg.PointCloud2 pointCloud2, int size__local_variable)
@@ -1653,7 +1652,7 @@ namespace ROS2
 
             if (bytes == null || bytes.Length != size__local_variable)
             {
-                Debug.WriteLine("HackedImage__ReadFromHandle: new byte buffer created");
+                // Debug.WriteLine("HackedImage__ReadFromHandle: new byte buffer created");
 
                 bytes = new byte[size__local_variable];
                 // Console.WriteLine($"makmustReleaseing new size for image subscription: {size__local_variable} subscription: {subscription.GetHashCode()}");
@@ -1703,7 +1702,7 @@ namespace ROS2
             }
             catch(Exception e)
             {
-                Debug.WriteLine("HackedImage__ReadFromHandle: exception");
+                // Debug.WriteLine("HackedImage__ReadFromHandle: exception");
             }
             finally
             {
