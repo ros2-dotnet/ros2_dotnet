@@ -47,6 +47,11 @@ namespace ROS2
 
         internal static NativeRCLOkType native_rcl_ok = null;
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLShutdownType();
+
+        internal static NativeRCLShutdownType native_rcl_shutdown = null;
+
         [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
         internal delegate RCLRet NativeRCLCreateNodeHandleType(
             ref SafeNodeHandle nodeHandle, [MarshalAs(UnmanagedType.LPStr)] string nodeName, [MarshalAs(UnmanagedType.LPStr)] string nodeNamespace);
@@ -409,6 +414,12 @@ namespace ROS2
                 (NativeRCLOkType)Marshal.GetDelegateForFunctionPointer(
                     native_rcl_ok_ptr, typeof(NativeRCLOkType));
 
+            IntPtr native_rcl_shutdown_ptr =
+                _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_shutdown");
+            RCLdotnetDelegates.native_rcl_shutdown =
+                (NativeRCLShutdownType)Marshal.GetDelegateForFunctionPointer(
+                    native_rcl_shutdown_ptr, typeof(NativeRCLShutdownType));
+
             IntPtr native_rcl_create_node_handle_ptr =
                 _dllLoadUtils.GetProcAddress(nativeLibrary, "native_rcl_create_node_handle");
             RCLdotnetDelegates.native_rcl_create_node_handle =
@@ -744,7 +755,8 @@ namespace ROS2
 
         public static bool Ok()
         {
-            return RCLdotnetDelegates.native_rcl_ok() != 0;
+            bool ret = RCLdotnetDelegates.native_rcl_ok() != 0;
+            return ret;
         }
 
         public static Node CreateNode(string nodeName)
@@ -772,6 +784,12 @@ namespace ROS2
             {
                 SpinOnce(node, 500);
             }
+        }
+
+        public static void Shutdown()
+        {
+            RCLRet ret = RCLdotnetDelegates.native_rcl_shutdown();
+            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_shutdown)}() failed.");
         }
 
         public static Clock CreateClock(ClockType type = ClockType.RosTime)

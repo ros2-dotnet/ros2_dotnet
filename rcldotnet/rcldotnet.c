@@ -83,6 +83,20 @@ int32_t native_rcl_ok() {
   return result ? 1 : 0;
 }
 
+int32_t native_rcl_shutdown() {
+  rcl_ret_t ret = rcl_shutdown(&context);
+  if (ret != RCL_RET_OK) {
+    return ret;
+  }
+  
+  // TODO: Add a `SafeContextHandle` and manipulate it's reference count
+  // in the child handles created from the context. This should be similar to
+  // `SafeNodeHandle` being referenced by `SafePublisherHandle` for example.
+  // See the documentation in rcl how the lifetime of the context object should work:
+  // https://github.com/ros2/rcl/blob/2a72dbaaf09458a998fad39d898adc9b8a60565a/rcl/include/rcl/context.h#L48-L112
+  return rcl_context_fini(&context);
+}
+
 int32_t native_rcl_create_node_handle(void **node_handle, const char *name, const char *namespace) {
   rcl_node_t *node = (rcl_node_t *)malloc(sizeof(rcl_node_t));
   *node = rcl_get_zero_initialized_node();
