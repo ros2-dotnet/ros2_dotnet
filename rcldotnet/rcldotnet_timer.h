@@ -20,4 +20,16 @@
 RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_timer_call(void *timer_handle);
 
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_timer_cancel(void *timer_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_timer_reset(void *timer_handle);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_timer_is_canceled(void *timer_handle, int32_t *is_canceled);
+
+RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_timer_is_ready(void *timer_handle, int32_t *is_ready);
+
 #endif // RCLDOTNET_TIMER_H

@@ -24,3 +24,33 @@ int32_t native_rcl_timer_call(void *timer_handle) {
 
   return rcl_timer_call(timer);
 }
+
+int32_t native_rcl_timer_cancel(void *timer_handle) {
+  rcl_timer_t *timer = (rcl_timer_t *)timer_handle;
+
+  return rcl_timer_cancel(timer);
+}
+
+int32_t native_rcl_timer_reset(void *timer_handle) {
+  rcl_timer_t *timer = (rcl_timer_t *)timer_handle;
+
+  return rcl_timer_reset(timer);
+}
+
+int32_t native_rcl_timer_is_canceled(void *timer_handle, int32_t *is_canceled) {
+  rcl_timer_t *timer = (rcl_timer_t *)timer_handle;
+
+  bool is_canceled_as_bool;
+  rcl_ret_t ret = rcl_timer_is_canceled(timer, &is_canceled_as_bool);
+  *is_canceled = is_canceled_as_bool ? 1 : 0;
+  return ret;
+}
+
+int32_t native_rcl_timer_is_ready(void *timer_handle, int32_t *is_ready) {
+  rcl_timer_t *timer = (rcl_timer_t *)timer_handle;
+
+  bool is_ready_as_bool;
+  rcl_ret_t ret = rcl_timer_is_ready(timer, &is_ready_as_bool);
+  *is_ready = is_ready_as_bool ? 1 : 0;
+  return ret;
+}
