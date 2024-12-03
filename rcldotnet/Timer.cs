@@ -25,9 +25,25 @@ namespace ROS2
     internal static class TimerDelegates
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        internal delegate RCLRet NativeRCLTimerFunctionType(SafeTimerHandle timerHandle);
+        internal delegate RCLRet NativeRCLTimerCallType(SafeTimerHandle timerHandle);
 
-        internal static NativeRCLTimerFunctionType native_rcl_timer_call = null;
+        internal static NativeRCLTimerCallType native_rcl_timer_call = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLTimerCancelType(SafeTimerHandle timerHandle);
+        internal static NativeRCLTimerCancelType native_rcl_timer_cancel = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLTimerResetType(SafeTimerHandle timerHandle);
+        internal static NativeRCLTimerResetType native_rcl_timer_reset = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLTimerIsCanceledType(SafeTimerHandle timerHandle, out int isCanceled);
+        internal static NativeRCLTimerIsCanceledType native_rcl_timer_is_canceled = null;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        internal delegate RCLRet NativeRCLTimerIsReadyType(SafeTimerHandle timerHandle, out int isReady);
+        internal static NativeRCLTimerIsReadyType native_rcl_timer_is_ready = null;
 
         static TimerDelegates()
         {
@@ -35,6 +51,10 @@ namespace ROS2
             IntPtr nativeLibrary = dllLoadUtils.LoadLibrary("rcldotnet");
 
             dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_timer_call), out native_rcl_timer_call);
+            dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_timer_cancel), out native_rcl_timer_cancel);
+            dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_timer_reset), out native_rcl_timer_reset);
+            dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_timer_is_canceled), out native_rcl_timer_is_canceled);
+            dllLoadUtils.RegisterNativeFunction(nativeLibrary, nameof(native_rcl_timer_is_ready), out native_rcl_timer_is_ready);
         }
     }
 
@@ -62,11 +82,48 @@ namespace ROS2
             Handle = handle;
         }
 
+        public void Cancel()
+        {
+            RCLRet ret = TimerDelegates.native_rcl_timer_cancel(Handle);
+            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(TimerDelegates.native_rcl_timer_cancel)}() failed.");
+        }
+
+        public void Reset()
+        {
+            RCLRet ret = TimerDelegates.native_rcl_timer_reset(Handle);
+            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(TimerDelegates.native_rcl_timer_reset)}() failed.");
+        }
+
+        public bool IsCanceled
+        {
+            get
+            {
+                RCLRet ret = TimerDelegates.native_rcl_timer_is_canceled(Handle, out int isCanceled);
+                RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(TimerDelegates.native_rcl_timer_is_canceled)}() failed.");
+                return isCanceled != 0;
+            }
+        }
+
+        public bool IsReady
+        {
+            get
+            {
+                RCLRet ret = TimerDelegates.native_rcl_timer_is_ready(Handle, out int isReady);
+                RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(TimerDelegates.native_rcl_timer_is_ready)}() failed.");
+                return isReady != 0;
+            }
+        }
+
         internal SafeTimerHandle Handle { get; }
 
         internal void Call()
         {
             RCLRet ret = TimerDelegates.native_rcl_timer_call(Handle);
+            if (ret == ROS2.RCLRet.TimerCanceled)
+            {
+                // Timer was canceled, do nothing.
+                return;
+            }
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(TimerDelegates.native_rcl_timer_call)}() failed.");
         }
 
