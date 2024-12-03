@@ -94,18 +94,24 @@ namespace ROS2
             RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(TimerDelegates.native_rcl_timer_reset)}() failed.");
         }
 
-        public bool IsCanceled()
+        public bool IsCanceled
         {
-            RCLRet ret = TimerDelegates.native_rcl_timer_is_canceled(Handle, out int isCanceled);
-            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(TimerDelegates.native_rcl_timer_is_canceled)}() failed.");
-            return isCanceled != 0;
+            get
+            {
+                RCLRet ret = TimerDelegates.native_rcl_timer_is_canceled(Handle, out int isCanceled);
+                RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(TimerDelegates.native_rcl_timer_is_canceled)}() failed.");
+                return isCanceled != 0;
+            }
         }
 
-        public bool IsReady()
+        public bool IsReady
         {
-            RCLRet ret = TimerDelegates.native_rcl_timer_is_ready(Handle, out int isReady);
-            RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(TimerDelegates.native_rcl_timer_is_ready)}() failed.");
-            return isReady != 0;
+            get
+            {
+                RCLRet ret = TimerDelegates.native_rcl_timer_is_ready(Handle, out int isReady);
+                RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(TimerDelegates.native_rcl_timer_is_ready)}() failed.");
+                return isReady != 0;
+            }
         }
 
         internal SafeTimerHandle Handle { get; }
