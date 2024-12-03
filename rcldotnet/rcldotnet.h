@@ -39,6 +39,9 @@ RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_ok();
 
 RCLDOTNET_EXPORT
+int32_t RCLDOTNET_CDECL native_rcl_shutdown();
+
+RCLDOTNET_EXPORT
 int32_t RCLDOTNET_CDECL native_rcl_create_node_handle(void **, const char *, const char *);
 
 RCLDOTNET_EXPORT
