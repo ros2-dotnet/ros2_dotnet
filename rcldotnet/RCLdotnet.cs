@@ -1488,14 +1488,29 @@ namespace ROS2
             }
         }
 
+        /// <summary>
+        /// Initialize ROS2 with app's launch arguments.
+        /// </summary>
         public static void Init()
+        {
+            string[] args = System.Environment.GetCommandLineArgs();
+            Init(args);
+        }
+
+        /// <summary>
+        /// Initialize ROS2 with supplied arguments.
+        /// </summary>
+        /// <remarks>
+        /// This is overloaded so that it can support arguments set up during run-time.
+        /// </remarks>
+        /// <param name="args">ROS2 arguments to pass along.</param>
+        public static void Init(string[] args)
         {
             lock (syncLock)
             {
                 if (!initialized)
                 {
-                    string[] args = System.Environment.GetCommandLineArgs();
-                    RCLRet ret = RCLdotnetDelegates.native_rcl_init(args.Length, args);
+                    RCLRet ret = RCLdotnetDelegates.native_rcl_init(args.Length, args.Length <= 0 ? null : args);
                     RCLExceptionHelper.CheckReturnValue(ret, $"{nameof(RCLdotnetDelegates.native_rcl_init)}() failed.");
                     initialized = true;
                 }
