@@ -26,6 +26,7 @@
 #include "rcldotnet.h"
 
 static rcl_context_t context;
+static rcl_clock_t clock;
 
 int32_t native_rcl_init(int argc, const char *argv[]) {
   context = rcl_get_zero_initialized_context();
@@ -40,6 +41,7 @@ int32_t native_rcl_init(int argc, const char *argv[]) {
     return ret;
   }
 
+  ret = rcl_clock_init(RCL_STEADY_TIME, &clock, &allocator);
   return ret;
 }
 

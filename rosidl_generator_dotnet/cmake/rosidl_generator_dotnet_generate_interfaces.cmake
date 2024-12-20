@@ -25,10 +25,10 @@ find_package(DotNETExtra REQUIRED)
 # Get a list of typesupport implementations from valid rmw implementations.
 rosidl_generator_dotnet_get_typesupports(_typesupport_impls)
 
-if(_typesupport_impls STREQUAL "")
-  message(WARNING "No valid typesupport for .NET generator. .NET messages will not be generated.")
-  return()
-endif()
+# if(_typesupport_impls STREQUAL "")
+#   message(WARNING "No valid typesupport for .NET generator. .NET messages will not be generated.")
+#   return()
+# endif()
 
 set(_output_path
   "${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_dotnet/${PROJECT_NAME}")

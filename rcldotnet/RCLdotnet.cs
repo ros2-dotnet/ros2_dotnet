@@ -18,6 +18,9 @@ using System.Runtime.InteropServices;
 using action_msgs.msg;
 using action_msgs.srv;
 using ROS2.Utils;
+using sensor_msgs.msg;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace ROS2
 {
@@ -916,7 +919,21 @@ namespace ROS2
                 switch (ret)
                 {
                     case RCLRet.Ok:
-                        ReadFromMessageHandle(message, messageHandle);
+                        if (message is sensor_msgs.msg.Image)
+                        {
+                            HackedReadFromImageMessageHandle(subscription, message, messageHandle);
+
+                        }
+                        else if (message is sensor_msgs.msg.PointCloud2)
+                        {
+                            // Console.WriteLine("PointCloud2");
+                            HackedReadFromPointCloudMessageHandle(subscription, message, messageHandle);
+                        }
+                        else
+                        {
+                            ReadFromMessageHandle(message, messageHandle);
+                        }
+
                         return true;
 
                     case RCLRet.SubscriptionTakeFailed:
@@ -1507,6 +1524,217 @@ namespace ROS2
             IntPtr ptr = RCLdotnetDelegates.native_rcl_get_rmw_identifier();
             string rmw_identifier = Marshal.PtrToStringAnsi(ptr);
             return rmw_identifier;
+        }
+
+
+        // WORKAROUND IMAGES
+        // public static Dictionary<Subscription, sensor_msgs.msg.Image> lastImages =new Dictionary<Subscription, sensor_msgs.msg.Image>();
+
+        public static Dictionary<Subscription, sensor_msgs.msg.PointCloud2> pointCloudSubscription = new Dictionary<Subscription, sensor_msgs.msg.PointCloud2>();
+
+        public static Dictionary<Subscription, sensor_msgs.msg.Image> imageSubscription = new Dictionary<Subscription, sensor_msgs.msg.Image>();
+
+        public static Dictionary<sensor_msgs.msg.Image, byte[]> lastImagesBytes = new Dictionary<Image, byte[]>();
+
+        public static Dictionary<sensor_msgs.msg.PointCloud2, byte[]> lastPointCloudsBytes = new Dictionary<sensor_msgs.msg.PointCloud2, byte[]>();
+
+        public static object IMG_DATA_LOCK = new object();
+        public static object POINTCLOUD_DATA_LOCK = new object();
+
+
+        public static void GetLastPointCloudCopy(sensor_msgs.msg.PointCloud2 pointCloud2, ref byte[] pointCloudData)
+        {
+            lock (POINTCLOUD_DATA_LOCK)
+            {
+                if (lastPointCloudsBytes.ContainsKey(pointCloud2))
+                {
+                    var cloudData = lastPointCloudsBytes[pointCloud2];
+
+                    // cloudData = lastPointCloudsBytes[pointCloud2];
+                    if(pointCloudData == null || pointCloudData.Length != cloudData.Length)
+                    {
+                        pointCloudData = new byte[lastPointCloudsBytes[pointCloud2].Length];
+                    }
+                    
+                    Buffer.BlockCopy(cloudData, 0, pointCloudData, 0, cloudData.Length);
+                    // Marshal.Copy(lastPointCloudsBytes[pointCloud2], 0, pointCloudData, cloudData.Length);
+                    
+                }
+                else
+                {
+                    pointCloudData = null;
+                }   
+            }
+        }
+
+        // public static byte[] GetLastPointCloudBytes(sensor_msgs.msg.PointCloud2 pointCloud2)
+        // {
+        //     lock (POINTCLOUD_DATA_LOCK)
+        //     {
+        //         if (lastPointCloudsBytes.ContainsKey(pointCloud2))
+        //         {
+        //             return lastPointCloudsBytes[pointCloud2];
+        //         }   
+        //         return null;
+        //     }
+        // }
+
+        public static void HackedPointCloud__ReadFromHandle(Subscription subscription, global::System.IntPtr messageHandle, sensor_msgs.msg.PointCloud2 pointCloud2)
+        {
+            Debug.WriteLine("HackedPointCloud__ReadFromHandle");
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            lock(POINTCLOUD_DATA_LOCK)
+            {
+                pointCloud2.Header.__ReadFromHandle(sensor_msgs.msg.PointCloud2.native_get_field_header_HANDLE(messageHandle));
+                pointCloud2.Height = sensor_msgs.msg.PointCloud2.native_read_field_height(messageHandle);
+                pointCloud2.Width = sensor_msgs.msg.PointCloud2.native_read_field_width(messageHandle);
+                pointCloud2.PointStep = sensor_msgs.msg.PointCloud2.native_read_field_point_step(messageHandle);
+                pointCloud2.RowStep = sensor_msgs.msg.PointCloud2.native_read_field_row_step(messageHandle);
+                pointCloud2.IsBigendian = sensor_msgs.msg.PointCloud2.native_read_field_is_bigendian(messageHandle);
+                {
+                    int size = sensor_msgs.msg.PointCloud2.native_getsize_field_data_message(messageHandle);
+                    HackedPointCloudMemoryCopy(subscription, messageHandle, pointCloud2, size);
+                }
+            }
+        }
+
+        public static void HackedImage__ReadFromHandle(Subscription subscription, global::System.IntPtr messageHandle, sensor_msgs.msg.Image image)  
+        {
+            // Debug.WriteLine("HackedImage__ReadFromHandle");
+            // var sw = System.Diagnostics.Stopwatch.StartNew();
+
+            lock(IMG_DATA_LOCK)
+            {
+            image.Header.__ReadFromHandle(sensor_msgs.msg.Image.native_get_field_header_HANDLE(messageHandle));
+            image.Height = sensor_msgs.msg.Image.native_read_field_height(messageHandle);
+            image.Width = sensor_msgs.msg.Image.native_read_field_width(messageHandle);
+            IntPtr pStr_Encoding = sensor_msgs.msg.Image.native_read_field_encoding(messageHandle);
+            image.Encoding = Marshal.PtrToStringAnsi(pStr_Encoding);
+            
+            image.IsBigendian = sensor_msgs.msg.Image.native_read_field_is_bigendian(messageHandle);
+            image.Step = sensor_msgs.msg.Image.native_read_field_step(messageHandle);
+                {
+                    int size__local_variable = sensor_msgs.msg.Image.native_getsize_field_data_message(messageHandle);
+
+                    HackedMemoryCopy(subscription, messageHandle, image, size__local_variable);
+
+                    // sw.Stop();
+
+                    // var sw2 = System.Diagnostics.Stopwatch.StartNew();
+
+                    // image.Data = new System.Collections.Generic.List<byte>(size__local_variable);
+                    // for (int i__local_variable = 0; i__local_variable < size__local_variable; i__local_variable++)
+                    // {
+                    //     image.Data.Add(sensor_msgs.msg.Image.native_read_field_data(sensor_msgs.msg.Image.native_get_field_data_message(messageHandle, i__local_variable)));
+                    // }
+
+                    // sw2.Stop();
+                    // Console.WriteLine($"copying image took: {sw.ElapsedTicks} ticks, {sw2.ElapsedTicks} ticks: {(float)(sw.ElapsedTicks - sw2.ElapsedTicks)/(float)sw.ElapsedTicks}");
+                
+                }
+            }
+
+            // sw.Stop();
+            // Debug.WriteLine($"HackedImage__ReadFromHandle END: {sw.ElapsedMilliseconds} ms");
+        }
+
+        private static void HackedPointCloudMemoryCopy(Subscription subscription, IntPtr messageHandle, sensor_msgs.msg.PointCloud2 pointCloud2, int size__local_variable)
+        {
+            IntPtr first = sensor_msgs.msg.PointCloud2.native_get_field_data_message(messageHandle, 0);
+            byte[] bytes = null;
+            if (pointCloudSubscription.ContainsKey(subscription))
+            {
+                var lastPointCloud = pointCloudSubscription[subscription];
+                bytes = lastPointCloudsBytes[lastPointCloud];
+                lastPointCloudsBytes.Remove(lastPointCloud);
+            }
+
+            if (bytes == null || bytes.Length != size__local_variable)
+            {
+                bytes = new byte[size__local_variable];
+                lastPointCloudsBytes[pointCloud2] = bytes;
+            }
+
+            Marshal.Copy(first, bytes, 0, (int)(size__local_variable));
+            lastPointCloudsBytes[pointCloud2] = bytes;
+            pointCloudSubscription[subscription] = pointCloud2;
+        }
+
+        private static void HackedMemoryCopy(Subscription subscription, IntPtr messageHandle, sensor_msgs.msg.Image image, int size__local_variable)
+        {
+            IntPtr first = sensor_msgs.msg.Image.native_get_field_data_message(messageHandle, 0);
+
+            // lastImagesHandles[image] = new Tuple<IntPtr, uint>(first, (uint)size__local_variable);
+
+            byte[] bytes = null;
+            if (imageSubscription.ContainsKey(subscription))
+            {
+                var lastImage = imageSubscription[subscription];
+                bytes = lastImagesBytes[lastImage];
+                lastImagesBytes.Remove(lastImage);
+            }
+
+            if (bytes == null || bytes.Length != size__local_variable)
+            {
+                // Debug.WriteLine("HackedImage__ReadFromHandle: new byte buffer created");
+
+                bytes = new byte[size__local_variable];
+                // Console.WriteLine($"makmustReleaseing new size for image subscription: {size__local_variable} subscription: {subscription.GetHashCode()}");
+            }
+
+
+            Marshal.Copy(first,bytes, 0, (int)(size__local_variable));
+
+            lastImagesBytes[image] = bytes;
+            imageSubscription[subscription] = image;
+        }
+
+        internal static void HackedReadFromPointCloudMessageHandle(Subscription subscription, IRosMessage message, SafeHandle messageHandle)
+        {
+            bool mustRelease = false;
+            try
+            {
+                messageHandle.DangerousAddRef(ref mustRelease);
+                HackedPointCloud__ReadFromHandle(subscription, messageHandle.DangerousGetHandle(),message as sensor_msgs.msg.PointCloud2);
+            }
+            finally
+            {
+                if (mustRelease)
+                {
+                    messageHandle.DangerousRelease();
+                }
+            }
+        }
+     
+
+        
+        internal static void HackedReadFromImageMessageHandle(Subscription subscription, IRosMessage message, SafeHandle messageHandle)
+        {
+            bool mustRelease = false;
+            try
+            {
+                // Using SafeHandles for __ReadFromHandle() is very tedious as
+                // this needs to be handled in generated code across multiple
+                // assemblies. Array and collection indexing would need to
+                // create SafeHandles everywhere. It's not worth it, especially
+                // considering the extra allocations for SafeHandles in arrays
+                // or collections that don't really represent their own native
+                // resource.
+                messageHandle.DangerousAddRef(ref mustRelease);
+                HackedImage__ReadFromHandle(subscription, messageHandle.DangerousGetHandle(),message as sensor_msgs.msg.Image);
+                //message.__ReadFromHandle(messageHandle.DangerousGetHandle());
+            }
+            catch(Exception e)
+            {
+                // Debug.WriteLine("HackedImage__ReadFromHandle: exception");
+            }
+            finally
+            {
+                if (mustRelease)
+                {
+                    messageHandle.DangerousRelease();
+                }
+            }
         }
 
         internal static void ReadFromMessageHandle(IRosMessage message, SafeHandle messageHandle)

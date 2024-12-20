@@ -42,6 +42,7 @@ namespace ROS2
             MacOSX,
             WindowsDesktop,
             UWP,
+            Android,
             Unknown
         }
 
@@ -65,6 +66,12 @@ namespace ROS2
             [DllImport("libdl.so.2", EntryPoint = "dlclose")]
             private static extern int dlclose_unix(IntPtr handle);
 
+            [DllImport("libdl.so", EntryPoint = "dlopen")]
+            private static extern IntPtr dlopen_android(string fileName, int flags);
+
+            [DllImport("libdl.so", EntryPoint = "dlclose")]
+            private static extern int dlclose_android(IntPtr handle);
+
             [DllImport("libdl.dylib", EntryPoint = "dlopen")]
             private static extern IntPtr dlopen_macosx(string fileName, int flags);
 
@@ -85,6 +92,8 @@ namespace ROS2
                         return new DllLoadUtilsWindowsDesktop();
                     case Platform.UWP:
                         return new DllLoadUtilsUWP();
+                    case Platform.Android:
+                        return new DllLoadUtilsAndroid();
                     case Platform.Unknown:
                     default:
                         throw new UnknownPlatformError();
@@ -133,6 +142,20 @@ namespace ROS2
                 }
             }
 
+            private static bool IsAndroid()
+            {
+                try
+                {
+                    IntPtr ptr = dlopen_android("libdl.so", RTLD_NOW);
+                    dlclose_android(ptr);
+                    return true;
+                }
+                catch (TypeLoadException)
+                {
+                    return false;
+                }
+            }
+
             private static bool IsMacOSX()
             {
                 try
@@ -164,6 +187,10 @@ namespace ROS2
                 else if (IsUWP())
                 {
                     return Platform.UWP;
+                }
+                else if (IsAndroid())
+                {
+                    return Platform.Android;
                 }
                 else
                 {
@@ -245,6 +272,50 @@ namespace ROS2
             {
                 string libraryName = fileName + "_native.dll";
                 IntPtr ptr = LoadLibraryA(libraryName);
+                if (ptr == IntPtr.Zero)
+                {
+                    throw new UnsatisfiedLinkError(libraryName);
+                }
+                return ptr;
+            }
+        }
+
+        internal class DllLoadUtilsAndroid : DllLoadUtilsAbs
+        {
+
+            [DllImport("libdl.so", ExactSpelling = true)]
+            private static extern IntPtr dlopen(string fileName, int flags);
+
+            [DllImport("libdl.so", ExactSpelling = true)]
+            private static extern IntPtr dlsym(IntPtr handle, string symbol);
+
+            [DllImport("libdl.so", ExactSpelling = true)]
+            private static extern int dlclose(IntPtr handle);
+
+            [DllImport("libdl.so", ExactSpelling = true)]
+            private static extern IntPtr dlerror();
+
+            private const int RTLD_NOW = 2;
+
+            public override void FreeLibrary(IntPtr handle) => dlclose(handle);
+
+            public override IntPtr GetProcAddress(IntPtr dllHandle, string name)
+            {
+                // clear previous errors if any
+                dlerror();
+                var res = dlsym(dllHandle, name);
+                var errPtr = dlerror();
+                if (errPtr != IntPtr.Zero)
+                {
+                    throw new Exception("dlsym: " + Marshal.PtrToStringAnsi(errPtr));
+                }
+                return res;
+            }
+
+            public override IntPtr LoadLibrary(string fileName)
+            {
+                string libraryName = "lib" + fileName + "_native.so";
+                IntPtr ptr = dlopen(libraryName, RTLD_NOW);
                 if (ptr == IntPtr.Zero)
                 {
                     throw new UnsatisfiedLinkError(libraryName);
